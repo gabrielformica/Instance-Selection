@@ -7,12 +7,14 @@
 #include <iostream>
 #include "is.h"
 
+const double epsilon = 0.00001;
+
 double IS::Metaheuristic::find_nearest(const Problem &p, const Instance &a) {
-    int imin = MAX;
+    double imin = 1.0 * MAX;
     double category;
     for (Problem::const_iterator it = p.begin(); it < p.end(); ++it) {
-        int dist = calc_distance(*it, a);
-        if (dist == 0) {
+        double dist = calc_distance(*it, a);
+        if (dist < epsilon) {
             category = (*it).getCategory();
             break;
         }

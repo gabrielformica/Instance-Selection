@@ -7,31 +7,29 @@
 #include <iostream>
 #include "is.h"
 
-IS::Instance IS::Metaheuristic::find_nearest(const Problem &p, const Instance &a) {
-      int min = MAX;
-      Instance ret;
-      for (Problem::const_iterator it = p.begin(); it < p.end(); ++it) {
-          int dist = calc_distance(*it, a);
-          if (dist < min) {
-            min = dist;                  
-            ret = *it;
-          }
-      }
-      return ret;
+double IS::Metaheuristic::find_nearest(const Problem &p, const Instance &a) {
+    int imin = MAX;
+    double category;
+    for (Problem::const_iterator it = p.begin(); it < p.end(); ++it) {
+        int dist = calc_distance(*it, a);
+        if (dist < imin) {
+            imin = dist;                  
+            category = (*it).getCategory();
+        }
+    }
+    return category;
 }
 
-void IS::Metaheuristic::oneNN(const Problem &training, Problem* result) {
+void IS::Metaheuristic::oneNN(const Problem &training, Problem *result) {
     Problem::iterator it;
-    for(it = result->begin(); it != result->end(); ++it) {
-        Instance nearest = find_nearest(training, *it);
-        (*it).setCategory(nearest.getCategory());
-    }
+    for(it = result->begin(); it != result->end(); ++it)
+        (*it).setCategory(find_nearest(training, *it));
 }
 
 double IS::Metaheuristic::calc_distance(const Instance &a, const Instance &b) {
     double dist = 0.0;
     assert(a.size() == b.size());
-    for(unsigned i = 0; i < a.size(); ++i)
+    for (int i = 0; i < a.size(); ++i)
         dist += (a[i] - b[i]) * (a[i] - b[i]);
     return sqrt(dist);
 }
@@ -40,14 +38,17 @@ void IS::Solution::generateRandom() {
     srand(time(NULL));
     for (int i = 0; i < size; i++) {
         int p = rand() % 100; 
-        this->bits[i] = (p > 50) ? 1 : 0;
+        this->bits[i] = (p > 10) ? 1 : 0;
     }
 }
 
 void IS::Solution::tweak() {
     srand(time(NULL));
-    int n = rand() % size;
-    this->bits[n] = ! this->bits[n];
+    int n = (rand() % bits.count()) + 1;
+    int i, j;
+    for (j = 0, i = 0; j < size && i < n; j++) if (bits.test(j)) i++;
+    assert(bits.test(j-1));
+    this->bits[j-1] = 0;
 }
 
 void IS::Metaheuristic::optimize(const IS::Problem &T, IS::Solution &S) {
@@ -56,14 +57,15 @@ void IS::Metaheuristic::optimize(const IS::Problem &T, IS::Solution &S) {
     while (1) {
         IS::Solution R(S);
         R.tweak(); 
+        assert((S.getBits() ^ R.getBits()).count() == 1);
         //TESTING
-//        std::cout << "---printing S---" << std::endl;
-//        std::cout << S.to_str() << std::endl;
-//        std::cout << "---printing S---" << std::endl;
-//
-//        std::cout << "---printing R---" << std::endl;
-//        std::cout << R.to_str() << std::endl;
-//        std::cout << "---printing R---" << std::endl;
+        //std::cout << "---printing S---" << std::endl;
+        //std::cout << S.to_str() << std::endl;
+        //std::cout << "---printing S---" << std::endl;
+
+        //std::cout << "---printing R---" << std::endl;
+        //std::cout << R.to_str() << std::endl;
+        //std::cout << "---printing R---" << std::endl;
         //TESTING
         double q1 = quality(T, R), q2 = quality(T, S);
         if (q1 > q2)
@@ -72,7 +74,7 @@ void IS::Metaheuristic::optimize(const IS::Problem &T, IS::Solution &S) {
         //TESTING
         std::cout << "---> " << max(q1, q2) << std::endl;
         //TESTING
-        if (std::max(q1, q2) > 0.95) break;
+        if (std::max(q1, q2) > 0.97) break;
     }
 }
 
@@ -93,12 +95,16 @@ double IS::Metaheuristic::quality(const IS::Problem &T, const IS::Solution &S) {
 
     //assert(result.size() == T.size());
     int count = 0;
-    //both sets will be disjoint, so this need to be change
-    //for (int i = 0; i < result.size(); i++) {
-    //    if (result[i].getCategory() != T[i].getCategory()) 
-    //        count++;
-    //}
-    //return double(count / result.size());
-    return 0.0;
+    //TODO : this is N * result.size()
+    for (int i = 0; i < result.size(); i++) {
+        for (int j = 0; j < T.size(); j++) {
+            if (result[i] == T[j]) {
+                if (result[i].getCategory() == T[j].getCategory()) 
+                    count++;
+                break;
+            }
+        }
+    }
+    std::cout << count << " / " << result.size() << std::endl;
+    return (1.0 * count) / (1.0 * result.size());
 }
-

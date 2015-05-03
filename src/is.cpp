@@ -7,25 +7,24 @@
 #include <iostream>
 #include "is.h"
 
-IS::Instance IS::Metaheuristic::find_nearest(const Problem &p, const Instance &a) {
-      int min = MAX;
-      Instance ret;
-      for (Problem::const_iterator it = p.begin(); it < p.end(); ++it) {
-          int dist = calc_distance(*it, a);
-          if (dist < min) {
-            min = dist;                  
-            ret = *it;
-          }
-      }
-      return ret;
+double IS::Metaheuristic::find_nearest(const Problem &p, const Instance &a) {
+    int imin = MAX;
+    double category;
+    for (Problem::const_iterator it = p.begin(); it < p.end(); ++it) {
+        //int dist = 0.0;
+        int dist = calc_distance(*it, a);
+        if (dist < imin) {
+            imin = dist;                  
+            category = (*it).getCategory();
+        }
+    }
+    return category;
 }
 
-void IS::Metaheuristic::oneNN(const Problem &training, Problem* result) {
+void IS::Metaheuristic::oneNN(const Problem &training, Problem *result) {
     Problem::iterator it;
-    for(it = result->begin(); it != result->end(); ++it) {
-        Instance nearest = find_nearest(training, *it);
-        (*it).setCategory(nearest.getCategory());
-    }
+    for(it = result->begin(); it != result->end(); ++it)
+        (*it).setCategory(find_nearest(training, *it));
 }
 
 double IS::Metaheuristic::calc_distance(const Instance &a, const Instance &b) {

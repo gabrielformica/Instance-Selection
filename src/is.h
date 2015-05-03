@@ -56,7 +56,7 @@ namespace IS {
       public:
         void optimize(const Problem &T, Solution &R);
         double quality(const IS::Problem &T, const IS::Solution &S);
-        IS::Instance find_nearest(const Problem &p, const Instance &a);
+        double find_nearest(const Problem &p, const Instance &a);
         void oneNN(const Problem &training, Problem *result);
         double calc_distance(const Instance &a, const Instance &b); 
         void tweak(Solution S);

@@ -21,6 +21,7 @@ IS::Problem load_data(char *file_name) {
     }
     
     IS::Problem problem = IS::Problem(instances);
+    problem.setAttrs(attrs);
 
     for(unsigned i = 0; i < instances; ++i) {
         // attrs-1 because last element of line is category
@@ -43,7 +44,17 @@ int main(int argc, char *argv[]) {
     IS::Metaheuristic ls;
     IS::Solution sol(problem.size());
 
-    // ls.optimize(&problem, &sol);
+    ls.optimize(problem, sol);
+
+    std::bitset<MAX> bits = sol.getBits();
+    for(unsigned i = 0; i < sol.getSize(); ++i) {
+        if(bits.test(i)) {
+            for(unsigned j = 0; j < problem.getAttrs()-1; ++j) {
+                cout << problem[i][j] << " ";
+            }
+            cout << problem[i].getCategory() << endl;
+        }
+    }
 
 
     //IS::Problem training = IS::Problem(training_size);

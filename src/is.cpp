@@ -12,6 +12,10 @@ double IS::Metaheuristic::find_nearest(const Problem &p, const Instance &a) {
     double category;
     for (Problem::const_iterator it = p.begin(); it < p.end(); ++it) {
         int dist = calc_distance(*it, a);
+        if (dist == 0) {
+            category = (*it).getCategory();
+            break;
+        }
         if (dist < imin) {
             imin = dist;                  
             category = (*it).getCategory();
@@ -54,6 +58,7 @@ void IS::Solution::tweak() {
 void IS::Metaheuristic::optimize(const IS::Problem &T, IS::Solution &S) {
     S.setSize(T.size());
     S.generateRandom();
+    double q_max;
     while (1) {
         IS::Solution R(S);
         R.tweak(); 
@@ -67,18 +72,22 @@ void IS::Metaheuristic::optimize(const IS::Problem &T, IS::Solution &S) {
         //std::cout << R.to_str() << std::endl;
         //std::cout << "---printing R---" << std::endl;
         //TESTING
-        double q1 = quality(T, R), q2 = quality(T, S);
+
+        // Using 0.5 beacuse paper
+        double q1 = quality(T, R, 0.5), q2 = quality(T, S, 0.5);
         if (q1 > q2)
             S.setBits(R.getBits());
         
-        //TESTING
-        std::cout << "---> " << max(q1, q2) << std::endl;
-        //TESTING
-        if (std::max(q1, q2) > 0.97) break;
+        q_max = std::max(q1, q2);
+        // std::cout << "---> " << q_max << std::endl;
+        if (q_max > 0.97) break;
     }
+    cout << "---> " << q_max << endl;
 }
 
-double IS::Metaheuristic::quality(const IS::Problem &T, const IS::Solution &S) {
+double IS::Metaheuristic::quality(const IS::Problem &T, 
+                                  const IS::Solution &S,
+                                  double alpha) {
     std::bitset<MAX> bits = S.getBits();
     IS::Problem training, result;
     int j = 0;
@@ -93,7 +102,7 @@ double IS::Metaheuristic::quality(const IS::Problem &T, const IS::Solution &S) {
 
     oneNN(training, &result);
 
-    //assert(result.size() == T.size());
+    // assert(result.size() == T.size());
     int count = 0;
     //TODO : this is N * result.size()
     for (int i = 0; i < result.size(); i++) {
@@ -105,6 +114,19 @@ double IS::Metaheuristic::quality(const IS::Problem &T, const IS::Solution &S) {
             }
         }
     }
-    std::cout << count << " / " << result.size() << std::endl;
-    return (1.0 * count) / (1.0 * result.size());
+
+    double clas_rate = (double)count/(double)result.size();
+    double perc_redc = ((double)(result.size()))/((double)T.size());
+
+    // cout << "Hubo un total de " << count << " aciertos" << endl;
+    // cout << "Result es de tamanio: " << result.size() << endl;
+    // cout << "La relación es: " << (double)count/(double)result.size() << endl;
+
+    // cout << "El tamaño de T es: " << T.size() << endl;
+    // cout << "El porcentaje de reducción es: " << perc_redc << endl;
+
+    double fitness = alpha*clas_rate + (1-alpha)*perc_redc;
+
+    // cout << "Fitness: " << fitness << endl;
+    return fitness;
 }

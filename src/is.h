@@ -9,7 +9,7 @@
 #include <bitset>
 #include <cstdlib>
 #include <ctime>
-#define MAX 10000
+#define MAX 20000
 
 using namespace std;
 
@@ -45,17 +45,21 @@ namespace IS {
     };
 
     class Problem : public std::vector<Instance> {
+      private:
+        int attrs;
       public:
         Problem() { };
         Problem(const Problem& a) : vector<Instance>(a.begin(), a.end()) { };
         Problem(int N) : std::vector<Instance>(N) {};
+        void setAttrs(int a) { attrs = a; }
+        int getAttrs() { return attrs; }
     };
 
 
     class Metaheuristic {
       public:
         void optimize(const Problem &T, Solution &R);
-        double quality(const IS::Problem &T, const IS::Solution &S);
+        double quality(const IS::Problem &T, const IS::Solution &S, double alpha);
         double find_nearest(const Problem &p, const Instance &a);
         void oneNN(const Problem &training, Problem *result);
         double calc_distance(const Instance &a, const Instance &b); 

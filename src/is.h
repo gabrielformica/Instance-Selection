@@ -40,7 +40,7 @@ namespace IS {
 
     class Problem : public std::vector<Instance> {
       public:
-        Problem();
+        Problem() { };
         Problem(const Problem& a) : vector<Instance>(a.begin(), a.end()) { };
         Problem(int N) : std::vector<Instance>(N) {};
     };

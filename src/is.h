@@ -61,7 +61,7 @@ namespace IS {
         void optimize(const Problem &T, Solution &R);
         double quality(const IS::Problem &T, const IS::Solution &S, double alpha);
         double find_nearest(const Problem &p, const Instance &a);
-        void oneNN(const Problem &training, Problem *result);
+        void oneNN(const Problem &training, const Problem &result, std::vector<double> &category);
         double calc_distance(const Instance &a, const Instance &b); 
         void tweak(Solution S);
     };

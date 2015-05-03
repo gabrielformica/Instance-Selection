@@ -44,6 +44,7 @@ int main(int argc, char *argv[]) {
     IS::Metaheuristic ls;
     IS::Solution sol(problem.size());
 
+    std::cout << ">> Local search: " << std::endl;
     ls.optimize(problem, sol);
 
     std::bitset<MAX> bits = sol.getBits();

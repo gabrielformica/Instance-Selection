@@ -24,10 +24,12 @@ double IS::Metaheuristic::find_nearest(const Problem &p, const Instance &a) {
     return category;
 }
 
-void IS::Metaheuristic::oneNN(const Problem &training, Problem *result) {
-    Problem::iterator it;
-    for(it = result->begin(); it != result->end(); ++it)
-        (*it).setCategory(find_nearest(training, *it));
+void IS::Metaheuristic::oneNN(const Problem &training, 
+                              const Problem &result, 
+                              std::vector<double> &category) {
+
+    for (int i = 0; i < result.size(); i++)
+        category[i] = find_nearest(training, result[i]);
 }
 
 double IS::Metaheuristic::calc_distance(const Instance &a, const Instance &b) {
@@ -63,24 +65,14 @@ void IS::Metaheuristic::optimize(const IS::Problem &T, IS::Solution &S) {
         IS::Solution R(S);
         R.tweak(); 
         assert((S.getBits() ^ R.getBits()).count() == 1);
-        //TESTING
-        //std::cout << "---printing S---" << std::endl;
-        //std::cout << S.to_str() << std::endl;
-        //std::cout << "---printing S---" << std::endl;
 
-        //std::cout << "---printing R---" << std::endl;
-        //std::cout << R.to_str() << std::endl;
-        //std::cout << "---printing R---" << std::endl;
-        //TESTING
-
-        // Using 0.5 beacuse paper
+        // Using 0.5 because paper
         double q1 = quality(T, R, 0.5), q2 = quality(T, S, 0.5);
         if (q1 > q2)
             S.setBits(R.getBits());
         
         q_max = std::max(q1, q2);
-        // std::cout << "---> " << q_max << std::endl;
-        if (q_max > 0.97) break;
+        if (q_max > 0.95) break;
     }
     cout << "---> " << q_max << endl;
 }
@@ -90,43 +82,33 @@ double IS::Metaheuristic::quality(const IS::Problem &T,
                                   double alpha) {
     std::bitset<MAX> bits = S.getBits();
     IS::Problem training, result;
+    std::vector<double> category;
     int j = 0;
     for (int i = 0; i < T.size(); i++) {
-        if (bits.test(i))
-            training.push_back(T[i]); 
-        else {
-            result.push_back(T[i]);
-            result[j++].setCategory(-1);
-        }
+        if (bits.test(i)) training.push_back(T[i]); 
+        else result.push_back(T[i]);
     }
 
-    oneNN(training, &result);
+    category.assign(result.size(), -1);
+    oneNN(training, result, category);
 
-    // assert(result.size() == T.size());
     int count = 0;
-    //TODO : this is N * result.size()
-    for (int i = 0; i < result.size(); i++) {
-        for (int j = 0; j < T.size(); j++) {
-            if (result[i] == T[j]) {
-                if (result[i].getCategory() == T[j].getCategory()) 
-                    count++;
-                break;
-            }
-        }
-    }
+    for (int i = 0; i < result.size(); i++)
+        if (result[i].getCategory() == category[i])
+            count++;
 
-    double clas_rate = (double)count/(double)result.size();
-    double perc_redc = ((double)(result.size()))/((double)T.size());
+    double clas_rate = (1.0 * count) / (1.0 * result.size());
+    double perc_redc = (1.0 * result.size()) / (1.0 * T.size());
 
-    // cout << "Hubo un total de " << count << " aciertos" << endl;
-    // cout << "Result es de tamanio: " << result.size() << endl;
-    // cout << "La relación es: " << (double)count/(double)result.size() << endl;
+    //cout << "Hubo un total de " << count << " aciertos" << endl;
+    //cout << "Result es de tamanio: " << result.size() << endl;
+    //cout << "La relación es: " << clas_rate << endl;
 
-    // cout << "El tamaño de T es: " << T.size() << endl;
-    // cout << "El porcentaje de reducción es: " << perc_redc << endl;
+    //cout << "El tamaño de T es: " << T.size() << endl;
+    //cout << "El porcentaje de reducción es: " << perc_redc << endl;
 
-    double fitness = alpha*clas_rate + (1-alpha)*perc_redc;
-
-    // cout << "Fitness: " << fitness << endl;
+    double fitness = alpha * clas_rate + (1 - alpha) * perc_redc;
+    cout << "El fitness es : " << fitness << std::endl;
+    assert(fitness <= 1.0);
     return fitness;
 }

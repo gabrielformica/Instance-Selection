@@ -19,9 +19,12 @@ int main() {
         T[i].setCategory(attr);
     }
 
-//    IS::Metaheuristic ls;
-//    IS::Solution sol(T.size());
-//    ls.optimize(T, sol);
+    IS::Metaheuristic ls;
+    IS::Solution sol(T.size());
+    
+    std::cout << "optimize" << std::endl;
+    ls.optimize(T, sol);
+    std::cout << "done" << std::endl;
 
 
     //IS::Problem training = IS::Problem(training_size);

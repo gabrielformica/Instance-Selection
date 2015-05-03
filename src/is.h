@@ -7,70 +7,54 @@
 #include <cmath>
 #include <vector>
 #include <bitset>
+#include <cstdlib>
+#include <ctime>
 #define MAX 10000000
 
 using namespace std;
 
 namespace IS {
+    class Instance : public std::vector<double> {
+      private:
+        double category;
+      public:
+        double getCategory() const { return category; }
+        void setCategory(double c) { category = c; }
+    }; 
 
-  class Atribute {
+    class Solution {
+      private:
+        std::bitset<MAX> bits;
+        int size;
+      public:
+        Solution(int N) : size(N) { };
+        Solution(std::bitset<MAX> a, int N) : bits(a), size(N) { };
+        Solution(const Solution &a) : bits(a.getBits()), size(a.getSize()) { };
+        int getSize() const { return size; };
+        void setSize(int n) { size = n; };
+        std::bitset<MAX> getBits() const { return bits; };
+        void setBits(std::bitset<MAX> a) { bits = a; }
+        void generateRandom(); 
+        void tweak();
+    };
 
-  };
-  
-  class Instance : public std::vector<double> {
-    private:
-      double category;
-    public:
-      double getCategory() { return category; }
-      void setCategory(double c) { category = c; }
-  }; 
-
-  class Problem : public std::vector<Instance> {
-    public:
-        Problem();
+    class Problem : public std::vector<Instance> {
+      public:
+        Problem() { };
         Problem(const Problem& a) : vector<Instance>(a.begin(), a.end()) { };
         Problem(int N) : std::vector<Instance>(N) {};
-  };
+    };
 
-  typedef std::bitset<MAX> Solution;
 
-  class Metaheuristic {
-    public:
-      virtual void optimize(const Problem &T, Solution &R) = 0;
-  };
-
-  double calc_distance(Instance a, Instance b) {
-      int i;
-      double dist = 0;
-      assert(a.size() == b.size());
-      for(unsigned i = 0; i < a.size(); ++i) {
-          dist += pow((a[i] - b[i]), 2);
-      }
-      return sqrt(dist);
-  }
-
-  Instance find_nearest(Instance a, Problem p) {
-      Problem::iterator it;
-      int min = MAX;
-      Instance ret;
-      for(it = p.begin(); it < p.end(); ++it) {
-          int dist = calc_distance(*it, a);
-          if (dist < min) {
-            min = dist;                  
-            ret = *it;
-          }
-      }
-      return ret;
-  }
-
-  void oneNN(Problem training, Problem* result) {
-      Problem::iterator it;
-      for(it = result->begin(); it != result->end(); ++it) {
-          Instance nearest = find_nearest(*it, training);
-          (*it).setCategory(nearest.getCategory());
-      }
-  }
-
+    class Metaheuristic {
+      public:
+        void optimize(const Problem &T, Solution &R);
+        double quality(const IS::Problem &T, const IS::Solution &S);
+        IS::Instance find_nearest(Problem p, Instance a);
+        void oneNN(Problem training, Problem *result);
+        double calc_distance(Instance a, Instance b); 
+        void tweak(Solution S);
+    };
 }
 
 #endif

@@ -1,36 +1,73 @@
 #include <cstdlib>
 #include <iostream>
+#include <string>
 #include <cstdio>
 #include "is.h"
 
-int main() {
-    int insts, attrs, training_size, testing_size;
-    cin >> insts >> attrs;
-    training_size = (int)floor(insts * 0.80);
-    testing_size     = (int)ceil(insts * 0.20);
+IS::Problem load_data(char *file_name) {
+    FILE *input = fopen(file_name, "r");
+    int instances, attrs;
 
-    IS::Problem training = IS::Problem(training_size);
-    IS::Problem testing = IS::Problem(testing_size);
-
-    for(unsigned i = 0; i < training_size; ++i) {
-        double attr;
-        for(unsigned j = 0; j < attrs-1; ++j) {
-            cin >> attr;
-            training[i].push_back(attr);
-        }
-        cin >> attr;
-        training[i].setCategory(attr);
+    if(input) 
+        printf("File: %s\n", file_name);
+    else {
+        perror("ERROR at data load");
+        exit(1);
     }
 
-    for(unsigned i = 0; i < testing_size; ++i) {
-        double attr;
-        for(unsigned j = 0; j < attrs-1; ++j) {
-            cin >> attr;
-            testing[i].push_back(attr);
-        }
-        cin >> attr;
-        testing[i].setCategory(attr);
+    if (fscanf(input, "%d %d", &instances, &attrs) != 2) {
+        printf("ERROR at data load: file malformed\n");
+        exit(1);
     }
+    
+    IS::Problem problem = IS::Problem(instances);
+
+    for(unsigned i = 0; i < instances; ++i) {
+        // attrs-1 because last element of line is category
+        double attr;
+        for(unsigned j = 0; j < attrs-1; ++j) { 
+            fscanf(input, "%lf", &attr);
+            problem[i].push_back(attr);
+        }
+        fscanf(input, "%lf", &attr);
+        problem[i].setCategory(attr);
+    }
+
+    return problem;
+}
+
+
+int main(int argc, char *argv[]) {
+
+    IS::Problem problem = load_data(argv[1]);
+    IS::Metaheuristic ls;
+    IS::Solution sol(problem.size());
+
+    // ls.optimize(&problem, &sol);
+
+
+    //IS::Problem training = IS::Problem(training_size);
+    //IS::Problem testing = IS::Problem(testing_size);
+
+    /*for(unsigned i = 0; i < training_size; ++i) {*/
+        //double attr;
+        //for(unsigned j = 0; j < attrs-1; ++j) {
+            //cin >> attr;
+            //training[i].push_back(attr);
+        //}
+        //cin >> attr;
+        //training[i].setCategory(attr);
+    //}
+
+    //for(unsigned i = 0; i < testing_size; ++i) {
+        //double attr;
+        //for(unsigned j = 0; j < attrs-1; ++j) {
+            //cin >> attr;
+            //testing[i].push_back(attr);
+        //}
+        //cin >> attr;
+        //testing[i].setCategory(attr);
+    /*}*/
 
     // cout << "TRAINING SET" << endl;
     // for(unsigned i = 0; i < training_size; ++i) {
@@ -50,28 +87,26 @@ int main() {
     //     cout << testing[i].getCategory() << endl;
     // }
 
-    IS::Problem result(training_size);
+  /*  IS::Problem result(testing_size);*/
 
-    for(unsigned i = 0; i < training_size; ++i) {
-        for(unsigned j = 0; j < attrs-1; ++j) {
-            result[i].push_back(training[i][j]);
-            result[i].setCategory(-1);
-        }
-    }
+    //for(unsigned i = 0; i < testing_size; ++i) {
+        //for(unsigned j = 0; j < attrs-1; ++j) {
+            //result[i].push_back(testing[i][j]);
+            //result[i].setCategory(-1);
+        //}
+    //}
 
-    oneNN(training, &result);
+    //oneNN(training, &result);
 
-    int count_error = 0;
-    for(unsigned i = 0; i < training_size; ++i) {
+    //int count_error = 0;
+    //for(unsigned i = 0; i < testing_size; ++i) {
 
-        if(training[i].getCategory() != result[i].getCategory()) {
-            cout << "test: " << testing[i].getCategory() << endl;
-            cout << "result: " << result[i].getCategory() << endl;
-            count_error++;
-        }
-    }
-    cout << "Error in " << count_error << " instances out of ";
-    cout << testing_size << ": " << (count_error*100)/testing_size << endl;
-
+        //if(testing[i].getCategory() != result[i].getCategory()) {
+            //cout << "test: " << testing[i].getCategory() << endl;
+            //cout << "result: " << result[i].getCategory() << endl;
+            //count_error++;
+        //}
+    //}
+    //cout << "Error in " << count_error << " instances out of ";
+    /*cout << testing_size << "." << endl;*/
 }
-

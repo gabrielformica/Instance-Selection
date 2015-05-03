@@ -11,7 +11,6 @@ double IS::Metaheuristic::find_nearest(const Problem &p, const Instance &a) {
     int imin = MAX;
     double category;
     for (Problem::const_iterator it = p.begin(); it < p.end(); ++it) {
-        //int dist = 0.0;
         int dist = calc_distance(*it, a);
         if (dist < imin) {
             imin = dist;                  
@@ -30,7 +29,7 @@ void IS::Metaheuristic::oneNN(const Problem &training, Problem *result) {
 double IS::Metaheuristic::calc_distance(const Instance &a, const Instance &b) {
     double dist = 0.0;
     assert(a.size() == b.size());
-    for(unsigned i = 0; i < a.size(); ++i)
+    for (int i = 0; i < a.size(); ++i)
         dist += (a[i] - b[i]) * (a[i] - b[i]);
     return sqrt(dist);
 }
@@ -56,13 +55,13 @@ void IS::Metaheuristic::optimize(const IS::Problem &T, IS::Solution &S) {
         IS::Solution R(S);
         R.tweak(); 
         //TESTING
-//        std::cout << "---printing S---" << std::endl;
-//        std::cout << S.to_str() << std::endl;
-//        std::cout << "---printing S---" << std::endl;
-//
-//        std::cout << "---printing R---" << std::endl;
-//        std::cout << R.to_str() << std::endl;
-//        std::cout << "---printing R---" << std::endl;
+        //std::cout << "---printing S---" << std::endl;
+        //std::cout << S.to_str() << std::endl;
+        //std::cout << "---printing S---" << std::endl;
+
+        //std::cout << "---printing R---" << std::endl;
+        //std::cout << R.to_str() << std::endl;
+        //std::cout << "---printing R---" << std::endl;
         //TESTING
         double q1 = quality(T, R), q2 = quality(T, S);
         if (q1 > q2)
@@ -93,11 +92,15 @@ double IS::Metaheuristic::quality(const IS::Problem &T, const IS::Solution &S) {
     //assert(result.size() == T.size());
     int count = 0;
     //both sets will be disjoint, so this need to be change
-    //for (int i = 0; i < result.size(); i++) {
-    //    if (result[i].getCategory() != T[i].getCategory()) 
-    //        count++;
-    //}
-    //return double(count / result.size());
-    return 0.0;
+    for (int i = 0; i < result.size(); i++) {
+        for (int j = 0; j < T.size(); j++) {
+            if (result[i] == T[j]) {
+                if (result[i].getCategory() == T[j].getCategory()) 
+                    count++;
+                break;
+            }
+        }
+    }
+    return (1.0 * count) / (1.0 * result.size());
 }
 

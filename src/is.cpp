@@ -38,14 +38,17 @@ void IS::Solution::generateRandom() {
     srand(time(NULL));
     for (int i = 0; i < size; i++) {
         int p = rand() % 100; 
-        this->bits[i] = (p > 50) ? 1 : 0;
+        this->bits[i] = (p > 10) ? 1 : 0;
     }
 }
 
 void IS::Solution::tweak() {
     srand(time(NULL));
-    int n = rand() % size;
-    this->bits[n] = ! this->bits[n];
+    int n = (rand() % bits.count()) + 1;
+    int i, j;
+    for (j = 0, i = 0; j < size && i < n; j++) if (bits.test(j)) i++;
+    assert(bits.test(j-1));
+    this->bits[j-1] = 0;
 }
 
 void IS::Metaheuristic::optimize(const IS::Problem &T, IS::Solution &S) {
@@ -54,6 +57,7 @@ void IS::Metaheuristic::optimize(const IS::Problem &T, IS::Solution &S) {
     while (1) {
         IS::Solution R(S);
         R.tweak(); 
+        assert((S.getBits() ^ R.getBits()).count() == 1);
         //TESTING
         //std::cout << "---printing S---" << std::endl;
         //std::cout << S.to_str() << std::endl;
@@ -70,7 +74,7 @@ void IS::Metaheuristic::optimize(const IS::Problem &T, IS::Solution &S) {
         //TESTING
         std::cout << "---> " << max(q1, q2) << std::endl;
         //TESTING
-        if (std::max(q1, q2) > 0.95) break;
+        if (std::max(q1, q2) > 0.97) break;
     }
 }
 
@@ -91,7 +95,7 @@ double IS::Metaheuristic::quality(const IS::Problem &T, const IS::Solution &S) {
 
     //assert(result.size() == T.size());
     int count = 0;
-    //both sets will be disjoint, so this need to be change
+    //TODO : this is N * result.size()
     for (int i = 0; i < result.size(); i++) {
         for (int j = 0; j < T.size(); j++) {
             if (result[i] == T[j]) {
@@ -101,6 +105,6 @@ double IS::Metaheuristic::quality(const IS::Problem &T, const IS::Solution &S) {
             }
         }
     }
+    std::cout << count << " / " << result.size() << std::endl;
     return (1.0 * count) / (1.0 * result.size());
 }
-

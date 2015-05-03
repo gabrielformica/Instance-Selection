@@ -1,11 +1,13 @@
+#include <cstdlib>
 #include <iostream>
+#include <cstdio>
 #include "is.h"
 
 int main() {
     int insts, attrs, training_size, testing_size;
     cin >> insts >> attrs;
-    training_size = (int)floor(insts * 0.70);
-    testing_size     = (int)ceil(insts * 0.30);
+    training_size = (int)floor(insts * 0.80);
+    testing_size     = (int)ceil(insts * 0.20);
 
     IS::Problem training = IS::Problem(training_size);
     IS::Problem testing = IS::Problem(testing_size);
@@ -48,11 +50,11 @@ int main() {
     //     cout << testing[i].getCategory() << endl;
     // }
 
-    IS::Problem result(testing_size);
+    IS::Problem result(training_size);
 
-    for(unsigned i = 0; i < testing_size; ++i) {
+    for(unsigned i = 0; i < training_size; ++i) {
         for(unsigned j = 0; j < attrs-1; ++j) {
-            result[i].push_back(testing[i][j]);
+            result[i].push_back(training[i][j]);
             result[i].setCategory(-1);
         }
     }
@@ -60,15 +62,16 @@ int main() {
     oneNN(training, &result);
 
     int count_error = 0;
-    for(unsigned i = 0; i < testing_size; ++i) {
+    for(unsigned i = 0; i < training_size; ++i) {
 
-        if(testing[i].getCategory() != result[i].getCategory()) {
+        if(training[i].getCategory() != result[i].getCategory()) {
             cout << "test: " << testing[i].getCategory() << endl;
             cout << "result: " << result[i].getCategory() << endl;
             count_error++;
         }
     }
     cout << "Error in " << count_error << " instances out of ";
-    cout << testing_size << "." << endl;
+    cout << testing_size << ": " << (count_error*100)/testing_size << endl;
+
 }
 

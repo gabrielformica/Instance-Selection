@@ -19,6 +19,8 @@
 \usepackage{times}
 \usepackage{url}
 \usepackage{latexsym}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
 \usepackage[utf8]{inputenc}
 
 %\setlength\titlebox{5cm}
@@ -90,6 +92,47 @@ de estar en la solución. Si bien en la literatura, lo común es
 que $\rho$ sea igual a $0.5$, de manera de comenzar con un solución
 de $50\%$, en nuestro caso hemos hecho $\rho = 0.1$. Esto nos genera
 solucción con una reducción del $90\%$.
+
+\section{Función de evaluación}
+En [referencia a cano] se describe una función de evaluación que considera la tasa de instancias clasificadas correctamente tomando en cuenta el conjunto reducido como conjunto de entrenamiento y una tasa de reducción del conjunto original. Se hace uso de una constante $\alpha$ donde $\alpha \in [0,1]$ para darle ponderación a ambos parámetros. La fórmula usada para medir la calidad de una solución es:
+
+\begin{center}
+    $ evaluar(R) = \alpha \times tasa\_clas + (1 - \alpha) \times porcen\_redc $
+\end{center}
+
+El objetivo de un algoritmo es maximizar esta función, entonces si $evaluar(A) < evaluar(B)$, se tiene que $B$ es mejor solución que $A$. Para los experimentos se usó la tasa sugerida por [referencia a cano] de $\alpha = 0.5$ dándole la misma ponderación a $tasa\_clas$ y a $porcen\_redc$.
+
+\section{Algoritmos}
+
+\subsection{Búsqueda local}
+    Para la búsqueda local se hace uso de un algoritmo inspirado en \emph{hill-climbing} el cual toma una solución inicial y tiene como objetivo mejorarla haciendo uso de un operador $op: S \to S$.
+
+    \begin{algorithmic}
+        \Function{BusquedaLocal}{$T: \text{Problema}$}
+            \State $S \gets \text{solucionAleatoria()}$
+            \While{\text{$\lnot condicionDeParada$}}
+                \State $R \gets S$
+                \State $R \gets operador(R)$
+                \If{\Call{calidad}{R,T} $<$ \Call{calidad}{S,T}}
+                    \State $S \gets R$
+                \EndIf
+            \EndWhile
+            \State return $S$
+        \EndFunction
+    \end{algorithmic}
+
+\subsection{1NN}
+    Para el cálculo de la calidad de una solución, se hace uso del clasificador $1NN$ que clasifica un conjunto usando un conjunto definido como entrenamiento. Sobre los resultados obtenidos de $1NN$ se corre una función de evaluación que asinga un valor a la solución.
+
+    \begin{algorithmic}
+        \Function{Calidad}{$S: \text{Solución}$, $T: \text{Problema}$}
+            \State \text{Problema entrenamiento}
+            \State \text{Problema resultado}
+            \State $resultado \gets \Call{1NN}{entrenamiento, T}$
+            \State retorna eval(resultado)
+        \EndFunction
+    \end{algorithmic}
+
 
 
 \subsection{Format of Electronic Manuscript}

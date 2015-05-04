@@ -47,15 +47,18 @@ int main(int argc, char *argv[]) {
     std::cout << ">> Local search: " << std::endl;
     ls.optimize(problem, sol);
 
+    int count = 0;
     std::bitset<MAX> bits = sol.getBits();
     for(unsigned i = 0; i < sol.getSize(); ++i) {
         if(bits.test(i)) {
+            count++;
             for(unsigned j = 0; j < problem.getAttrs()-1; ++j) {
                 cout << problem[i][j] << " ";
             }
             cout << problem[i].getCategory() << endl;
         }
     }
+    cout << "Solution of size: " << count << endl;
 
 
     //IS::Problem training = IS::Problem(training_size);

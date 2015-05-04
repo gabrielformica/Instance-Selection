@@ -1,325 +1,401 @@
-% ****** Start of file aipsamp.tex ******
 %
-%   This file is part of the AIP files in the AIP distribution for REVTeX 4.
-%   Version 4.1 of REVTeX, October 2009
+% File acl2014.tex
 %
-%   Copyright (c) 2009 American Institute of Physics.
-%
-%   See the AIP README file for restrictions and more information.
-%
-% TeX'ing this file requires that you have AMS-LaTeX 2.0 installed
-% as well as the rest of the prerequisites for REVTeX 4.1
-%
-% It also requires running BibTeX. The commands are as follows:
-%
-%  1)  latex  aipsamp
-%  2)  bibtex aipsamp
-%  3)  latex  aipsamp
-%  4)  latex  aipsamp
-%
-% Use this file as a source of example code for your aip document.
-% Use the file aiptemplate.tex as a template for your document.
-\documentclass[%
- aip,
- jmp,%
- amsmath,amssymb,
-%preprint,%
- reprint,%
-%author-year,%
-%author-numerical,%
-]{revtex4-1}
+% Contact: koller@ling.uni-potsdam.de, yusuke@nii.ac.jp
+%%
+%% Based on the style files for ACL-2013, which were, in turn,
+%% Based on the style files for ACL-2012, which were, in turn,
+%% based on the style files for ACL-2011, which were, in turn, 
+%% based on the style files for ACL-2010, which were, in turn, 
+%% based on the style files for ACL-IJCNLP-2009, which were, in turn,
+%% based on the style files for EACL-2009 and IJCNLP-2008...
 
-\usepackage{graphicx}% Include figure files
-\usepackage{dcolumn}% Align table columns on decimal point
-\usepackage[utf8]{inputenc}% bold math
-%\usepackage[mathlines]{lineno}% Enable numbering of text and display math
-%\linenumbers\relax % Commence numbering lines
+%% Based on the style files for EACL 2006 by 
+%%e.agirre@ehu.es or Sergi.Balari@uab.es
+%% and that of ACL 08 by Joakim Nivre and Noah Smith
+
+\documentclass[11pt]{article}
+\usepackage{paper}
+\usepackage{times}
+\usepackage{url}
+\usepackage{latexsym}
+\usepackage[utf8]{inputenc}
+
+%\setlength\titlebox{5cm}
+
+% You can expand the titlebox if you need extra space
+% to show all the authors. Please do not make the titlebox
+% smaller than 5cm (the original size); we will check this
+% in the camera-ready version and ask you to change it back.
+
+
+\title{Selección de Instancias}
+
+\author{Formica, Gabriel\\
+  Universidad Simón Bolívar\\
+  Caracas, Venezuela\\
+  {gabrielformica93@gmail.com} \\\And
+  Ponte, José Antonio\\
+  Universidad Simón Bolívar\\
+  Caracas, Venezuela\\
+  {pontezambrano@gmail.com} \\}
+
+\date{}
 
 \begin{document}
-
-\preprint{AIP/123-QED}
-
-\title[Sample title]{Selección de Instancias}% Force line breaks with \\
-
-\author{Formica, Gabriel}
-\author{Ponte, José Antonio}%
-\affiliation{ 
-Universidad Simón Bolívar%\\This line break forced with \textbackslash\textbackslash
-}%
-
-\author{C. Author}
- \homepage{http://www.Second.institution.edu/~Charlie.Author.}
-\affiliation{%
-Universidad Simón Bolívar%\\This line break forced% with \\
-}%
-
-\date{\today}% It is always \today, today,
-             %  but any date may be explicitly specified
-
+\maketitle
 \begin{abstract}
+  El problema de \textit{Selección de Instancias} (IS por sus siglas en inglés), busca
+  escoger un subconjunto de instancias de menor cardinalidad del conjunto original
+  que mantenga o mejore la clasificación de las muestras a ser usadas como un conjunto
+  de entrenamiento. En este articulo se considera la resolución de este problema
+  mediante varios algoritmos metaheurísticos, finalizando con los resultados 
+  experimentales y comparaciones entre ellos.
 \end{abstract}
 
-\pacs{Valid PACS appear here}% PACS, the Physics and Astronomy
-                             % Classification Scheme.
-\keywords{Suggested keywords}%Use showkeys class option if keyword
-                              %display desired
-\maketitle
+\section{Definición del Problema}
 
-\begin{quotation}
-The ``lead paragraph'' is encapsulated with the \LaTeX\ 
-\verb+quotation+ environment and is formatted as a single paragraph before the first section heading. 
-(The \verb+quotation+ environment reverts to its usual meaning after the first sectioning command.) 
-Note that numbered references are allowed in the lead paragraph.
-%
-The lead paragraph will only be found in an article being prepared for the journal \textit{Chaos}.
-\end{quotation}
+Un conjunto de datos se define en función de un conjunto de clases $\Omega$ y
+un conjunto de $n$ observaciones $T$. Un problema de SI se define entonces como dicho 
+conjunto de instancias 
+$T = \{t_{1}, t_{2},..., t_{n}\}$, donde una instancia (observación) $t_{i}$ es
+una tupla $t_{i} = (v_{i,1}, v_{i,2},...,v_{i,m})$ de $m$ valores/mediciones
+(un punto en un espacio m-dimensional). Además, cada instancia $t_{i}$
+pertenece a una clase $w_{t_{i}}  \epsilon  \Omega$. 
 
-\section{\label{sec:level1}First-level heading}
+La idea es seleccionar un subconjuto de menor cardinalidad 
+$R \subseteq T$ tal que $R$ mantega o mejore la capacidad 
+de representación del conjunto $T$.
 
-This sample document demonstrates proper use of REV\TeX~4.1 (and
-\LaTeXe) in manuscripts prepared for submission to AIP
-journals. Further information can be found in the documentation included in the distribution or available at
-\url{http://authors.aip.org} and in the documentation for 
-REV\TeX~4.1 itself.
+\section{Descripción de la solución}
 
-When commands are referred to in this example file, they are always
-shown with their required arguments, using normal \TeX{} format. In
-this format, \verb+#1+, \verb+#2+, etc. stand for required
-author-supplied arguments to commands. For example, in
-\verb+\section{#1}+ the \verb+#1+ stands for the title text of the
-author's section heading, and in \verb+\title{#1}+ the \verb+#1+
-stands for the title text of the paper.
+En esta sección se muestra al lector el proceso de construcción de una 
+solución. Especificamente, se muestra cómo se representa una solución,
+cómo se generan las soluciones iniciales, y finalmente, se incluye 
+el pseudocódigo de la metaheurística implementada.
 
-Line breaks in section headings at all levels can be introduced using
-\textbackslash\textbackslash. A blank input line tells \TeX\ that the
-paragraph has ended. 
+\subsection{Representación}
 
-\subsection{\label{sec:level2}Second-level heading: Formatting}
+Sea un conjunto inicial $T$, una solución al problema de SI está
+dado por un subconjuto de instancias $R$,
+que puede ser fácilmente representado por una cadena de bits de 
+tamaño $n = |T|$ donde cada bit tiene valor 1/0, indicando respectivamente,
+la pertenencia o no de una instancia $t_{i} \epsilon T$ en la solución. 
 
-This file may be formatted in both the \texttt{preprint} (the default) and
-\texttt{reprint} styles; the latter format may be used to 
-mimic final journal output. Either format may be used for submission
-purposes; however, for peer review and production, AIP will format the
-article using the \texttt{preprint} class option. Hence, it is
-essential that authors check that their manuscripts format acceptably
-under \texttt{preprint}. Manuscripts submitted to AIP that do not
-format correctly under the \texttt{preprint} option may be delayed in
-both the editorial and production processes.
+\subsection{Generación de soluciones iniciales}
 
-The \texttt{widetext} environment will make the text the width of the
-full page, as on page~\pageref{eq:wideeq}. (Note the use the
-\verb+\pageref{#1}+ to get the page number right automatically.) The
-width-changing commands only take effect in \texttt{twocolumn}
-formatting. It has no effect if \texttt{preprint} formatting is chosen
-instead.
+Siendo una representación una cadena de bits, para generar una solución
+inicial seguimos una estrategia muy sencilla: cada bit tiene una probabilidad $\rho$
+de estar en la solución. Si bien en la literatura, lo común es
+que $\rho$ sea igual a $0.5$, de manera de comenzar con un solución
+de $50\%$, en nuestro caso hemos hecho $\rho = 0.1$. Esto nos genera
+solucción con una reducción del $90\%$.
 
-\subsubsection{\label{sec:level3}Third-level heading: Citations and Footnotes}
 
-Citations in text refer to entries in the Bibliography;
-they use the commands \verb+\cite{#1}+ or \verb+\onlinecite{#1}+. 
-Because REV\TeX\ uses the \verb+natbib+ package of Patrick Daly, 
-its entire repertoire of commands are available in your document;
-see the \verb+natbib+ documentation for further details.
-The argument of \verb+\cite+ is a comma-separated list of \emph{keys};
-a key may consist of letters and numerals. 
+\subsection{Format of Electronic Manuscript}
+\label{sect:pdf}
 
-By default, citations are numerical; \cite{feyn54} author-year citations are an option. 
-To give a textual citation, use \verb+\onlinecite{#1}+: (Refs.~\onlinecite{witten2001,epr,Bire82}). 
-REV\TeX\ ``collapses'' lists of consecutive numerical citations when appropriate. 
-REV\TeX\ provides the ability to properly punctuate textual citations in author-year style;
-this facility works correctly with numerical citations only with \texttt{natbib}'s compress option turned off. 
-To illustrate, we cite several together \cite{feyn54,witten2001,epr,Berman1983}, 
-and once again (Refs.~\onlinecite{epr,feyn54,Bire82,Berman1983}). 
-Note that, when numerical citations are used, the references were sorted into the same order they appear in the bibliography. 
+For the production of the electronic manuscript you must use Adobe's
+Portable Document Format (PDF). PDF files are usually produced from
+\LaTeX\ using the \textit{pdflatex} command. If your version of
+\LaTeX\ produces Postscript files, you can convert these into PDF
+using \textit{ps2pdf} or \textit{dvipdf}. On Windows, you can also use
+Adobe Distiller to generate PDF.
 
-A reference within the bibliography is specified with a \verb+\bibitem{#1}+ command,
-where the argument is the citation key mentioned above. 
-\verb+\bibitem{#1}+ commands may be crafted by hand or, preferably,
-generated by using Bib\TeX. 
-The AIP styles for REV\TeX~4 include Bib\TeX\ style files
-\verb+aipnum.bst+ and \verb+aipauth.bst+, appropriate for
-numbered and author-year bibliographies,
-respectively. 
-REV\TeX~4 will automatically choose the style appropriate for 
-the document's selected class options: the default is numerical, and
-you obtain the author-year style by specifying a class option of \verb+author-year+.
+Please make sure that your PDF file includes all the necessary fonts
+(especially tree diagrams, symbols, and fonts with Asian
+characters). When you print or create the PDF file, there is usually
+an option in your printer setup to include none, all or just
+non-standard fonts.  Please make sure that you select the option of
+including ALL the fonts. \textbf{Before sending it, test your PDF by
+  printing it from a computer different from the one where it was
+  created.} Moreover, some word processors may generate very large PDF
+files, where each page is rendered as an image. Such images may
+reproduce poorly. In this case, try alternative ways to obtain the
+PDF. One way on some systems is to install a driver for a postscript
+printer, send your document to the printer specifying ``Output to a
+file'', then convert the file to PDF.
 
-This sample file demonstrates a simple use of Bib\TeX\ 
-via a \verb+\bibliography+ command referencing the \verb+aipsamp.bib+ file.
-Running Bib\TeX\ (in this case \texttt{bibtex
-aipsamp}) after the first pass of \LaTeX\ produces the file
-\verb+aipsamp.bbl+ which contains the automatically formatted
-\verb+\bibitem+ commands (including extra markup information via
-\verb+\bibinfo+ commands). If not using Bib\TeX, the
-\verb+thebibiliography+ environment should be used instead.
+It is of utmost importance to specify the \textbf{A4 format} (21 cm
+x 29.7 cm) when formatting the paper. When working with
+{\tt dvips}, for instance, one should specify {\tt -t a4}.
 
-\paragraph{Fourth-level heading is run in.}%
-Footnotes are produced using the \verb+\footnote{#1}+ command. 
-Numerical style citations put footnotes into the 
-bibliography\footnote{Automatically placing footnotes into the bibliography requires using BibTeX to compile the bibliography.}.
-Author-year and numerical author-year citation styles (each for its own reason) cannot use this method. 
-Note: due to the method used to place footnotes in the bibliography, \emph{you
-must re-run BibTeX every time you change any of your document's
-footnotes}. 
+Print-outs of the PDF file on A4 paper should be identical to the
+hardcopy version. If you cannot meet the above requirements about the
+production of your electronic submission, please contact the
+publication chairs as soon as possible.
 
-\section{Math and Equations}
-Inline math may be typeset using the \verb+$+ delimiters. Bold math
-symbols may be achieved using the \verb+bm+ package and the
-\verb+\bm{#1}+ command it supplies. For instance, a bold $\alpha$ can
-be typeset as \verb+$\bm{\alpha}$+ giving $\bm{\alpha}$. Fraktur and
-Blackboard (or open face or double struck) characters should be
-typeset using the \verb+\mathfrak{#1}+ and \verb+\mathbb{#1}+ commands
-respectively. Both are supplied by the \texttt{amssymb} package. For
-example, \verb+$\mathbb{R}$+ gives $\mathbb{R}$ and
-\verb+$\mathfrak{G}$+ gives $\mathfrak{G}$
 
-In \LaTeX\ there are many different ways to display equations, and a
-few preferred ways are noted below. Displayed math will center by
-default. Use the class option \verb+fleqn+ to flush equations left.
+\subsection{Layout}
+\label{ssec:layout}
 
-Below we have numbered single-line equations, the most common kind: 
-\begin{eqnarray}
-\chi_+(p)\alt{\bf [}2|{\bf p}|(|{\bf p}|+p_z){\bf ]}^{-1/2}
-\left(
-\begin{array}{c}
-|{\bf p}|+p_z\\
-px+ip_y
-\end{array}\right)\;,
-\\
-\left\{%
- \openone234567890abc123\alpha\beta\gamma\delta1234556\alpha\beta
- \frac{1\sum^{a}_{b}}{A^2}%
-\right\}%
-\label{eq:one}.
-\end{eqnarray}
-Note the open one in Eq.~(\ref{eq:one}).
+Format manuscripts two columns to a page, in the manner these
+instructions are formatted. The exact dimensions for a page on A4
+paper are:
 
-Not all numbered equations will fit within a narrow column this
-way. The equation number will move down automatically if it cannot fit
-on the same line with a one-line equation:
-\begin{equation}
-\left\{
- ab12345678abc123456abcdef\alpha\beta\gamma\delta1234556\alpha\beta
- \frac{1\sum^{a}_{b}}{A^2}%
-\right\}.
-\end{equation}
+\begin{itemize}
+\item Left and right margins: 2.5 cm
+\item Top margin: 2.5 cm
+\item Bottom margin: 2.5 cm
+\item Column width: 7.7 cm
+\item Column height: 24.7 cm
+\item Gap between columns: 0.6 cm
+\end{itemize}
 
-When the \verb+\label{#1}+ command is used [cf. input for
-Eq.~(\ref{eq:one})], the equation can be referred to in text without
-knowing the equation number that \TeX\ will assign to it. Just
-use \verb+\ref{#1}+, where \verb+#1+ is the same name that used in
-the \verb+\label{#1}+ command.
+\noindent Papers should not be submitted on any other paper size.
+ If you cannot meet the above requirements about the production of your electronic submission, please contact the publication chairs above as soon as possible.
 
-Unnumbered single-line equations can be typeset
-using the \verb+\[+, \verb+\]+ format:
-\[g^+g^+ \rightarrow g^+g^+g^+g^+ \dots ~,~~q^+q^+\rightarrow
-q^+g^+g^+ \dots ~. \]
 
-\subsection{Multiline equations}
+\subsection{Fonts}
 
-Multiline equations are obtained by using the \verb+eqnarray+
-environment.  Use the \verb+\nonumber+ command at the end of each line
-to avoid assigning a number:
-\begin{eqnarray}
-{\cal M}=&&ig_Z^2(4E_1E_2)^{1/2}(l_i^2)^{-1}
-\delta_{\sigma_1,-\sigma_2}
-(g_{\sigma_2}^e)^2\chi_{-\sigma_2}(p_2)\nonumber\\
-&&\times
-[\epsilon_jl_i\epsilon_i]_{\sigma_1}\chi_{\sigma_1}(p_1),
-\end{eqnarray}
-\begin{eqnarray}
-\sum \vert M^{\text{viol}}_g \vert ^2&=&g^{2n-4}_S(Q^2)~N^{n-2}
-        (N^2-1)\nonumber \\
- & &\times \left( \sum_{i<j}\right)
-  \sum_{\text{perm}}
- \frac{1}{S_{12}}
- \frac{1}{S_{12}}
- \sum_\tau c^f_\tau~.
-\end{eqnarray}
-\textbf{Note:} Do not use \verb+\label{#1}+ on a line of a multiline
-equation if \verb+\nonumber+ is also used on that line. Incorrect
-cross-referencing will result. Notice the use \verb+\text{#1}+ for
-using a Roman font within a math environment.
+For reasons of uniformity, Adobe's {\bf Times Roman} font should be
+used. In \LaTeX2e{} this is accomplished by putting
 
-To set a multiline equation without \emph{any} equation
-numbers, use the \verb+\begin{eqnarray*}+,
-\verb+\end{eqnarray*}+ format:
-\begin{eqnarray*}
-\sum \vert M^{\text{viol}}_g \vert ^2&=&g^{2n-4}_S(Q^2)~N^{n-2}
-        (N^2-1)\\
- & &\times \left( \sum_{i<j}\right)
- \left(
-  \sum_{\text{perm}}\frac{1}{S_{12}S_{23}S_{n1}}
- \right)
- \frac{1}{S_{12}}~.
-\end{eqnarray*}
-To obtain numbers not normally produced by the automatic numbering,
-use the \verb+\tag{#1}+ command, where \verb+#1+ is the desired
-equation number. For example, to get an equation number of
-(\ref{eq:mynum}),
-\begin{equation}
-g^+g^+ \rightarrow g^+g^+g^+g^+ \dots ~,~~q^+q^+\rightarrow
-q^+g^+g^+ \dots ~. \tag{2.6$'$}\label{eq:mynum}
-\end{equation}
+\begin{quote}
+\begin{verbatim}
+\usepackage{times}
+\usepackage{latexsym}
+\end{verbatim}
+\end{quote}
+in the preamble. If Times Roman is unavailable, use {\bf Computer
+  Modern Roman} (\LaTeX2e{}'s default).  Note that the latter is about
+  10\% less dense than Adobe's Times Roman font.
 
-A few notes on \verb=\tag{#1}=. \verb+\tag{#1}+ requires
-\texttt{amsmath}. The \verb+\tag{#1}+ must come before the
-\verb+\label{#1}+, if any. The numbering set with \verb+\tag{#1}+ is
-\textit{transparent} to the automatic numbering in REV\TeX{};
-therefore, the number must be known ahead of time, and it must be
-manually adjusted if other equations are added. \verb+\tag{#1}+ works
-with both single-line and multiline equations. \verb+\tag{#1}+ should
-only be used in exceptional case - do not use it to number all
-equations in a paper.
 
-Enclosing single-line and multiline equations in
-\verb+\begin{subequations}+ and \verb+\end{subequations}+ will produce
-a set of equations that are ``numbered'' with letters, as shown in
-Eqs.~(\ref{subeq:1}) and (\ref{subeq:2}) below:
-\begin{subequations}
-\label{eq:whole}
-\begin{equation}
-\left\{
- abc123456abcdef\alpha\beta\gamma\delta1234556\alpha\beta
- \frac{1\sum^{a}_{b}}{A^2}
-\right\},\label{subeq:1}
-\end{equation}
-\begin{eqnarray}
-{\cal M}=&&ig_Z^2(4E_1E_2)^{1/2}(l_i^2)^{-1}
-(g_{\sigma_2}^e)^2\chi_{-\sigma_2}(p_2)\nonumber\\
-&&\times
-[\epsilon_i]_{\sigma_1}\chi_{\sigma_1}(p_1).\label{subeq:2}
-\end{eqnarray}
-\end{subequations}
-Putting a \verb+\label{#1}+ command right after the
-\verb+\begin{subequations}+, allows one to
-reference all the equations in a subequations environment. For
-example, the equations in the preceding subequations environment were
-Eqs.~(\ref{eq:whole}).
+\begin{table}[h]
+\begin{center}
+\begin{tabular}{|l|rl|}
+\hline \bf Type of Text & \bf Font Size & \bf Style \\ \hline
+paper title & 15 pt & bold \\
+author names & 12 pt & bold \\
+author affiliation & 12 pt & \\
+the word ``Abstract'' & 12 pt & bold \\
+section titles & 12 pt & bold \\
+document text & 11 pt  &\\
+captions & 11 pt & \\
+abstract text & 10 pt & \\
+bibliography & 10 pt & \\
+footnotes & 9 pt & \\
+\hline
+\end{tabular}
+\end{center}
+\caption{\label{font-table} Font guide. }
+\end{table}
 
-\subsubsection{Wide equations}
-The equation that follows is set in a wide format, i.e., it spans
-across the full page. The wide format is reserved for long equations
-that cannot be easily broken into four lines or less:
-\begin{widetext}
-\begin{equation}
-{\cal R}^{(\text{d})}=
- g_{\sigma_2}^e
- \left(
-   \frac{[\Gamma^Z(3,21)]_{\sigma_1}}{Q_{12}^2-M_W^2}
-  +\frac{[\Gamma^Z(13,2)]_{\sigma_1}}{Q_{13}^2-M_W^2}
- \right)
- + x_WQ_e
- \left(
-   \frac{[\Gamma^\gamma(3,21)]_{\sigma_1}}{Q_{12}^2-M_W^2}
-  +\frac{[\Gamma^\gamma(13,2)]_{\sigma_1}}{Q_{13}^2-M_W^2}
- \right)\;. \label{eq:wideeq}
-\end{equation}
-\end{widetext}
-This is typed to show the output is in wide format.
-(Since there is no input line between \verb+\equation+ and
-this paragraph, there is no paragraph indent for this paragraph.)
+\subsection{The First Page}
+\label{ssec:first}
+
+Center the title, author's name(s) and affiliation(s) across both
+columns. Do not use footnotes for affiliations. Do not include the
+paper ID number assigned during the submission process. Use the
+two-column format only when you begin the abstract.
+
+{\bf Title}: Place the title centered at the top of the first page, in
+a 15-point bold font. (For a complete guide to font sizes and styles,
+see Table~\ref{font-table}) Long titles should be typed on two lines
+without a blank line intervening. Approximately, put the title at 2.5
+cm from the top of the page, followed by a blank line, then the
+author's names(s), and the affiliation on the following line. Do not
+use only initials for given names (middle initials are allowed). Do
+not format surnames in all capitals (e.g., use ``Schlangen'' not
+``SCHLANGEN'').  Do not format title and section headings in all
+capitals as well except for proper names (such as ``BLEU'') that are
+conventionally in all capitals.  The affiliation should contain the
+author's complete address, and if possible, an electronic mail
+address. Start the body of the first page 7.5 cm from the top of the
+page.
+
+The title, author names and addresses should be completely identical
+to those entered to the electronical paper submission website in order
+to maintain the consistency of author information among all
+publications of the conference. If they are different, the publication
+chairs may resolve the difference without consulting with you; so it
+is in your own interest to double-check that the information is
+consistent.
+
+{\bf Abstract}: Type the abstract at the beginning of the first
+column. The width of the abstract text should be smaller than the
+width of the columns for the text in the body of the paper by about
+0.6 cm on each side. Center the word {\bf Abstract} in a 12 point bold
+font above the body of the abstract. The abstract should be a concise
+summary of the general thesis and conclusions of the paper. It should
+be no longer than 200 words. The abstract text should be in 10 point font.
+
+{\bf Text}: Begin typing the main body of the text immediately after
+the abstract, observing the two-column format as shown in 
+the present document. Do not include page numbers.
+
+{\bf Indent} when starting a new paragraph. Use 11 points for text and 
+subsection headings, 12 points for section headings and 15 points for
+the title. 
+
+\subsection{Sections}
+
+{\bf Headings}: Type and label section and subsection headings in the
+style shown on the present document.  Use numbered sections (Arabic
+numerals) in order to facilitate cross references. Number subsections
+with the section number and the subsection number separated by a dot,
+in Arabic numerals. Do not number subsubsections.
+
+{\bf Citations}: Citations within the text appear in parentheses
+as~\cite{Gusfield:97} or, if the author's name appears in the text
+itself, as Gusfield~\shortcite{Gusfield:97}.  Append lowercase letters
+to the year in cases of ambiguity.  Treat double authors as
+in~\cite{Aho:72}, but write as in~\cite{Chandra:81} when more than two
+authors are involved. Collapse multiple citations as
+in~\cite{Gusfield:97,Aho:72}. Also refrain from using full citations
+as sentence constituents. We suggest that instead of
+\begin{quote}
+  ``\cite{Gusfield:97} showed that ...''
+\end{quote}
+you use
+\begin{quote}
+``Gusfield \shortcite{Gusfield:97}   showed that ...''
+\end{quote}
+
+If you are using the provided \LaTeX{} and Bib\TeX{} style files, you
+can use the command \verb|\newcite| to get ``author (year)'' citations.
+
+As reviewing will be double-blind, the submitted version of the papers
+should not include the authors' names and affiliations. Furthermore,
+self-references that reveal the author's identity, e.g.,
+\begin{quote}
+``We previously showed \cite{Gusfield:97} ...''  
+\end{quote}
+should be avoided. Instead, use citations such as 
+\begin{quote}
+``Gusfield \shortcite{Gusfield:97}
+previously showed ... ''
+\end{quote}
+
+\textbf{Please do not use anonymous citations} and do not include
+acknowledgements when submitting your papers. Papers that do not
+conform to these requirements may be rejected without review.
+
+\textbf{References}: Gather the full set of references together under
+the heading {\bf References}; place the section before any Appendices,
+unless they contain references. Arrange the references alphabetically
+by first author, rather than by order of occurrence in the text.
+Provide as complete a citation as possible, using a consistent format,
+such as the one for {\em Computational Linguistics\/} or the one in the 
+{\em Publication Manual of the American 
+Psychological Association\/}~\cite{APA:83}.  Use of full names for
+authors rather than initials is preferred.  A list of abbreviations
+for common computer science journals can be found in the ACM 
+{\em Computing Reviews\/}~\cite{ACM:83}.
+
+The \LaTeX{} and Bib\TeX{} style files provided roughly fit the
+American Psychological Association format, allowing regular citations, 
+short citations and multiple citations as described above.
+
+{\bf Appendices}: Appendices, if any, directly follow the text and the
+references (but see above).  Letter them in sequence and provide an
+informative title: {\bf Appendix A. Title of Appendix}.
+
+\subsection{Footnotes}
+
+{\bf Footnotes}: Put footnotes at the bottom of the page and use 9
+points text. They may be numbered or referred to by asterisks or other
+symbols.\footnote{This is how a footnote should appear.} Footnotes
+should be separated from the text by a line.\footnote{Note the line
+separating the footnotes from the text.}
+
+\subsection{Graphics}
+
+{\bf Illustrations}: Place figures, tables, and photographs in the
+paper near where they are first discussed, rather than at the end, if
+possible.  Wide illustrations may run across both columns.  Color
+illustrations are discouraged, unless you have verified that  
+they will be understandable when printed in black ink.
+
+{\bf Captions}: Provide a caption for every illustration; number each one
+sequentially in the form:  ``Figure 1. Caption of the Figure.'' ``Table 1.
+Caption of the Table.''  Type the captions of the figures and 
+tables below the body, using 11 point text.
+
+
+\section{XML conversion and supported \LaTeX\ packages}
+
+ACL 2014 innovates over earlier years in that we will attempt to
+automatically convert your \LaTeX\ source files to machine-readable
+XML with semantic markup. This will facilitate future research that
+uses the ACL proceedings themselves as a corpus.
+
+We encourage you to submit a ZIP file of your \LaTeX\ sources along
+with the camera-ready version of your paper. We will then convert them
+to XML automatically, using the LaTeXML tool
+(\url{http://dlmf.nist.gov/LaTeXML}). LaTeXML has \emph{bindings} for
+a number of \LaTeX\ packages, including the ACL 2014 stylefile. These
+bindings allow LaTeXML to render the commands from these packages
+correctly in XML. For best results, we encourage you to use the
+packages that are officially supported by LaTeXML, listed at
+\url{http://dlmf.nist.gov/LaTeXML/manual/included.bindings}
+
+
+
+
+
+\section{Translation of non-English Terms}
+
+It is also advised to supplement non-English characters and terms
+with appropriate transliterations and/or translations
+since not all readers understand all such characters and terms.
+Inline transliteration or translation can be represented in
+the order of: original-form transliteration ``translation''.
+
+\section{Length of Submission}
+\label{sec:length}
+
+Long papers may consist of up to 9 pages of content, plus two extra
+pages for references. Short papers may consist of up to 5 pages of
+content, plus two extra pages for references.  Papers that do not
+conform to the specified length and formatting requirements may be
+rejected without review.
+
+
+
+\section*{Acknowledgments}
+
+The acknowledgments should go immediately before the references.  Do
+not number the acknowledgments section. Do not include this section
+when submitting your paper for review.
+
+% include your own bib file like this:
+%\bibliographystyle{acl}
+%\bibliography{acl2014}
+
+\begin{thebibliography}{}
+
+\bibitem[\protect\citename{Aho and Ullman}1972]{Aho:72}
+Alfred~V. Aho and Jeffrey~D. Ullman.
+\newblock 1972.
+\newblock {\em The Theory of Parsing, Translation and Compiling}, volume~1.
+\newblock Prentice-{Hall}, Englewood Cliffs, NJ.
+
+\bibitem[\protect\citename{{American Psychological Association}}1983]{APA:83}
+{American Psychological Association}.
+\newblock 1983.
+\newblock {\em Publications Manual}.
+\newblock American Psychological Association, Washington, DC.
+
+\bibitem[\protect\citename{{Association for Computing Machinery}}1983]{ACM:83}
+{Association for Computing Machinery}.
+\newblock 1983.
+\newblock {\em Computing Reviews}, 24(11):503--512.
+
+\bibitem[\protect\citename{Chandra \bgroup et al.\egroup }1981]{Chandra:81}
+Ashok~K. Chandra, Dexter~C. Kozen, and Larry~J. Stockmeyer.
+\newblock 1981.
+\newblock Alternation.
+\newblock {\em Journal of the Association for Computing Machinery},
+  28(1):114--133.
+
+\bibitem[\protect\citename{Gusfield}1997]{Gusfield:97}
+Dan Gusfield.
+\newblock 1997.
+\newblock {\em Algorithms on Strings, Trees and Sequences}.
+\newblock Cambridge University Press, Cambridge, UK.
+
+\end{thebibliography}
 
 \end{document}
-%
-% ****** End of file aipsamp.tex ******

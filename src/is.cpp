@@ -62,7 +62,8 @@ void IS::Solution::tweak() {
 void IS::Metaheuristic::optimize(const IS::Problem &T, IS::Solution &S) {
     S.setSize(T.size());
     S.generateRandom();
-    double q_max;
+    double q_max, old_q = -1;
+    int iter_old = 0;
     while (1) {
         IS::Solution R(S);
         R.tweak(); 
@@ -74,7 +75,13 @@ void IS::Metaheuristic::optimize(const IS::Problem &T, IS::Solution &S) {
             S.setBits(R.getBits());
         
         q_max = std::max(q1, q2);
-        if (q_max > 0.95) break;
+        if (old_q == q_max) {
+          iter_old ++;  
+        } else {
+            iter_old = 0;
+        }
+        if (q_max > 0.95 or iter_old == 1000) break;
+        old_q = q_max;
     }
     cout << "---> " << q_max << endl;
 }
@@ -102,15 +109,15 @@ double IS::Metaheuristic::quality(const IS::Problem &T,
     double clas_rate = (1.0 * count) / (1.0 * result.size());
     double perc_redc = (1.0 * result.size()) / (1.0 * T.size());
 
-    //cout << "Hubo un total de " << count << " aciertos" << endl;
-    //cout << "Result es de tamanio: " << result.size() << endl;
-    //cout << "La relación es: " << clas_rate << endl;
+    // cout << "Hubo un total de " << count << " aciertos" << endl;
+    // cout << "Result es de tamanio: " << result.size() << endl;
+    // cout << "La relación es: " << clas_rate << endl;
 
-    //cout << "El tamaño de T es: " << T.size() << endl;
-    //cout << "El porcentaje de reducción es: " << perc_redc << endl;
+    // cout << "El tamaño de T es: " << T.size() << endl;
+    // cout << "El porcentaje de reducción es: " << perc_redc << endl;
 
     double fitness = alpha * clas_rate + (1 - alpha) * perc_redc;
-    cout << "El fitness es : " << fitness << std::endl;
+    // cout << "El fitness es : " << fitness << std::endl;
     assert(fitness <= 1.0);
     return fitness;
 }

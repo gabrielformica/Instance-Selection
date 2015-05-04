@@ -1,2 +1,5 @@
 .*
 !.gitignore
+doc/paper.*
+!doc/paper.tex
+doc/paperNotes*

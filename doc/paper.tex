@@ -17,10 +17,10 @@
 \documentclass[11pt]{article}
 \usepackage{paper}
 \usepackage{times}
-\usepackage{url}
-\usepackage{latexsym}
 \usepackage{algorithm}
 \usepackage{algpseudocode}
+\usepackage{url}
+\usepackage{latexsym}
 \usepackage[utf8]{inputenc}
 
 %\setlength\titlebox{5cm}
@@ -90,8 +90,9 @@ Siendo una representación una cadena de bits, para generar una solución
 inicial seguimos una estrategia muy sencilla: cada bit tiene una probabilidad $\rho$
 de estar en la solución. Si bien en la literatura, lo común es
 que $\rho$ sea igual a $0.5$, de manera de comenzar con un solución
-de $50\%$, en nuestro caso hemos hecho $\rho = 0.1$. Esto nos genera
-solucción con una reducción del $90\%$.
+de $50\%$, en nuestro caso hemos hecho varias ``corridas'' con distintos valores
+de $\rho$, generando soluciones iniciales de distintos tamaños, de manera de poder
+evaluar el impacto de cada una de estas reducciones.
 
 \section{Función de evaluación}
 En [referencia a cano] se describe una función de evaluación que considera la tasa de instancias clasificadas correctamente tomando en cuenta el conjunto reducido como conjunto de entrenamiento y una tasa de reducción del conjunto original. Se hace uso de una constante $\alpha$ donde $\alpha \in [0,1]$ para darle ponderación a ambos parámetros. La fórmula usada para medir la calidad de una solución es:

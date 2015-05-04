@@ -146,38 +146,21 @@ El objetivo de un algoritmo es maximizar esta función, entonces si $evaluar(A) 
 
 
 
-\subsection{Format of Electronic Manuscript}
-\label{sect:pdf}
+\subsection{Operador}
+Ante la necesidad de movernos en el
+espacio de busqueda, surge la idea de un operador 
+que modifique de manera sutil (y rápida) una solución
+dada. 
+En nuestro caso, nuestro operador selecciona al
+azar un bit ``prendido'' y lo ``apaga'', que se traduce
+en ``sacar'' una instancia del conjunto de instancias solución.
 
-For the production of the electronic manuscript you must use Adobe's
-Portable Document Format (PDF). PDF files are usually produced from
-\LaTeX\ using the \textit{pdflatex} command. If your version of
-\LaTeX\ produces Postscript files, you can convert these into PDF
-using \textit{ps2pdf} or \textit{dvipdf}. On Windows, you can also use
-Adobe Distiller to generate PDF.
-
-Please make sure that your PDF file includes all the necessary fonts
-(especially tree diagrams, symbols, and fonts with Asian
-characters). When you print or create the PDF file, there is usually
-an option in your printer setup to include none, all or just
-non-standard fonts.  Please make sure that you select the option of
-including ALL the fonts. \textbf{Before sending it, test your PDF by
-  printing it from a computer different from the one where it was
-  created.} Moreover, some word processors may generate very large PDF
-files, where each page is rendered as an image. Such images may
-reproduce poorly. In this case, try alternative ways to obtain the
-PDF. One way on some systems is to install a driver for a postscript
-printer, send your document to the printer specifying ``Output to a
-file'', then convert the file to PDF.
-
-It is of utmost importance to specify the \textbf{A4 format} (21 cm
-x 29.7 cm) when formatting the paper. When working with
-{\tt dvips}, for instance, one should specify {\tt -t a4}.
-
-Print-outs of the PDF file on A4 paper should be identical to the
-hardcopy version. If you cannot meet the above requirements about the
-production of your electronic submission, please contact the
-publication chairs as soon as possible.
+De esta manera, se consiguen soluciones cada vez más pequeñas y una tasa
+de aciertos $tasa\_clas$ cada vez más precisas: esto viene de si tenemos 
+$x$ aciertos y $w$ instancias que no están en la solución, aumetar el tamaño
+de una solución conllevaría a una posible $tasa\_clas = x / (w - 1) $,
+que supondría una mayor $tasa\_clas$ y por lo tanto una mejor solución. Sin embargo, 
+esto no puede estar más alejado de la realidad.
 
 
 \subsection{Layout}

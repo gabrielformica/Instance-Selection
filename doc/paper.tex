@@ -150,6 +150,23 @@ El objetivo de un algoritmo es maximizar esta función, entonces si $evaluar(A) 
     }
 
 
+\subsection{Operador}
+Ante la necesidad de movernos en el
+espacio de busqueda, surge la idea de un operador 
+que modifique de manera sutil (y rápida) una solución
+dada. 
+En nuestro caso, nuestro operador selecciona al
+azar un bit ``prendido'' y lo ``apaga'', que se traduce
+en ``sacar'' una instancia del conjunto de instancias solución.
+
+De esta manera, se consiguen soluciones cada vez más pequeñas y una tasa
+de aciertos $tasa\_clas$ cada vez más precisas: esto viene de si tenemos 
+$x$ aciertos y $w$ instancias que no están en la solución, aumetar el tamaño
+de una solución conllevaría a una posible $tasa\_clas = x / (w - 1) $,
+que supondría una mayor $tasa\_clas$ y por lo tanto una mejor solución. Sin embargo, 
+esto no puede estar más alejado de la realidad.
+
+
 \section{Experimentos}
 
 Se seleccionaron instancias de tamaño pequeño con menos de 1000 instancias y mediano con más de 1000 pero menos de 5000 instancias. Cada problema cuenta con atributos y clases en el dominio de los reales.

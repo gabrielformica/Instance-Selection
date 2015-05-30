@@ -5,3 +5,4 @@ doc/paper.*
 !doc/paper.sty
 doc/paperNotes*
 src/instance_selection
+data/*

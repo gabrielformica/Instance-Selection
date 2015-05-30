@@ -24,11 +24,12 @@ double IS::Instance::calcDistance(const IS::Instance &b) const {
     return sqrt(dist);
 } 
 
-void IS::Problem::getDispersions(std::vector<double> &dispersion) {
+void IS::Problem::getDispersions(std::vector<double> &dispersion) const {
     dispersion.assign(0.0, size());
     IS::Instance dummy;
     dummy.assign(0.0, size());
-    IS::Problem &a = *this;
+
+    const IS::Problem &a = *this;
     for (int i = 0; i < a.size(); i++)
         dispersion[i] = a[i].calcDistance(dummy);
 }

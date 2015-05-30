@@ -53,7 +53,7 @@ namespace IS {
         Problem(int N) : std::vector<Instance>(N) {};
         void setAttrs(int a) { attrs = a; }
         int getAttrs() { return attrs; }
-        void getDispersions(std::vector<double> &dispersion);
+        void getDispersions(std::vector<double> &dispersion) const;
     };
 }
 

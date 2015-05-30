@@ -106,18 +106,6 @@ void HillClimbing::optimize(const IS::Problem &T, IS::Solution &S) {
     cout << "---> " << q_max << endl;
 }
 
-// void HillClimbing::tweak(IS::Solution &S) {
-//     std::bitset<MAX> bits = S.getBits();
-//     int size = S.getSize();
-//     srand(time(NULL));
-//     int n = (rand() % bits.count()) + 1;
-//     int i, j;
-//     for (j = 0, i = 0; j < size && i < n; j++) if (bits.test(j)) i++;
-//     assert(bits.test(j-1));
-//     bits[j-1] = 0;
-//     S.setBits(bits);
-// }
-
 /* Simulated Annealing  */
 
 void SimulatedAnnealing::optimize(const IS::Problem &T, IS::Solution &S) {

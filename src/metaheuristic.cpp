@@ -86,7 +86,7 @@ void HillClimbing::optimize(const IS::Problem &T, IS::Solution &S) {
     int iter_old = 0;
     while (1) {
         IS::Solution R(S);
-        tweak(R); 
+        getTweaker()->tweak(R); 
         assert((S.getBits() ^ R.getBits()).count() == 1);
 
         // Using 0.5 because paper
@@ -106,17 +106,17 @@ void HillClimbing::optimize(const IS::Problem &T, IS::Solution &S) {
     cout << "---> " << q_max << endl;
 }
 
-void HillClimbing::tweak(IS::Solution &S) {
-    std::bitset<MAX> bits = S.getBits();
-    int size = S.getSize();
-    srand(time(NULL));
-    int n = (rand() % bits.count()) + 1;
-    int i, j;
-    for (j = 0, i = 0; j < size && i < n; j++) if (bits.test(j)) i++;
-    assert(bits.test(j-1));
-    bits[j-1] = 0;
-    S.setBits(bits);
-}
+// void HillClimbing::tweak(IS::Solution &S) {
+//     std::bitset<MAX> bits = S.getBits();
+//     int size = S.getSize();
+//     srand(time(NULL));
+//     int n = (rand() % bits.count()) + 1;
+//     int i, j;
+//     for (j = 0, i = 0; j < size && i < n; j++) if (bits.test(j)) i++;
+//     assert(bits.test(j-1));
+//     bits[j-1] = 0;
+//     S.setBits(bits);
+// }
 
 /* Simulated Annealing  */
 
@@ -131,7 +131,7 @@ void SimulatedAnnealing::optimize(const IS::Problem &T, IS::Solution &S) {
     int t = temperature;  // Temperature 
     while (1) {
         IS::Solution R(S);
-        tweak(R, S.getSize() / 40); 
+        getTweaker()->tweak(R); 
         // assert((S.getBits() ^ R.getBits()).count() == 1);
 
         // Using 0.5 because paper
@@ -158,51 +158,6 @@ void SimulatedAnnealing::optimize(const IS::Problem &T, IS::Solution &S) {
     }
 }
 
-void SimulatedAnnealing::tweak(IS::Solution &S) {
-    std::bitset<MAX> bits = S.getBits();
-    int size = S.getSize();
-    srand(time(NULL));
-    int n = (rand() % bits.count()) + 1;
-    int i, j;
-    for (j = 0, i = 0; j < size && i < n; j++) if (bits.test(j)) i++;
-    assert(bits.test(j-1));
-    bits[j-1] = 0;
-    S.setBits(bits);
-
-    //std::bitset<MAX> bits = S.getBits();
-    //srand(time(NULL));
-    //int i = (rand() % S.getSize());
-    //bits.flip(i);  // Toggle n-th bit
-    //S.setBits(bits);
-}
-
-void SimulatedAnnealing::tweak(IS::Solution &S, int max_tweak) {
-    std::bitset<MAX> bits = S.getBits();
-    int size = S.getSize();
-
-    srand(time(NULL));
-    int t = (rand() % max_tweak) + 1;
-
-    for(unsigned i = 0; i < t; ++i) {
-        srand(time(NULL));
-        int j = (rand() % size) + 1;
-        bits.flip(j);
-    }
-    S.setBits(bits);
-
-    // int i, j;
-    // for (j = 0, i = 0; j < size && i < n; j++) if (bits.test(j)) i++;
-    // assert(bits.test(j-1));
-    // bits[j-1] = 0;
-    // S.setBits(bits);
-
-    //std::bitset<MAX> bits = S.getBits();
-    //srand(time(NULL));
-    //int i = (rand() % S.getSize());
-    //bits.flip(i);  // Toggle n-th bit
-    //S.setBits(bits);
-}
-
 /* ILS */
 
 void ILS::optimize(const IS::Problem &T, IS::Solution &S) {
@@ -226,8 +181,7 @@ void ILS::optimize(const IS::Problem &T, IS::Solution &S) {
         int max_iter = 1000; 
         while(1) {
             IS::Solution R(S);
-            // TODO: Need general tweak 
-            // tweak(R); 
+            getTweaker()->tweak(R); 
             double q1 = quality(T, R, 0.5), q2 = quality(T, S, 0.5);
             if (q1 > q2)
                 S.setBits(R.getBits());
@@ -247,17 +201,16 @@ void ILS::optimize(const IS::Problem &T, IS::Solution &S) {
         double qb = quality(T, best, 0.5);
 
         if (qs > qb) best.setBits(S.getBits());
-        // TODO: Need a super tweak (perturb)
-        // tweak();
+        // Flipping 25% of bits for perturb
+        // TODO: This CAN be an argument
+        nRandomFlips tweaker = nRandomFlips(S.getSize() / 4);
+        tweaker.tweak(S);
 
         iter++;
         if (q_max > 0.95 or iter == max_out_iter) break;
 
     }
 }
-
-
-void ILS::tweak(IS::Solution &S) { }
 
 /* Tabu */
 
@@ -271,11 +224,11 @@ void Tabu::optimize(const IS::Problem &T, IS::Solution &best) {
     while (1) {
         if (tabu_list.size() > length) tabu_list.pop_front();
         IS::Solution R(S);
-        tweak(R); 
+        getTweaker()->tweak(R); 
 
         for (int i = 0; i < number_of_tweaks - 1; i++) {
             IS::Solution W(S); 
-            tweak(W);
+            getTweaker()->tweak(W);
 
             // Checking if W is in tabu list
             std::deque<IS::Solution>::iterator it;

@@ -4,3 +4,4 @@ doc/paper.*
 !doc/paper.tex
 !doc/paper.sty
 doc/paperNotes*
+src/instance_selection

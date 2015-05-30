@@ -1,7 +1,7 @@
 GPPFLAGS= -std=c++11 
 CLANG= clang++
 CC= clang++
-OBJ= main.cpp is.cpp metaheuristic.cpp
+OBJ= main.cpp is.cpp metaheuristic.cpp tweaker.cpp
 
 clang: CC=clang++
 clang: $(OBJ)

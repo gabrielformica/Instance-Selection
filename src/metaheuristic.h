@@ -2,6 +2,8 @@
 #define METAHEURISTIC_H
 
 #include <iostream>
+#include <deque>
+#include <algorithm>
 #include "is.h"
 
 const double epsilon = 0.00001;
@@ -32,6 +34,15 @@ class SimulatedAnnealing : public Metaheuristic {
     void optimize(const IS::Problem &T, IS::Solution &R);
     void tweak(IS::Solution &S);
     void tweak(IS::Solution &S, int max_tweak);
+};
+
+class Tabu : public Metaheuristic {
+  private:
+    int length, number_of_tweaks;
+  public:
+    Tabu(int l, int n) : length(l), number_of_tweaks(n) { };
+    void optimize(const IS::Problem &T, IS::Solution &R);
+    void tweak(IS::Solution &S) { };
 };
 
 #endif

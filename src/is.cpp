@@ -15,6 +15,12 @@ void IS::Solution::generateRandom() {
     }
 }
 
+void IS::Solution::copy(const Solution &a) {
+    size = a.size;
+    bits.reset();
+    bits |= a.bits;
+}
+
 double IS::Instance::calcDistance(const IS::Instance &b) const {
     const IS::Instance &a = *this;
     double dist = 0.0;

@@ -28,7 +28,6 @@ class SimulatedAnnealing : public Metaheuristic {
   private:
     int temperature, dec_factor;
   public: 
-    SimulatedAnnealing(): temperature(160000), dec_factor(10) { };
     SimulatedAnnealing(int t, int d): temperature(t), dec_factor(d) { };
     void optimize(const IS::Problem &T, IS::Solution &R);
     void tweak(IS::Solution &S);

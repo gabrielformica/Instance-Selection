@@ -138,27 +138,39 @@ void SimulatedAnnealing::optimize(const IS::Problem &T, IS::Solution &S) {
         double qb = quality(T, best, 0.5);
         // Random number between 0 and 1
         double r = ((double) rand() / (RAND_MAX));
-        double prob = exp((qr - qs) / t);
+        double prob = -1.0;
+        if (t > epsilon) prob = exp((qr - qs) / t);
 
         if (qr > qs || (prob - r > epsilon)) {
             S.setBits(R.getBits());
             qs = qr;
         }
         t -= dec_factor;  // Decreasing temperature
+        cout << "temperatura = " << t << endl;
         
         if (qs > qb) { 
             best.setBits(S.getBits());
             qb = qs;
         }
 
-        if (qb > 0.95 || temperature <= epsilon) break;
+        if (qb > 0.95 || t <= epsilon) break;
     }
 }
 
 void SimulatedAnnealing::tweak(IS::Solution &S) {
     std::bitset<MAX> bits = S.getBits();
+    int size = S.getSize();
     srand(time(NULL));
-    int i = (rand() % S.getSize());
-    bits.flip(i);  // Toggle n-th bit
+    int n = (rand() % bits.count()) + 1;
+    int i, j;
+    for (j = 0, i = 0; j < size && i < n; j++) if (bits.test(j)) i++;
+    assert(bits.test(j-1));
+    bits[j-1] = 0;
     S.setBits(bits);
+
+    //std::bitset<MAX> bits = S.getBits();
+    //srand(time(NULL));
+    //int i = (rand() % S.getSize());
+    //bits.flip(i);  // Toggle n-th bit
+    //S.setBits(bits);
 }

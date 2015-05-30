@@ -63,15 +63,15 @@ double Metaheuristic::quality(const IS::Problem &T,
     double clas_rate = (1.0 * count) / (1.0 * result.size());
     double perc_redc = (1.0 * result.size()) / (1.0 * T.size());
 
-    cout << "Hubo un total de " << count << " aciertos" << endl;
-    cout << "Result es de tamanio: " << result.size() << endl;
-    cout << "La relación es: " << clas_rate << endl;
+    // cout << "Hubo un total de " << count << " aciertos" << endl;
+    // cout << "Result es de tamanio: " << result.size() << endl;
+    // cout << "La relación es: " << clas_rate << endl;
 
-    cout << "El tamaño de T es: " << T.size() << endl;
-    cout << "El porcentaje de reducción es: " << perc_redc << endl;
+    // cout << "El tamaño de T es: " << T.size() << endl;
+    // cout << "El porcentaje de reducción es: " << perc_redc << endl;
 
     double fitness = alpha * clas_rate + (1 - alpha) * perc_redc;
-    cout << "El fitness es : " << fitness << endl << endl;
+    // cout << "El fitness es : " << fitness << endl << endl;
     assert(fitness <= 1.0);
     return fitness;
 }
@@ -131,8 +131,8 @@ void SimulatedAnnealing::optimize(const IS::Problem &T, IS::Solution &S) {
     int t = temperature;  // Temperature 
     while (1) {
         IS::Solution R(S);
-        tweak(R); 
-        assert((S.getBits() ^ R.getBits()).count() == 1);
+        tweak(R, S.getSize() / 40); 
+        // assert((S.getBits() ^ R.getBits()).count() == 1);
 
         // Using 0.5 because paper
         double qr = quality(T, R, 0.5), qs = quality(T, S, 0.5);
@@ -147,7 +147,7 @@ void SimulatedAnnealing::optimize(const IS::Problem &T, IS::Solution &S) {
             qs = qr;
         }
         t -= dec_factor;  // Decreasing temperature
-        cout << "temperatura = " << t << endl;
+        // cout << "temperatura = " << t << endl;
         
         if (qs > qb) { 
             best.setBits(S.getBits());
@@ -168,6 +168,33 @@ void SimulatedAnnealing::tweak(IS::Solution &S) {
     assert(bits.test(j-1));
     bits[j-1] = 0;
     S.setBits(bits);
+
+    //std::bitset<MAX> bits = S.getBits();
+    //srand(time(NULL));
+    //int i = (rand() % S.getSize());
+    //bits.flip(i);  // Toggle n-th bit
+    //S.setBits(bits);
+}
+
+void SimulatedAnnealing::tweak(IS::Solution &S, int max_tweak) {
+    std::bitset<MAX> bits = S.getBits();
+    int size = S.getSize();
+
+    srand(time(NULL));
+    int t = (rand() % max_tweak) + 1;
+
+    for(unsigned i = 0; i < t; ++i) {
+        srand(time(NULL));
+        int j = (rand() % size) + 1;
+        bits.flip(j);
+    }
+    S.setBits(bits);
+
+    // int i, j;
+    // for (j = 0, i = 0; j < size && i < n; j++) if (bits.test(j)) i++;
+    // assert(bits.test(j-1));
+    // bits[j-1] = 0;
+    // S.setBits(bits);
 
     //std::bitset<MAX> bits = S.getBits();
     //srand(time(NULL));

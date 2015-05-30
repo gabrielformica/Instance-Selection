@@ -203,6 +203,7 @@ void SimulatedAnnealing::tweak(IS::Solution &S, int max_tweak) {
     //S.setBits(bits);
 }
 
+/* ILS */
 
 void ILS::optimize(const IS::Problem &T, IS::Solution &S) {
     S.setSize(T.size());
@@ -257,3 +258,46 @@ void ILS::optimize(const IS::Problem &T, IS::Solution &S) {
 
 
 void ILS::tweak(IS::Solution &S) { }
+
+/* Tabu */
+
+void Tabu::optimize(const IS::Problem &T, IS::Solution &best) {
+    IS::Solution S(T.size());
+    S.generateRandom();  // First random solution
+
+    std::deque<IS::Solution> tabu_list;   // Tabu list
+    tabu_list.push_back(S);
+    best.copy(S);
+    while (1) {
+        if (tabu_list.size() > length) tabu_list.pop_front();
+        IS::Solution R(S);
+        tweak(R); 
+
+        for (int i = 0; i < number_of_tweaks - 1; i++) {
+            IS::Solution W(S); 
+            tweak(W);
+
+            // Checking if W is in tabu list
+            std::deque<IS::Solution>::iterator it;
+            it = std::find(tabu_list.begin(), tabu_list.end(), W);
+            bool is_in = it != tabu_list.end();
+            if (! is_in) {
+                double qw = quality(T, W, 0.5), qr = quality(T, R, 0.5);
+                if (qw > qr || std::find(tabu_list.begin(), tabu_list.end(), R)
+                               != tabu_list.end())
+                R.copy(W);
+            }
+
+            // R is not in L
+            if (std::find(tabu_list.begin(), tabu_list.end(), R) == tabu_list.end()) {
+                S.copy(R);
+                tabu_list.push_back(R);
+            }
+
+            double qs = quality(T, S, 0.5), qb = quality(T, best, 0.5);
+            double q_max = std::max(qs, qb);
+            if (qs > qb) best.copy(S);
+            if (q_max > 0.95) break;
+        }
+    }
+}

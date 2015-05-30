@@ -42,6 +42,10 @@ namespace IS {
                 str = (bits.test(i) ? "1" : "0") + str; 
             return str;
         }
+        void copy(const Solution &a);
+        bool operator==(const Solution &b) const {
+            return (size == b.size && bits == b.bits);
+        }
     };
 
     class Problem : public std::vector<Instance> {

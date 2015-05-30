@@ -34,4 +34,13 @@ class SimulatedAnnealing : public Metaheuristic {
     void tweak(IS::Solution &S, int max_tweak);
 };
 
+class ILS : public Metaheuristic {
+  public: 
+    void optimize(const IS::Problem &T, IS::Solution &R);
+    void tweak(IS::Solution &S);
+    void tweak(IS::Solution &S, int max_tweak);
+};
+
+
+
 #endif

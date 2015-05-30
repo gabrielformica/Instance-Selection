@@ -202,3 +202,58 @@ void SimulatedAnnealing::tweak(IS::Solution &S, int max_tweak) {
     //bits.flip(i);  // Toggle n-th bit
     //S.setBits(bits);
 }
+
+
+void ILS::optimize(const IS::Problem &T, IS::Solution &S) {
+    S.setSize(T.size());
+    S.generateRandom();
+
+    IS::Solution best(S);
+    IS::Solution home_base(S);
+
+    double q_max, old_q = -1;
+    int iter_old = 0, iter = 0;
+    
+    // TODO: Tune this
+    int max_out_iter = 1000;
+
+    while(1) {
+        // Local search
+
+        // TODO: Ideally some tuneable number of iterations
+        // 500 to 1000 random comes to mind
+        int max_iter = 1000; 
+        while(1) {
+            IS::Solution R(S);
+            // TODO: Need general tweak 
+            // tweak(R); 
+            double q1 = quality(T, R, 0.5), q2 = quality(T, S, 0.5);
+            if (q1 > q2)
+                S.setBits(R.getBits());
+
+            q_max = std::max(q1, q2);
+            if (old_q == q_max) {
+              iter_old ++;  
+            } else {
+                iter_old = 0;
+            }
+            if (q_max > 0.95 or iter_old == max_iter) break;
+            old_q = q_max;
+        }
+
+        // Compare and (maybe) perturb
+        double qs = quality(T, S, 0.5);
+        double qb = quality(T, best, 0.5);
+
+        if (qs > qb) best.setBits(S.getBits());
+        // TODO: Need a super tweak (perturb)
+        // tweak();
+
+        iter++;
+        if (q_max > 0.95 or iter == max_out_iter) break;
+
+    }
+}
+
+
+void ILS::tweak(IS::Solution &S) { }

@@ -33,9 +33,9 @@ namespace IS {
         int getSize() const { return size; };
         void setSize(int n) { size = n; };
         std::bitset<MAX> getBits() const { return bits; };
-        void setBits(std::bitset<MAX> a) { bits = a; }
+        void setBits(const std::bitset<MAX> &a) { bits = a; }
         void generateRandom(); 
-        void tweak();
+    //    void tweak();
         std::string to_str() {
             std::string str = "";
             for (int i = 0; i < size; i++)
@@ -56,15 +56,15 @@ namespace IS {
     };
 
 
-    class Metaheuristic {
-      public:
-        void optimize(const Problem &T, Solution &R);
-        double quality(const IS::Problem &T, const IS::Solution &S, double alpha);
-        double find_nearest(const Problem &p, const Instance &a);
-        void oneNN(const Problem &training, const Problem &result, std::vector<double> &category);
-        double calc_distance(const Instance &a, const Instance &b); 
-        void tweak(Solution S);
-    };
+ //   class Metaheuristic {
+ //     public:
+ //       void optimize(const Problem &T, Solution &R);
+ //       double quality(const IS::Problem &T, const IS::Solution &S, double alpha);
+ //       double find_nearest(const Problem &p, const Instance &a);
+ //       void oneNN(const Problem &training, const Problem &result, std::vector<double> &category);
+ //       double calc_distance(const Instance &a, const Instance &b); 
+ //       void tweak(Solution S);
+ //   };
 }
 
 #endif

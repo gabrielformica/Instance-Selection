@@ -3,6 +3,7 @@
 #include <string>
 #include <cstdio>
 #include "is.h"
+#include "metaheuristic.h"
 
 IS::Problem load_data(char *file_name) {
     FILE *input = fopen(file_name, "r");
@@ -41,7 +42,7 @@ IS::Problem load_data(char *file_name) {
 int main(int argc, char *argv[]) {
 
     IS::Problem problem = load_data(argv[1]);
-    IS::Metaheuristic ls;
+    HillClimbing ls;
     IS::Solution sol(problem.size());
 
     std::cout << ">> Local search: " << std::endl;

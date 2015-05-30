@@ -20,6 +20,7 @@ namespace IS {
       public:
         double getCategory() const { return category; }
         void setCategory(double c) { category = c; }
+        double calcDistance(const Instance &a) const;
     }; 
 
     class Solution {
@@ -52,6 +53,7 @@ namespace IS {
         Problem(int N) : std::vector<Instance>(N) {};
         void setAttrs(int a) { attrs = a; }
         int getAttrs() { return attrs; }
+        void getDispersions(std::vector<double> &dispersion);
     };
 }
 

@@ -6,11 +6,12 @@ using namespace std;
 /* Metaheuristics methods */
 
 double Metaheuristic::calc_distance(const IS::Instance &a, const IS::Instance &b) {
-    double dist = 0.0;
-    assert(a.size() == b.size());
-    for (int i = 0; i < a.size(); ++i)
-        dist += (a[i] - b[i]) * (a[i] - b[i]);
-    return sqrt(dist);
+    return a.calcDistance(b);
+    //double dist = 0.0;
+    //assert(a.size() == b.size());
+    //for (int i = 0; i < a.size(); ++i)
+    //    dist += (a[i] - b[i]) * (a[i] - b[i]);
+    //return sqrt(dist);
 }
 
 double Metaheuristic::find_nearest(const IS::Problem &p, const IS::Instance &a) {

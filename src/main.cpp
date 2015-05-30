@@ -42,8 +42,8 @@ IS::Problem load_data(char *file_name) {
 int main(int argc, char *argv[]) {
 
     IS::Problem problem = load_data(argv[1]);
-    //HillClimbing ls;
-    SimulatedAnnealing ls(10000, 10);
+    HillClimbing ls;
+    //SimulatedAnnealing ls(10000, 10);
     IS::Solution sol(problem.size());
 
     std::cout << ">> Local search: " << std::endl;

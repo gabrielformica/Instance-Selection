@@ -52,8 +52,8 @@ namespace IS {
         Problem(const Problem& a) : vector<Instance>(a.begin(), a.end()) { };
         Problem(int N) : std::vector<Instance>(N) {};
         void setAttrs(int a) { attrs = a; }
-        int getAttrs() { return attrs; }
-        void getDispersions(std::vector<double> &dispersion);
+        int getAttrs() const { return attrs; }
+        void getDispersions(std::vector<double> &dispersion) const;
     };
 }
 

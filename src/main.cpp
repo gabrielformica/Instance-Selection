@@ -80,6 +80,7 @@ void print_dispersions(const IS::Problem &problem) {
 }
 
 void hill_climbing(const IS::Problem &problem) {
+    std::cout << ">>>> Running hill climbing" << std::endl << std::endl;
     IS::Solution sol(problem.size());
     HillClimbing hc;
     hc.optimize(problem, sol);
@@ -87,6 +88,7 @@ void hill_climbing(const IS::Problem &problem) {
 }
 
 void simulated_annealing(const IS::Problem &problem) {
+    std::cout << ">>>> Running simulated annealing" << std::endl << std::endl;
     IS::Solution sol(problem.size());
     SimulatedAnnealing sa(10000, 10);
     sa.optimize(problem, sol);

@@ -49,22 +49,47 @@ IS::Problem load_data(std::string file_name_str) {
 }
 
 void print_help() {
-    std::cout << "-h, --help\t\t\tPrint this help" << std::endl;
-    std::cout << "-f, --file\t\t\tExpect a file name" << std::endl;
-    std::cout << "-d, --disp\t\t\tPrint dispersion vector" << std::endl;
+    std::cout << "Usage: ./instance_selection [OPTIONS]" << std::endl;
+    std::cout << "Run a metaheuristic with an tweaker over a problem.";
+    std::cout << std::endl << std::endl;
+    std::cout << "Flags with -Needed- are mandatory." << std::endl << std::endl;
 
-    std::cout << "-c, --hill-climing\t\tRun hill climbing metaheuristic"; 
+    std::cout << "Flags of the form '--FOO-optional-arg'";
+    std::cout << ", recieve parameters that has " << std::endl;
+    std::cout << "to be used by 'FOO', ";
+    std::cout << "and they follow a possitional order that is" << std::endl;
+    std::cout << "meaningful to 'FOO'." << std::endl << std::endl;
+
+    std::cout << "-h, --help\t\t\t\tPrint this help" << std::endl;  
+    std::cout << "-f, --file\t-Needed-\t\tExpect a file name" << std::endl; 
+    std::cout << "-d, --disp\t\t\t\tPrint dispersion vector" << std::endl; 
+
+    // Metaheuristic
+    std::cout << "-g, --metaheuristic [NAME]     -Needed-\tSpecify metaheuristic"; 
     std::cout << std::endl;
 
-    std::cout << "-s, --simulated-annealing\tRun simulated annealing metaheuristic"; 
+    std::cout << "-m, --meta-optional-arg [VALUE]\t\tValue for metaheuristic"; 
     std::cout << std::endl;
 
-    std::cout << "-t, --tabu\t\t\tRun tabu metaheuristic"; 
+    // Tweaker
+    std::cout << "-x, --tweaker \t-Needed-\t\tSpecify tweaker"; 
     std::cout << std::endl;
+
+    std::cout << "-o, --tweaker-optional-arg [VALUE]\tValue for tweaker"; 
+    std::cout << std::endl << std::endl;
+
+    // Example
+    std::cout << "Example" << std::endl;
+    std::cout << "   ./instance_selection -g \"Tabu\" -m 100 -m 30 ";
+    std::cout << "-x \"nRandomFlips\" -o 15" << std::endl << std::endl;
+    std::cout << "   Wich will use Tabu with a tabu list of 100 elements and";
+    std::cout << std::endl <<  "   number of tweaks equals to 30" << std::endl;
+
 }
 
 void error_(std::string msg) {
-    std::cout << msg << std::endl;
+
+    std::cout << "ERROR: " <<  msg << std::endl;
     exit(1);
 }
 
@@ -109,11 +134,13 @@ Metaheuristic *choose_metaheuristic(std::string metaheuristic_str) {
         int n = metaheuristic_optional_arg[1];
         return new Tabu(l, n);
     } else if (metaheuristic_str == "ILS") return new ILS();
+    error_("The metaheuristic you are providing doesn't exist");
+    return NULL;   // Shut up warning
 }
 
 Tweaker *choose_tweaker(std::string tweaker_str) {
     Tweaker *tweaker;
-    if (tweaker_str == "oneRandomFlip") return new oneRandomFlip();
+    if (tweaker_str == "oneRandomUnset") return new oneRandomUnset();
     else if (tweaker_str == "upToNRandomFlips") {
         // Print error and exit
         if (toa_counter != 1) error_("upToNRandomFlips needs one argument");
@@ -150,7 +177,7 @@ int main(int argc, char *argv[]) {
     std::string file_name, metaheuristic_str, tweaker_str;
 
     while (1) {
-        opt = getopt_long(argc, argv, "hf:dg:m:o:t:", long_options, &option_index);
+        opt = getopt_long(argc, argv, "hf:dg:m:o:x:", long_options, &option_index);
         if (opt == -1) break;
 
         switch (opt) {
@@ -175,8 +202,14 @@ int main(int argc, char *argv[]) {
     if (! flag_x) error_("You have to specify a tweaker");
 
     IS::Problem problem = load_data(file_name);
-    Tweaker *tweaker = choose_tweaker(tweaker_str);
     Metaheuristic *metaheuristic = choose_metaheuristic(metaheuristic_str);
+    Tweaker *tweaker = choose_tweaker(tweaker_str);
+
+    metaheuristic->setTweaker(tweaker);
+
+    IS::Solution solution(problem.size());
+    metaheuristic->optimize(problem, solution);
+
 
     return 0;
 }

@@ -8,7 +8,7 @@ class Tweaker {
     virtual void tweak(IS::Solution &S) = 0;
 };
 
-class oneRandomFlip : public Tweaker {
+class oneRandomUnset: public Tweaker {
   public:
     void tweak(IS::Solution &S);
 };

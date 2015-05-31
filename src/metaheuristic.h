@@ -10,11 +10,11 @@
 const double epsilon = 0.00001;
 
 class Metaheuristic {
-  private:
+  protected:
     Tweaker *tweaker;
   public:
     virtual void optimize(const IS::Problem &T, IS::Solution &R) = 0;
-    void setTweaker(Tweaker &Tw) { tweaker = &Tw; };
+    void setTweaker(Tweaker *tw) { tweaker = tw; };
     Tweaker* getTweaker() { return tweaker; };
     double quality(const IS::Problem &T, const IS::Solution &S, double alpha);
     double find_nearest(const IS::Problem &p, const IS::Instance &a);

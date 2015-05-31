@@ -1,12 +1,13 @@
-#include <cstdlib>
+#include <algorithm>
 #include <iostream>
-#include <string>
-#include <cstring>
-#include <cstdio>
 #include <getopt.h>
-#include "is.h"
+#include <cstdlib>
+#include <cstring>
+#include <string>
+#include <cstdio>
 #include "metaheuristic.h"
 #include "tweaker.h"
+#include "is.h"
 
 int metaheuristic_optional_arg[10];
 int moa_counter = 0;
@@ -111,9 +112,16 @@ void print_solution(const IS::Dataset &problem, const IS::Solution &sol) {
 void print_dispersions(const IS::Dataset &dataset) {
     std::vector<double> dispersion;
     dataset.getDispersions(dispersion);
+
+    std::sort(dispersion.begin(), dispersion.end());
+
     std::cout << ">>>>>> Dispersions: " << std::endl;
     for (int i = 0; i < dispersion.size(); i++)
-        std::cout << dispersion[i] << " ";
+        if(i % 10 == 0 and i != 0)  {
+            std::cout << dispersion[i] << " " << std::endl;
+        } else {
+            std::cout << dispersion[i] << " ";
+        }
     std::cout << endl;
 }
 

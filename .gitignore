@@ -6,3 +6,4 @@ doc/paper.*
 doc/paperNotes*
 src/instance_selection
 data/*
+scripts/*

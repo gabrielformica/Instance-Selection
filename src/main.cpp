@@ -18,6 +18,13 @@ int moa_counter = 0;
 int tweaker_optional_arg[10];
 int toa_counter = 0;
 
+typedef struct result {
+    int errors;
+    float size;
+    float val_error;
+} result;
+
+
 std::pair<ds, ds> load_data(std::string file_name_str, int partition) {
     const char *file_name = file_name_str.c_str();
     FILE *input = fopen(file_name, "r");
@@ -220,8 +227,8 @@ int main(int argc, char *argv[]) {
     };
 
     // Parser of CLI
-    int opt, option_index;
-    bool flag_h, flag_f, flag_d, flag_g, flag_m, flag_o;
+    int opt, option_index, runs;
+    bool flag_h, flag_f, flag_d, flag_g, flag_m, flag_o, flag_n;
     bool flag_x;
     memset(metaheuristic_optional_arg, 0, sizeof(metaheuristic_optional_arg));
     memset(tweaker_optional_arg, 0, sizeof(tweaker_optional_arg));
@@ -230,7 +237,7 @@ int main(int argc, char *argv[]) {
     std::string file_name, metaheuristic_str, tweaker_str;
 
     while (1) {
-        opt = getopt_long(argc, argv, "hf:dg:m:o:x:", long_options, &option_index);
+        opt = getopt_long(argc, argv, "hf:dg:m:o:x:n:", long_options, &option_index);
         if (opt == -1) break;
 
         switch (opt) {
@@ -244,6 +251,7 @@ int main(int argc, char *argv[]) {
             case 'o': tweaker_optional_arg[toa_counter++] = atoi(optarg); 
                       break;
             case 'x': flag_x = true; tweaker_str = optarg; break;
+            case 'n': flag_n = true; runs = atoi(optarg); break;
         }
     }
 
@@ -253,6 +261,10 @@ int main(int argc, char *argv[]) {
     if (! flag_f and ! flag_d) error_("You have to specify a file");  
     if (! flag_g and ! flag_d) error_("You have to specify a metaheuristic"); 
     if (! flag_x and ! flag_d) error_("You have to specify a tweaker");
+    if (! flag_n and ! flag_d) {
+        runs = 1;
+    }
+
 
     // TODO: Make this a parameter
     int part = 10;
@@ -270,35 +282,49 @@ int main(int argc, char *argv[]) {
     Tweaker *tweaker = choose_tweaker(tweaker_str);
 
     metaheuristic->setTweaker(tweaker);
+    vector<result> results;
 
-    IS::Solution solution(training.size());
-    metaheuristic->optimize(training, solution);
+    for(unsigned i = 0; i < runs; ++i) {
+        /* code */
+        IS::Solution solution(training.size());
+        metaheuristic->optimize(training, solution);
 
-    // Checking quality of final solution
-    std::vector<double> categories;
-    categories.assign(validation.size(), -1);
+        // Checking quality of final solution
+        std::vector<double> categories;
+        categories.assign(validation.size(), -1);
 
-    std::bitset<MAX> bits = solution.getBits();
-    IS::Dataset final;
-    for(unsigned i = 0; i < training.size(); ++i) {
-        if(bits[i]) final.push_back(training[i]);
+        std::bitset<MAX> bits = solution.getBits();
+        IS::Dataset final;
+        for(unsigned i = 0; i < training.size(); ++i) {
+            if(bits[i]) final.push_back(training[i]);
+        }
+
+        metaheuristic->oneNN(final, validation, categories);
+
+        int errors = 0;
+        for (int i = 0; i < validation.size(); i++)
+            if (validation[i].getCategory() != categories[i])
+                errors++;
+
+        double clas_rate = (1.0 * errors) / (1.0 * validation.size());
+        double perc_redc = (1.0 * final.size()) / (1.0 * training.size());
+        double fitness = 0.5 * clas_rate + (1 - 0.5) * perc_redc;
+
+        // XXX: Print
+        result r;
+        r.errors = errors;
+        r.val_error = (errors * 100.0) / (validation.size() * 1.0);
+        r.size = (final.size() * 100.0) / (training.size() * 1.0);
+        results.push_back(r);
+
     }
 
-    metaheuristic->oneNN(final, validation, categories);
-
-    int errors = 0;
-    for (int i = 0; i < validation.size(); i++)
-        if (validation[i].getCategory() != categories[i])
-            errors++;
-
-    double clas_rate = (1.0 * errors) / (1.0 * validation.size());
-    double perc_redc = (1.0 * final.size()) / (1.0 * training.size());
-    double fitness = 0.5 * clas_rate + (1 - 0.5) * perc_redc;
-
-    // XXX: Print
-    cout << "Total errors: " << errors << endl;
-    cout << "Validation error %: " << (errors * 100.0) / (validation.size() * 1.0) << endl;
-    cout << "Size %: " << (final.size() * 100.0) / (training.size() * 1.0) << endl;
+    for(unsigned i = 0; i < results.size(); ++i) {
+        result r = results[i];
+        cout << "Total errors: " << r.errors << endl;
+        cout << "Validation error %: " << r.val_error << endl;
+        cout << "Size %: " << r.size << endl;
+    }
 
     return 0;
 }

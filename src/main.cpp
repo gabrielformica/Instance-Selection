@@ -108,12 +108,12 @@ void print_solution(const IS::Dataset &problem, const IS::Solution &sol) {
     std::cout << "Solution of size: " << count << std::endl;
 }
 
-void print_dispersions(const IS::Dataset &problem) {
+void print_dispersions(const IS::Dataset &dataset) {
     std::vector<double> dispersion;
-    problem.getDispersions(dispersion);
+    dataset.getDispersions(dispersion);
     std::cout << ">>>>>> Dispersions: " << std::endl;
     for (int i = 0; i < dispersion.size(); i++)
-        std::cout << dispersion[i];
+        std::cout << dispersion[i] << " ";
     std::cout << endl;
 }
 
@@ -210,13 +210,19 @@ int main(int argc, char *argv[]) {
     if (! flag_x) error_("You have to specify a tweaker");
 
     IS::Dataset dataset = load_data(file_name);
-    Metaheuristic *metaheuristic = choose_metaheuristic(metaheuristic_str);
-    Tweaker *tweaker = choose_tweaker(tweaker_str);
 
-    metaheuristic->setTweaker(tweaker);
+    if (flag_d) {
+        print_dispersions(dataset);
+    } else {
+        Metaheuristic *metaheuristic = choose_metaheuristic(metaheuristic_str);
+        Tweaker *tweaker = choose_tweaker(tweaker_str);
 
-    IS::Solution solution(dataset.size());
-    metaheuristic->optimize(dataset, solution);
+        metaheuristic->setTweaker(tweaker);
+
+        IS::Solution solution(dataset.size());
+        metaheuristic->optimize(dataset, solution);
+    }
+
 
 
     return 0;

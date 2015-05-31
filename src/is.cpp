@@ -21,6 +21,12 @@ void IS::Solution::copy(const Solution &a) {
     bits |= a.bits;
 }
 
+int IS::Solution::bitsOn() {
+    int on = 0;
+    for(unsigned i = 0; i < size; ++i) if(bits[i]) on++;
+    return on;
+}
+
 double IS::Instance::calcDistance(const IS::Instance &b) const {
     const IS::Instance &a = *this;
     double dist = 0.0;
@@ -34,7 +40,6 @@ void IS::Dataset::getDispersions(std::vector<double> &dispersion) const {
     dispersion.assign(size(), 0.0);
     IS::Instance dummy;
     dummy.assign(getAttrs()-1, 0.0);
-
     const IS::Dataset &a = *this;
     for (int i = 0; i < a.size(); i++)
         dispersion[i] = a[i].calcDistance(dummy);

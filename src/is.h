@@ -36,6 +36,7 @@ namespace IS {
         std::bitset<MAX> getBits() const { return bits; };
         void setBits(const std::bitset<MAX> &a) { bits = a; }
         void generateRandom(); 
+        int bitsOn();
         std::string to_str() {
             std::string str = "";
             for (int i = 0; i < size; i++)

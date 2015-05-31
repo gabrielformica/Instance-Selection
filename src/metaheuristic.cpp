@@ -60,12 +60,12 @@ double Metaheuristic::quality(const IS::Dataset &T,
     double fitness = alpha * clas_rate + (1 - alpha) * perc_redc;
 
     // XXX: Print
-    cout << "Hubo un total de " << count << " aciertos" << endl;
-    cout << "Result es de tamanio: " << result.size() << endl;
-    cout << "La relación es: " << clas_rate << endl;
-    cout << "El tamaño de T es: " << T.size() << endl;
-    cout << "El porcentaje de reducción es: " << perc_redc << endl;
-    cout << "El fitness es : " << fitness << endl << endl;
+    // cout << "Hubo un total de " << count << " aciertos" << endl;
+    // cout << "Result es de tamanio: " << result.size() << endl;
+    // cout << "La relación es: " << clas_rate << endl;
+    // cout << "El tamaño de T es: " << T.size() << endl;
+    // cout << "El porcentaje de reducción es: " << perc_redc << endl;
+    // cout << "El fitness es : " << fitness << endl << endl;
 
     assert(fitness <= 1.0);
     return fitness;
@@ -79,8 +79,9 @@ void HillClimbing::optimize(const IS::Dataset &T, IS::Solution &S) {
     S.setSize(T.size());
     S.generateRandom();
     double q_max, old_q = -1;
-    int iter_old = 0;
+    int iter_old = 0, iter_total = 0;
     while (1) {
+        iter_total++;
         IS::Solution R(S);
         tweaker->tweak(R); 
         assert((S.getBits() ^ R.getBits()).count() == 1);
@@ -98,8 +99,13 @@ void HillClimbing::optimize(const IS::Dataset &T, IS::Solution &S) {
         }
         if (q_max > 0.95 or iter_old == 1000) break;
         old_q = q_max;
+
+        if(iter_total % 100 == 0 and iter_total != 0) {
+            cout << "Total iterations: " << iter_total << endl;
+            cout << "Best fitness so far: " << q_max << endl;
+            cout << "Solution size: " << S.bitsOn() << endl << endl;
+        }
     }
-    cout << "---> " << q_max << endl;
 }
 
 /* Simulated Annealing  */

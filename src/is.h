@@ -48,13 +48,13 @@ namespace IS {
         }
     };
 
-    class Problem : public std::vector<Instance> {
+    class Dataset : public std::vector<Instance> {
       private:
         int attrs;
       public:
-        Problem() { };
-        Problem(const Problem& a) : vector<Instance>(a.begin(), a.end()) { };
-        Problem(int N) : std::vector<Instance>(N) {};
+        Dataset() { };
+        Dataset(const Dataset& a) : vector<Instance>(a.begin(), a.end()) { };
+        Dataset(int N) : std::vector<Instance>(N) {};
         void setAttrs(int a) { attrs = a; }
         int getAttrs() const { return attrs; }
         void getDispersions(std::vector<double> &dispersion) const;

@@ -13,20 +13,20 @@ class Metaheuristic {
   protected:
     Tweaker *tweaker;
   public:
-    virtual void optimize(const IS::Problem &T, IS::Solution &R) = 0;
+    virtual void optimize(const IS::Dataset &T, IS::Solution &R) = 0;
     void setTweaker(Tweaker *tw) { tweaker = tw; };
     Tweaker* getTweaker() { return tweaker; };
-    double quality(const IS::Problem &T, const IS::Solution &S, double alpha);
-    double find_nearest(const IS::Problem &p, const IS::Instance &a);
-    void oneNN(const IS::Problem &training, 
-               const IS::Problem &result, 
+    double quality(const IS::Dataset &T, const IS::Solution &S, double alpha);
+    double find_nearest(const IS::Dataset &p, const IS::Instance &a);
+    void oneNN(const IS::Dataset &training, 
+               const IS::Dataset &result, 
                std::vector<double> &category);
     double calc_distance(const IS::Instance &a, const IS::Instance &b); 
 };
 
 class HillClimbing : public Metaheuristic {
   public: 
-    void optimize(const IS::Problem &T, IS::Solution &R);
+    void optimize(const IS::Dataset &T, IS::Solution &R);
 };
 
 class SimulatedAnnealing : public Metaheuristic {
@@ -34,13 +34,22 @@ class SimulatedAnnealing : public Metaheuristic {
     int temperature, dec_factor;
   public: 
     SimulatedAnnealing(int t, int d): temperature(t), dec_factor(d) { };
-    void optimize(const IS::Problem &T, IS::Solution &R);
+    void optimize(const IS::Dataset &T, IS::Solution &R);
 };
 
 
 class ILS : public Metaheuristic {
+  private:
+    int li, ti, pp;
   public: 
-    void optimize(const IS::Problem &T, IS::Solution &R);
+    ILS(int l, int t, int p) : li(l), ti(t), pp(p) { };
+    int  getLocalIter() { return li; }
+    int  getTotalIter() { return ti; }
+    int  getPerturbPerc() { return pp; }
+    void setLocalIter(int l) { li = l; }
+    void setTotalIter(int t) { ti = t; }
+    void setPerturbPerc(int p) { pp = p; }
+    void optimize(const IS::Dataset &T, IS::Solution &R);
 };
 
 class Tabu : public Metaheuristic {
@@ -48,7 +57,7 @@ class Tabu : public Metaheuristic {
     int length, number_of_tweaks;
   public:
     Tabu(int l, int n) : length(l), number_of_tweaks(n) { };
-    void optimize(const IS::Problem &T, IS::Solution &R);
+    void optimize(const IS::Dataset &T, IS::Solution &R);
 };
 
 

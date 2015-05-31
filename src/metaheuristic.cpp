@@ -9,10 +9,10 @@ double Metaheuristic::calc_distance(const IS::Instance &a, const IS::Instance &b
     return a.calcDistance(b);
 }
 
-double Metaheuristic::find_nearest(const IS::Problem &p, const IS::Instance &a) {
+double Metaheuristic::find_nearest(const IS::Dataset &p, const IS::Instance &a) {
     double imin = 1.0 * MAX;
     double category;
-    for (IS::Problem::const_iterator it = p.begin(); it < p.end(); ++it) {
+    for (IS::Dataset::const_iterator it = p.begin(); it < p.end(); ++it) {
         double dist = calc_distance(*it, a);
         if (dist < epsilon) {
             category = (*it).getCategory();
@@ -26,20 +26,20 @@ double Metaheuristic::find_nearest(const IS::Problem &p, const IS::Instance &a) 
     return category;
 }
 
-void Metaheuristic::oneNN(const IS::Problem &training, 
-                          const IS::Problem &result, 
+void Metaheuristic::oneNN(const IS::Dataset &training, 
+                          const IS::Dataset &result, 
                           std::vector<double> &category) {
 
     for (int i = 0; i < result.size(); i++)
         category[i] = find_nearest(training, result[i]);
 }
 
-double Metaheuristic::quality(const IS::Problem &T, 
+double Metaheuristic::quality(const IS::Dataset &T, 
                               const IS::Solution &S,
                               double alpha) {
 
     std::bitset<MAX> bits = S.getBits();
-    IS::Problem training, result;
+    IS::Dataset training, result;
     std::vector<double> category;
     int j = 0;
     for (int i = 0; i < T.size(); i++) {
@@ -74,7 +74,7 @@ double Metaheuristic::quality(const IS::Problem &T,
 
 /* Hill Climbing */
 
-void HillClimbing::optimize(const IS::Problem &T, IS::Solution &S) {
+void HillClimbing::optimize(const IS::Dataset &T, IS::Solution &S) {
     std::cout << ">>>> Running Hill Climbing" << std::endl;
     S.setSize(T.size());
     S.generateRandom();
@@ -104,7 +104,7 @@ void HillClimbing::optimize(const IS::Problem &T, IS::Solution &S) {
 
 /* Simulated Annealing  */
 
-void SimulatedAnnealing::optimize(const IS::Problem &T, IS::Solution &S) {
+void SimulatedAnnealing::optimize(const IS::Dataset &T, IS::Solution &S) {
     assert(T.size() == S.getSize());
     std::cout << ">>>> Running Simulated Annealing" << std::endl;
     S.setSize(T.size());
@@ -146,7 +146,7 @@ void SimulatedAnnealing::optimize(const IS::Problem &T, IS::Solution &S) {
 
 /* ILS */
 
-void ILS::optimize(const IS::Problem &T, IS::Solution &S) {
+void ILS::optimize(const IS::Dataset &T, IS::Solution &S) {
     std::cout << ">>>> Running ILS" << std::endl;
     S.setSize(T.size());
     S.generateRandom();
@@ -158,14 +158,15 @@ void ILS::optimize(const IS::Problem &T, IS::Solution &S) {
     int iter_old = 0, iter = 0;
     
     // TODO: Tune this
-    int max_out_iter = 1000;
+    int max_out_iter = getTotalIter();
 
     while(1) {
         // Local search
 
         // TODO: Ideally some tuneable number of iterations
         // 500 to 1000 random comes to mind
-        int max_iter = 1000; 
+        int max_iter = getLocalIter(); 
+        cout << ">>> Running local search" << endl;
         while(1) {
             IS::Solution R(S);
             tweaker->tweak(R); 
@@ -190,7 +191,8 @@ void ILS::optimize(const IS::Problem &T, IS::Solution &S) {
         if (qs > qb) best.setBits(S.getBits());
         // Flipping 25% of bits for perturb
         // TODO: This CAN be an argument
-        nRandomFlips tweaker = nRandomFlips(S.getSize() / 4);
+        cout << ">>> Perturbing" << endl;
+        nRandomFlips tweaker = nRandomFlips(S.getSize() / getPerturbPerc());
         tweaker.tweak(S);
 
         iter++;
@@ -200,7 +202,7 @@ void ILS::optimize(const IS::Problem &T, IS::Solution &S) {
 
 /* Tabu */
 
-void Tabu::optimize(const IS::Problem &T, IS::Solution &best) {
+void Tabu::optimize(const IS::Dataset &T, IS::Solution &best) {
     std::cout << ">>>> Running Tabu" << std::endl;
     IS::Solution S(T.size());
     S.generateRandom();  // First random solution

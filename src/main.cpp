@@ -14,7 +14,7 @@ int moa_counter = 0;
 int tweaker_optional_arg[10];
 int toa_counter = 0;
 
-IS::Problem load_data(std::string file_name_str) {
+IS::Dataset load_data(std::string file_name_str) {
     const char *file_name = file_name_str.c_str();
     FILE *input = fopen(file_name, "r");
     int instances, attrs;
@@ -31,7 +31,7 @@ IS::Problem load_data(std::string file_name_str) {
         exit(1);
     }
     
-    IS::Problem problem = IS::Problem(instances);
+    IS::Dataset problem = IS::Dataset(instances);
     problem.setAttrs(attrs);
 
     for(unsigned i = 0; i < instances; ++i) {
@@ -93,7 +93,7 @@ void error_(std::string msg) {
     exit(1);
 }
 
-void print_solution(const IS::Problem &problem, const IS::Solution &sol) {
+void print_solution(const IS::Dataset &problem, const IS::Solution &sol) {
     int count = 0;
     std::bitset<MAX> bits = sol.getBits();
     for (unsigned i = 0; i < sol.getSize(); ++i) {
@@ -108,7 +108,7 @@ void print_solution(const IS::Problem &problem, const IS::Solution &sol) {
     std::cout << "Solution of size: " << count << std::endl;
 }
 
-void print_dispersions(const IS::Problem &problem) {
+void print_dispersions(const IS::Dataset &problem) {
     std::vector<double> dispersion;
     problem.getDispersions(dispersion);
     std::cout << ">>>>>> Dispersions: " << std::endl;
@@ -133,7 +133,15 @@ Metaheuristic *choose_metaheuristic(std::string metaheuristic_str) {
         int l = metaheuristic_optional_arg[0]; 
         int n = metaheuristic_optional_arg[1];
         return new Tabu(l, n);
-    } else if (metaheuristic_str == "ILS") return new ILS();
+    } else if (metaheuristic_str == "ILS") {
+        
+        // Print error and exit
+        if (moa_counter != 3) error_("ILS needs three arguments");
+        int l = metaheuristic_optional_arg[0]; 
+        int t = metaheuristic_optional_arg[1];
+        int p = metaheuristic_optional_arg[2];
+        return new ILS(l, t, p);
+    }
     error_("The metaheuristic you are providing doesn't exist");
     return NULL;   // Shut up warning
 }
@@ -201,14 +209,14 @@ int main(int argc, char *argv[]) {
     if (! flag_g) error_("You have to specify a metaheuristic"); 
     if (! flag_x) error_("You have to specify a tweaker");
 
-    IS::Problem problem = load_data(file_name);
+    IS::Dataset dataset = load_data(file_name);
     Metaheuristic *metaheuristic = choose_metaheuristic(metaheuristic_str);
     Tweaker *tweaker = choose_tweaker(tweaker_str);
 
     metaheuristic->setTweaker(tweaker);
 
-    IS::Solution solution(problem.size());
-    metaheuristic->optimize(problem, solution);
+    IS::Solution solution(dataset.size());
+    metaheuristic->optimize(dataset, solution);
 
 
     return 0;

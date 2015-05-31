@@ -6,8 +6,16 @@
 #include <getopt.h>
 #include "is.h"
 #include "metaheuristic.h"
+#include "tweaker.h"
 
-IS::Problem load_data(char *file_name) {
+int metaheuristic_optional_arg[10];
+int moa_counter = 0;
+
+int tweaker_optional_arg[10];
+int toa_counter = 0;
+
+IS::Problem load_data(std::string file_name_str) {
+    const char *file_name = file_name_str.c_str();
     FILE *input = fopen(file_name, "r");
     int instances, attrs;
 
@@ -41,18 +49,48 @@ IS::Problem load_data(char *file_name) {
 }
 
 void print_help() {
-    std::cout << "-h, --help\t\t\tPrint this help" << std::endl;
-    std::cout << "-f, --file\t\t\tExpect a file name" << std::endl;
-    std::cout << "-d, --disp\t\t\tPrint dispersion vector" << std::endl;
+    std::cout << "Usage: ./instance_selection [OPTIONS]" << std::endl;
+    std::cout << "Run a metaheuristic with an tweaker over a problem.";
+    std::cout << std::endl << std::endl;
+    std::cout << "Flags with -Needed- are mandatory." << std::endl << std::endl;
 
-    std::cout << "-c, --hill-climing\t\tRun hill climbing metaheuristic"; 
+    std::cout << "Flags of the form '--FOO-optional-arg'";
+    std::cout << ", recieve parameters that has " << std::endl;
+    std::cout << "to be used by 'FOO', ";
+    std::cout << "and they follow a possitional order that is" << std::endl;
+    std::cout << "meaningful to 'FOO'." << std::endl << std::endl;
+
+    std::cout << "-h, --help\t\t\t\tPrint this help" << std::endl;  
+    std::cout << "-f, --file\t-Needed-\t\tExpect a file name" << std::endl; 
+    std::cout << "-d, --disp\t\t\t\tPrint dispersion vector" << std::endl; 
+
+    // Metaheuristic
+    std::cout << "-g, --metaheuristic [NAME]     -Needed-\tSpecify metaheuristic"; 
     std::cout << std::endl;
 
-    std::cout << "-s, --simulated-annealing\tRun simulated annealing metaheuristic"; 
+    std::cout << "-m, --meta-optional-arg [VALUE]\t\tValue for metaheuristic"; 
     std::cout << std::endl;
 
-    std::cout << "-t, --tabu\t\t\tRun tabu metaheuristic"; 
+    // Tweaker
+    std::cout << "-x, --tweaker \t-Needed-\t\tSpecify tweaker"; 
     std::cout << std::endl;
+
+    std::cout << "-o, --tweaker-optional-arg [VALUE]\tValue for tweaker"; 
+    std::cout << std::endl << std::endl;
+
+    // Example
+    std::cout << "Example" << std::endl;
+    std::cout << "   ./instance_selection -g \"Tabu\" -m 100 -m 30 ";
+    std::cout << "-x \"nRandomFlips\" -o 15" << std::endl << std::endl;
+    std::cout << "   Wich will use Tabu with a tabu list of 100 elements and";
+    std::cout << std::endl <<  "   number of tweaks equals to 30" << std::endl;
+
+}
+
+void error_(std::string msg) {
+
+    std::cout << "ERROR: " <<  msg << std::endl;
+    exit(1);
 }
 
 void print_solution(const IS::Problem &problem, const IS::Solution &sol) {
@@ -79,30 +117,40 @@ void print_dispersions(const IS::Problem &problem) {
     std::cout << endl;
 }
 
-void hill_climbing(const IS::Problem &problem) {
-    std::cout << ">>>> Running hill climbing" << std::endl << std::endl;
-    IS::Solution sol(problem.size());
-    HillClimbing hc;
-    hc.optimize(problem, sol);
-    print_solution(problem, sol);
+Metaheuristic *choose_metaheuristic(std::string metaheuristic_str) {
+    Metaheuristic *metaheuristic;
+    if (metaheuristic_str == "HillClimbing") {
+        return new HillClimbing();
+    } else if (metaheuristic_str == "SimulatedAnnealing") {
+        // Print error and exit
+        if (moa_counter != 2) error_("SimulatedAnnealing needs two arguments");
+        int t = metaheuristic_optional_arg[0]; 
+        int d = metaheuristic_optional_arg[1];
+        return new SimulatedAnnealing(t, d);
+    } else if (metaheuristic_str == "Tabu") {
+        // Print error and exit
+        if (moa_counter != 2) error_("Tabu needs two arguments");
+        int l = metaheuristic_optional_arg[0]; 
+        int n = metaheuristic_optional_arg[1];
+        return new Tabu(l, n);
+    } else if (metaheuristic_str == "ILS") return new ILS();
+    error_("The metaheuristic you are providing doesn't exist");
+    return NULL;   // Shut up warning
 }
 
-void simulated_annealing(const IS::Problem &problem) {
-    std::cout << ">>>> Running simulated annealing" << std::endl << std::endl;
-    IS::Solution sol(problem.size());
-    SimulatedAnnealing sa(10000, 10);
-    sa.optimize(problem, sol);
-    print_solution(problem, sol);
-}
-
-
-void tabu() {
-
-}
-
-void missing_file() {
-    std::cout << "You need to specify a file path" << std::endl;
-    exit(1);
+Tweaker *choose_tweaker(std::string tweaker_str) {
+    Tweaker *tweaker;
+    if (tweaker_str == "oneRandomUnset") return new oneRandomUnset();
+    else if (tweaker_str == "upToNRandomFlips") {
+        // Print error and exit
+        if (toa_counter != 1) error_("upToNRandomFlips needs one argument");
+        return new upToNRandomFlips(tweaker_optional_arg[0]);
+    } else if (tweaker_str == "nRandomFlips") {
+        // Print error and exit
+        if (toa_counter != 1) error_("nRandomFlips needs one argument");
+        return new nRandomFlips(tweaker_optional_arg[0]);
+    }
+    return NULL;
 }
 
 int main(int argc, char *argv[]) {
@@ -111,38 +159,57 @@ int main(int argc, char *argv[]) {
         {"help", no_argument, 0, 'h'},
         {"file", required_argument, 0, 'f'},
         {"disp", no_argument, 0, 'd'},
-        {"hill-climbing", no_argument, 0, 'c'},
-        {"simulated-annealing", no_argument, 0, 's'},
-        {"tabu", no_argument, 0, 't'},
+        {"metaheuristic", required_argument, 0, 'g'},
+        {"meta-optional-arg", required_argument, 0, 'm'},
+        {"tweaker-optional-arg", required_argument, 0, 'o'},
+        {"tweaker", required_argument, 0, 'x'},
         {0, 0, 0, 0}
     };
 
     // Parser of CLI
     int opt, option_index;
-    bool flag_dispersions, flag_help, flag_d, flag_f, flag_c, flag_s, flag_t;
-    char file_name[100];
+    bool flag_h, flag_f, flag_d, flag_g, flag_m, flag_o;
+    bool flag_x;
+    memset(metaheuristic_optional_arg, 0, sizeof(metaheuristic_optional_arg));
+    memset(tweaker_optional_arg, 0, sizeof(tweaker_optional_arg));
+
+    // We need these three things
+    std::string file_name, metaheuristic_str, tweaker_str;
+
     while (1) {
-        opt = getopt_long(argc, argv, "hf:dcst", long_options, &option_index);
+        opt = getopt_long(argc, argv, "hf:dg:m:o:x:", long_options, &option_index);
         if (opt == -1) break;
 
         switch (opt) {
             case 0: break;
-            case 'h': flag_help = true; print_help(); break;
-            case 'f': flag_f = true; strcpy(file_name, optarg); break;
+            case 'h': flag_h = true; print_help(); break;
+            case 'f': flag_f = true; file_name = optarg; break;
             case 'd': flag_d = true; break;
-            case 'c': flag_c = true; break;
-            case 's': flag_s = true; break;
-            case 't': flag_t = true; break;
+            case 'g': flag_g = true; metaheuristic_str = optarg; break; 
+            case 'm': metaheuristic_optional_arg[moa_counter++] = atoi(optarg); 
+                      break;
+            case 'o': tweaker_optional_arg[toa_counter++] = atoi(optarg); 
+                      break;
+            case 'x': flag_x = true; tweaker_str = optarg; break;
         }
     }
-    if (flag_help) return 0; // Print help and exit
 
-    if (! flag_f) missing_file();  // Print error and exit
+    if (flag_h) return 0; // Print help and exit
+
+    // Checking and exit in case of error
+    if (! flag_f) error_("You have to specify a file");  
+    if (! flag_g) error_("You have to specify a metaheuristic"); 
+    if (! flag_x) error_("You have to specify a tweaker");
 
     IS::Problem problem = load_data(file_name);
-    if (flag_d) print_dispersions(problem);
-    if (flag_c) hill_climbing(problem);
-    if (flag_s) simulated_annealing(problem);
+    Metaheuristic *metaheuristic = choose_metaheuristic(metaheuristic_str);
+    Tweaker *tweaker = choose_tweaker(tweaker_str);
+
+    metaheuristic->setTweaker(tweaker);
+
+    IS::Solution solution(problem.size());
+    metaheuristic->optimize(problem, solution);
+
 
     return 0;
 }

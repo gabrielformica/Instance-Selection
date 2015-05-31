@@ -1,6 +1,6 @@
 #include "tweaker.h"
 
-void oneRandomFlip::tweak(IS::Solution &S) {
+void oneRandomUnset::tweak(IS::Solution &S) {
     std::bitset<MAX> bits = S.getBits();
     int size = S.getSize();
     srand(time(NULL));

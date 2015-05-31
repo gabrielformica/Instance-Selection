@@ -7,11 +7,6 @@ using namespace std;
 
 double Metaheuristic::calc_distance(const IS::Instance &a, const IS::Instance &b) {
     return a.calcDistance(b);
-    //double dist = 0.0;
-    //assert(a.size() == b.size());
-    //for (int i = 0; i < a.size(); ++i)
-    //    dist += (a[i] - b[i]) * (a[i] - b[i]);
-    //return sqrt(dist);
 }
 
 double Metaheuristic::find_nearest(const IS::Problem &p, const IS::Instance &a) {
@@ -62,16 +57,16 @@ double Metaheuristic::quality(const IS::Problem &T,
 
     double clas_rate = (1.0 * count) / (1.0 * result.size());
     double perc_redc = (1.0 * result.size()) / (1.0 * T.size());
-
-    // cout << "Hubo un total de " << count << " aciertos" << endl;
-    // cout << "Result es de tamanio: " << result.size() << endl;
-    // cout << "La relación es: " << clas_rate << endl;
-
-    // cout << "El tamaño de T es: " << T.size() << endl;
-    // cout << "El porcentaje de reducción es: " << perc_redc << endl;
-
     double fitness = alpha * clas_rate + (1 - alpha) * perc_redc;
-    // cout << "El fitness es : " << fitness << endl << endl;
+
+    // XXX: Print
+    cout << "Hubo un total de " << count << " aciertos" << endl;
+    cout << "Result es de tamanio: " << result.size() << endl;
+    cout << "La relación es: " << clas_rate << endl;
+    cout << "El tamaño de T es: " << T.size() << endl;
+    cout << "El porcentaje de reducción es: " << perc_redc << endl;
+    cout << "El fitness es : " << fitness << endl << endl;
+
     assert(fitness <= 1.0);
     return fitness;
 }
@@ -80,13 +75,14 @@ double Metaheuristic::quality(const IS::Problem &T,
 /* Hill Climbing */
 
 void HillClimbing::optimize(const IS::Problem &T, IS::Solution &S) {
+    std::cout << ">>>> Running Hill Climbing" << std::endl;
     S.setSize(T.size());
     S.generateRandom();
     double q_max, old_q = -1;
     int iter_old = 0;
     while (1) {
         IS::Solution R(S);
-        getTweaker()->tweak(R); 
+        tweaker->tweak(R); 
         assert((S.getBits() ^ R.getBits()).count() == 1);
 
         // Using 0.5 because paper
@@ -109,6 +105,8 @@ void HillClimbing::optimize(const IS::Problem &T, IS::Solution &S) {
 /* Simulated Annealing  */
 
 void SimulatedAnnealing::optimize(const IS::Problem &T, IS::Solution &S) {
+    assert(T.size() == S.getSize());
+    std::cout << ">>>> Running Simulated Annealing" << std::endl;
     S.setSize(T.size());
     S.generateRandom();   // Initial solution
 
@@ -119,7 +117,7 @@ void SimulatedAnnealing::optimize(const IS::Problem &T, IS::Solution &S) {
     int t = temperature;  // Temperature 
     while (1) {
         IS::Solution R(S);
-        getTweaker()->tweak(R); 
+        tweaker->tweak(R); 
         // assert((S.getBits() ^ R.getBits()).count() == 1);
 
         // Using 0.5 because paper
@@ -149,6 +147,7 @@ void SimulatedAnnealing::optimize(const IS::Problem &T, IS::Solution &S) {
 /* ILS */
 
 void ILS::optimize(const IS::Problem &T, IS::Solution &S) {
+    std::cout << ">>>> Running ILS" << std::endl;
     S.setSize(T.size());
     S.generateRandom();
 
@@ -169,7 +168,7 @@ void ILS::optimize(const IS::Problem &T, IS::Solution &S) {
         int max_iter = 1000; 
         while(1) {
             IS::Solution R(S);
-            getTweaker()->tweak(R); 
+            tweaker->tweak(R); 
             double q1 = quality(T, R, 0.5), q2 = quality(T, S, 0.5);
             if (q1 > q2)
                 S.setBits(R.getBits());
@@ -196,13 +195,13 @@ void ILS::optimize(const IS::Problem &T, IS::Solution &S) {
 
         iter++;
         if (q_max > 0.95 or iter == max_out_iter) break;
-
     }
 }
 
 /* Tabu */
 
 void Tabu::optimize(const IS::Problem &T, IS::Solution &best) {
+    std::cout << ">>>> Running Tabu" << std::endl;
     IS::Solution S(T.size());
     S.generateRandom();  // First random solution
 
@@ -212,11 +211,11 @@ void Tabu::optimize(const IS::Problem &T, IS::Solution &best) {
     while (1) {
         if (tabu_list.size() > length) tabu_list.pop_front();
         IS::Solution R(S);
-        getTweaker()->tweak(R); 
+        tweaker->tweak(R); 
 
         for (int i = 0; i < number_of_tweaks - 1; i++) {
             IS::Solution W(S); 
-            getTweaker()->tweak(W);
+            tweaker->tweak(W);
 
             // Checking if W is in tabu list
             std::deque<IS::Solution>::iterator it;

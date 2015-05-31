@@ -24,7 +24,6 @@ void IS::Solution::copy(const Solution &a) {
 double IS::Instance::calcDistance(const IS::Instance &b) const {
     const IS::Instance &a = *this;
     double dist = 0.0;
-    cout << "a: " << a.size() << " b: " << b.size() << endl;
     assert(a.size() == b.size());
     for (int i = 0; i < a.size(); ++i)
         dist += (a[i] - b[i]) * (a[i] - b[i]);

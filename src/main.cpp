@@ -1,13 +1,16 @@
-#include <algorithm>
 #include <iostream>
 #include <getopt.h>
 #include <cstdlib>
 #include <cstring>
+#include <cassert>
 #include <string>
 #include <cstdio>
+#include <ctime>
 #include "metaheuristic.h"
 #include "tweaker.h"
 #include "is.h"
+
+typedef IS::Dataset ds;
 
 int metaheuristic_optional_arg[10];
 int moa_counter = 0;
@@ -15,10 +18,10 @@ int moa_counter = 0;
 int tweaker_optional_arg[10];
 int toa_counter = 0;
 
-IS::Dataset load_data(std::string file_name_str) {
+std::pair<ds, ds> load_data(std::string file_name_str, int partition) {
     const char *file_name = file_name_str.c_str();
     FILE *input = fopen(file_name, "r");
-    int instances, attrs;
+    int insts_size, num_attrs;
 
     if (input) 
         printf("File: %s\n", file_name);
@@ -27,26 +30,56 @@ IS::Dataset load_data(std::string file_name_str) {
         exit(1);
     }
 
-    if (fscanf(input, "%d %d", &instances, &attrs) != 2) {
+    if (fscanf(input, "%d %d", &insts_size, &num_attrs) != 2) {
         printf("ERROR at data load: file malformed\n");
         exit(1);
     }
     
-    IS::Dataset problem = IS::Dataset(instances);
-    problem.setAttrs(attrs);
+    int val_size = insts_size / 10;
+    int tra_size = insts_size - val_size;
 
-    for(unsigned i = 0; i < instances; ++i) {
-        // attrs-1 because last element of line is category
-        double attr;
-        for(unsigned j = 0; j < attrs-1; ++j) { 
+    // Two datasets are built: One for validation and one for training
+    IS::Dataset validation = IS::Dataset();
+    IS::Dataset training   = IS::Dataset();
+    training.setAttrs(num_attrs);
+    validation.setAttrs(num_attrs);
+
+    std::vector<int> val_pos;
+    
+    srand(time(NULL));
+    for(unsigned i = 0; i < val_size; ++i) {
+        int j = rand() % tra_size;
+        val_pos.push_back(j);
+    }
+    assert(val_pos.size() == val_size);
+
+    for(unsigned i = 0; i < insts_size; ++i) {
+        if(std::find(val_pos.begin(), val_pos.end(), i) != val_pos.end()) {
+            /* validation instance */
+            double attr;
+            IS::Instance val;
+            for(unsigned j = 0; j < num_attrs-1; ++j) { 
+                fscanf(input, "%lf", &attr);
+                val.push_back(attr);
+            }
             fscanf(input, "%lf", &attr);
-            problem[i].push_back(attr);
+            val.setCategory(attr);
+            validation.push_back(val);
+        } else {
+            /* not a validation instance */
+            double attr;
+            IS::Instance tra;
+            for(unsigned j = 0; j < num_attrs-1; ++j) { 
+                fscanf(input, "%lf", &attr);
+                tra.push_back(attr);
+            }
+            fscanf(input, "%lf", &attr);
+            tra.setCategory(attr);
+            training.push_back(tra);
         }
-        fscanf(input, "%lf", &attr);
-        problem[i].setCategory(attr);
     }
 
-    return problem;
+    return pair<ds,ds>(training, validation);
 }
 
 void print_help() {
@@ -217,21 +250,27 @@ int main(int argc, char *argv[]) {
     if (! flag_g) error_("You have to specify a metaheuristic"); 
     if (! flag_x) error_("You have to specify a tweaker");
 
-    IS::Dataset dataset = load_data(file_name);
+    // TODO: Make this a parameter
+    int part = 10;
+
+    std::pair<ds, ds> dataset = load_data(file_name, part);
+    IS::Dataset training   = dataset.first;
+    IS::Dataset validation = dataset.second;
+
+    Metaheuristic *metaheuristic = choose_metaheuristic(metaheuristic_str);
+    Tweaker *tweaker = choose_tweaker(tweaker_str);
 
     if (flag_d) {
-        print_dispersions(dataset);
+        print_dispersions(training);
     } else {
         Metaheuristic *metaheuristic = choose_metaheuristic(metaheuristic_str);
         Tweaker *tweaker = choose_tweaker(tweaker_str);
 
         metaheuristic->setTweaker(tweaker);
 
-        IS::Solution solution(dataset.size());
-        metaheuristic->optimize(dataset, solution);
+        IS::Solution solution(training.size());
+        metaheuristic->optimize(training, solution);
     }
-
-
 
     return 0;
 }

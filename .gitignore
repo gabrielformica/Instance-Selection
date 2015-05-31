@@ -5,5 +5,9 @@ doc/paper.*
 !doc/paper.sty
 doc/paperNotes*
 src/instance_selection
+!data/
 data/*
+!data/small/
+!data/medium/
+!data/large/
 scripts/*

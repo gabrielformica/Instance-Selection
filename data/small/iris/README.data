@@ -1,0 +1,4 @@
+In the original dataset there were 3 classes, which are now mapped this way:
+    * Iris setosa     -> 1
+    * Iris veriscolor -> 2
+    * Iris virginica  -> 3

@@ -84,7 +84,7 @@ void HillClimbing::optimize(const IS::Dataset &T, IS::Solution &S) {
         iter_total++;
         IS::Solution R(S);
         tweaker->tweak(R); 
-        assert((S.getBits() ^ R.getBits()).count() == 1);
+        // assert((S.getBits() ^ R.getBits()).count() == 1);
 
         // Using 0.5 because paper
         double q1 = quality(T, R, 0.5), q2 = quality(T, S, 0.5);
@@ -97,6 +97,7 @@ void HillClimbing::optimize(const IS::Dataset &T, IS::Solution &S) {
         } else {
             iter_old = 0;
         }
+        // TODO: Pass these values as parameters
         if (q_max > 0.95 or iter_old == 1000) break;
         old_q = q_max;
 

@@ -79,7 +79,7 @@ std::pair<ds, ds> load_data(std::string file_name_str, int partition) {
         }
     }
 
-    return pair<ds,ds>(training, validation);
+    return make_pair(training, validation);
 }
 
 void print_help() {
@@ -246,9 +246,9 @@ int main(int argc, char *argv[]) {
     if (flag_h) return 0; // Print help and exit
 
     // Checking and exit in case of error
-    if (! flag_f) error_("You have to specify a file");  
-    if (! flag_g) error_("You have to specify a metaheuristic"); 
-    if (! flag_x) error_("You have to specify a tweaker");
+    if (! flag_f and ! flag_d) error_("You have to specify a file");  
+    if (! flag_g and ! flag_d) error_("You have to specify a metaheuristic"); 
+    if (! flag_x and ! flag_d) error_("You have to specify a tweaker");
 
     // TODO: Make this a parameter
     int part = 10;
@@ -257,20 +257,18 @@ int main(int argc, char *argv[]) {
     IS::Dataset training   = dataset.first;
     IS::Dataset validation = dataset.second;
 
+    if (flag_d) {
+        print_dispersions(training);
+        return 0;
+    }
+
     Metaheuristic *metaheuristic = choose_metaheuristic(metaheuristic_str);
     Tweaker *tweaker = choose_tweaker(tweaker_str);
 
-    if (flag_d) {
-        print_dispersions(training);
-    } else {
-        Metaheuristic *metaheuristic = choose_metaheuristic(metaheuristic_str);
-        Tweaker *tweaker = choose_tweaker(tweaker_str);
+    metaheuristic->setTweaker(tweaker);
 
-        metaheuristic->setTweaker(tweaker);
-
-        IS::Solution solution(training.size());
-        metaheuristic->optimize(training, solution);
-    }
+    IS::Solution solution(training.size());
+    metaheuristic->optimize(training, solution);
 
     return 0;
 }

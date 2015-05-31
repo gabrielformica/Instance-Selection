@@ -54,7 +54,7 @@ namespace IS {
         int attrs;
       public:
         Dataset() { };
-        Dataset(const Dataset& a) : vector<Instance>(a.begin(), a.end()) { };
+        Dataset(const Dataset& a) : vector<Instance>(a.begin(), a.end()), attrs(a.getAttrs()) { };
         Dataset(int N) : std::vector<Instance>(N) {};
         void setAttrs(int a) { attrs = a; }
         int getAttrs() const { return attrs; }

@@ -270,5 +270,31 @@ int main(int argc, char *argv[]) {
     IS::Solution solution(training.size());
     metaheuristic->optimize(training, solution);
 
+    // Checking quality of final solution
+    std::vector<double> categories;
+    categories.assign(validation.size(), -1);
+
+    std::bitset<MAX> bits = solution.getBits();
+    IS::Dataset final;
+    for(unsigned i = 0; i < training.size(); ++i) {
+        if(bits[i]) final.push_back(training[i]);
+    }
+
+    metaheuristic->oneNN(final, validation, categories);
+
+    int errors = 0;
+    for (int i = 0; i < validation.size(); i++)
+        if (validation[i].getCategory() != categories[i])
+            errors++;
+
+    double clas_rate = (1.0 * errors) / (1.0 * validation.size());
+    double perc_redc = (1.0 * final.size()) / (1.0 * training.size());
+    double fitness = 0.5 * clas_rate + (1 - 0.5) * perc_redc;
+
+    // XXX: Print
+    cout << "Total errors: " << errors << endl;
+    cout << "Validation error %: " << (errors * 100.0) / (validation.size() * 1.0) << endl;
+    cout << "Size %: " << (final.size() * 100.0) / (training.size() * 1.0) << endl;
+
     return 0;
 }

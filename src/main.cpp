@@ -198,6 +198,10 @@ Tweaker *choose_tweaker(std::string tweaker_str) {
         // Print error and exit
         if (toa_counter != 1) error_("nRandomFlips needs one argument");
         return new nRandomFlips(tweaker_optional_arg[0]);
+    } else if (tweaker_str == "percRandomFlips") {
+        // Print error and exit
+        if (toa_counter != 1) error_("percRandomFlips needs one argument");
+        return new percRandomFlips(tweaker_optional_arg[0]);
     }
     return NULL;
 }

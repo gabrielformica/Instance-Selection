@@ -37,3 +37,18 @@ void nRandomFlips::tweak(IS::Solution &S) {
     S.setBits(bits);
 }
 
+void percRandomFlips::tweak(IS::Solution &S) {
+    std::bitset<MAX> bits = S.getBits();
+    int size = S.getSize();
+    int n = (perc * size) / 100;
+
+    srand(time(NULL));
+    for(unsigned i = 0; i < n; ++i) {
+        int j = (rand() % size) + 1;
+        bits.flip(j);
+    }
+    S.setBits(bits);
+}
+
+
+

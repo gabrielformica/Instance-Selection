@@ -29,5 +29,13 @@ class nRandomFlips : public Tweaker {
     void tweak(IS::Solution &S);
 };
 
+class percRandomFlips : public Tweaker {
+  private:
+    int perc;
+  public:
+    percRandomFlips(int x) : perc(x) { }
+    void tweak(IS::Solution &S);
+};
+
 
 #endif

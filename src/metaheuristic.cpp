@@ -213,12 +213,13 @@ void Tabu::optimize(const IS::Dataset &T, IS::Solution &best) {
     std::cout << ">>>> Running Tabu" << std::endl;
     IS::Solution S(T.size());
     S.generateRandom();  // First random solution
+    int max_length = (length * T.size() / 100);
 
     std::deque<IS::Solution> tabu_list;   // Tabu list
     tabu_list.push_back(S);
     best.copy(S);
     while (1) {
-        if (tabu_list.size() > length) tabu_list.pop_front();
+        if (tabu_list.size() > max_length) tabu_list.pop_front();
         IS::Solution R(S);
         tweaker->tweak(R); 
 

@@ -1,5 +1,6 @@
 #include <iostream>
 #include <getopt.h>
+#include <fstream>
 #include <cstdlib>
 #include <cstring>
 #include <cassert>
@@ -18,11 +19,12 @@ int moa_counter = 0;
 int tweaker_optional_arg[10];
 int toa_counter = 0;
 
-typedef struct result {
-    int errors;
-    float size;
-    float val_error;
+typedef struct results {
+    std::vector<int> errors;
+    std::vector<float> sizes;
+    std::vector<float> val_errors;
 } result;
+
 
 
 std::pair<ds, ds> load_data(std::string file_name_str, int partition) {
@@ -223,28 +225,37 @@ int main(int argc, char *argv[]) {
         {"meta-optional-arg", required_argument, 0, 'm'},
         {"tweaker-optional-arg", required_argument, 0, 'o'},
         {"tweaker", required_argument, 0, 'x'},
+        {"results", required_argument, 0, 'r'},
         {0, 0, 0, 0}
     };
 
     // Parser of CLI
-    int opt, option_index, runs;
-    bool flag_h, flag_f, flag_d, flag_g, flag_m, flag_o, flag_n;
-    bool flag_x;
+    int opt = 0, option_index, runs;
+    bool flag_h = false; 
+    bool flag_f = false; 
+    bool flag_d = false; 
+    bool flag_g = false; 
+    bool flag_m = false; 
+    bool flag_o = false; 
+    bool flag_n = false;
+    bool flag_x = false;
+    bool flag_r = false;
     memset(metaheuristic_optional_arg, 0, sizeof(metaheuristic_optional_arg));
     memset(tweaker_optional_arg, 0, sizeof(tweaker_optional_arg));
 
     // We need these three things
     std::string file_name, metaheuristic_str, tweaker_str;
+    std::string out_fn;
 
     while (1) {
-        opt = getopt_long(argc, argv, "hf:dg:m:o:x:n:", long_options, &option_index);
+        opt = getopt_long(argc, argv, "dhf:g:m:o:x:n:r:", long_options, &option_index);
         if (opt == -1) break;
+        opt = char(opt);
 
         switch (opt) {
-            case 0: break;
+            case 0  : break;
             case 'h': flag_h = true; print_help(); break;
             case 'f': flag_f = true; file_name = optarg; break;
-            case 'd': flag_d = true; break;
             case 'g': flag_g = true; metaheuristic_str = optarg; break; 
             case 'm': metaheuristic_optional_arg[moa_counter++] = atoi(optarg); 
                       break;
@@ -252,6 +263,9 @@ int main(int argc, char *argv[]) {
                       break;
             case 'x': flag_x = true; tweaker_str = optarg; break;
             case 'n': flag_n = true; runs = atoi(optarg); break;
+            case 'r': flag_r = true; out_fn = optarg; break;
+            case 'd': flag_d = true; break;
+            case '?': break;
         }
     }
 
@@ -261,10 +275,7 @@ int main(int argc, char *argv[]) {
     if (! flag_f and ! flag_d) error_("You have to specify a file");  
     if (! flag_g and ! flag_d) error_("You have to specify a metaheuristic"); 
     if (! flag_x and ! flag_d) error_("You have to specify a tweaker");
-    if (! flag_n and ! flag_d) {
-        runs = 1;
-    }
-
+    if (! flag_n and ! flag_d) runs = 1;
 
     // TODO: Make this a parameter
     int part = 10;
@@ -279,10 +290,18 @@ int main(int argc, char *argv[]) {
     }
 
     Metaheuristic *metaheuristic = choose_metaheuristic(metaheuristic_str);
+    if (!metaheuristic) {
+        std::cerr << "Error: No metaheuristic by that name." << std::endl;
+        exit(1);
+    }
     Tweaker *tweaker = choose_tweaker(tweaker_str);
+    if (!tweaker) {
+        std::cerr << "Error: No tweaker by that name." << std::endl;
+        exit(1);
+    }
 
     metaheuristic->setTweaker(tweaker);
-    vector<result> results;
+    results res;
 
     for(unsigned i = 0; i < runs; ++i) {
         /* code */
@@ -310,21 +329,32 @@ int main(int argc, char *argv[]) {
         double perc_redc = (1.0 * final.size()) / (1.0 * training.size());
         double fitness = 0.5 * clas_rate + (1 - 0.5) * perc_redc;
 
-        // XXX: Print
-        result r;
-        r.errors = errors;
-        r.val_error = (errors * 100.0) / (validation.size() * 1.0);
-        r.size = (final.size() * 100.0) / (training.size() * 1.0);
-        results.push_back(r);
-
+        res.errors.push_back(errors);
+        res.val_errors.push_back((errors * 100.0) / (validation.size() * 1.0));
+        res.sizes.push_back((final.size() * 100.0) / (training.size() * 1.0));
     }
 
-    for(unsigned i = 0; i < results.size(); ++i) {
-        result r = results[i];
-        cout << "Total errors: " << r.errors << endl;
-        cout << "Validation error %: " << r.val_error << endl;
-        cout << "Size %: " << r.size << endl;
+
+    std::ostream *out;
+
+    if(flag_r) {
+        std::ofstream rFile;
+        rFile.open(out_fn, std::ios::out);
+        out = &rFile;
+    } else {
+        out = &std::cout;
     }
+    double esum = std::accumulate(res.errors.begin(), res.errors.end(), 0.0);
+    double emean = esum / res.errors.size();
+    double vsum = std::accumulate(res.sizes.begin(), res.sizes.end(), 0.0);
+    double vmean = vsum / res.sizes.size();
+    double ssum = std::accumulate(res.val_errors.begin(), res.val_errors.end(), 0.0);
+    double smean = ssum / res.val_errors.size();
+
+
+    *out << "Errors: " << emean << std::endl;
+    *out << "Size of solution %: " << smean << std::endl;
+    *out << "Validation errors: %: " << vmean << std::endl;
 
     return 0;
 }

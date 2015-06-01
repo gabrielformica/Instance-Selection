@@ -336,9 +336,9 @@ int main(int argc, char *argv[]) {
 
 
     std::ostream *out;
+    std::ofstream rFile;
 
     if(flag_r) {
-        std::ofstream rFile;
         rFile.open(out_fn, std::ios::out);
         out = &rFile;
     } else {
@@ -355,6 +355,7 @@ int main(int argc, char *argv[]) {
     *out << "Errors: " << emean << std::endl;
     *out << "Size of solution %: " << smean << std::endl;
     *out << "Validation errors: %: " << vmean << std::endl;
+    rFile.close();
 
     return 0;
 }

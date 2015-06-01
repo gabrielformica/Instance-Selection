@@ -218,7 +218,10 @@ void Tabu::optimize(const IS::Dataset &T, IS::Solution &best) {
     std::deque<IS::Solution> tabu_list;   // Tabu list
     tabu_list.push_back(S);
     best.copy(S);
+    double q_max, old_q = -1;
+    int iter_old = 0, iter_total = 0;
     while (1) {
+        iter_total++;
         if (tabu_list.size() > max_length) tabu_list.pop_front();
         IS::Solution R(S);
         tweaker->tweak(R); 
@@ -247,7 +250,16 @@ void Tabu::optimize(const IS::Dataset &T, IS::Solution &best) {
             double qs = quality(T, S, 0.5), qb = quality(T, best, 0.5);
             double q_max = std::max(qs, qb);
             if (qs > qb) best.copy(S);
-            if (q_max > 0.95) break;
         }
+        // TODO: Tune iter_total and iter_old
+        if (q_max > 0.95 || iter_total == 10000 || iter_old == 1000) break;
+
+        if (old_q == q_max) {
+          iter_old ++;  
+        } else {
+            iter_old = 0;
+        }
+
+        old_q = q_max;
     }
 }

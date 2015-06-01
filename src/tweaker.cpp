@@ -1,3 +1,4 @@
+#include <iostream>
 #include "tweaker.h"
 
 void oneRandomUnset::tweak(IS::Solution &S) {

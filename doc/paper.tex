@@ -153,21 +153,32 @@ El objetivo de un algoritmo es maximizar esta función, entonces si $evaluar(A) 
 
 
 \subsection{Operador}
-Ante la necesidad de movernos en el
-espacio de busqueda, surge la idea de un operador 
-que modifique de manera sutil (y rápida) una solución
-dada. 
-En nuestro caso, nuestro operador selecciona al
-azar un bit ``prendido'' y lo ``apaga'', que se traduce
-en ``sacar'' una instancia del conjunto de instancias solución.
 
-De esta manera, se consiguen soluciones cada vez más pequeñas y una tasa
-de aciertos $tasa\_clas$ cada vez más precisas: esto viene de si tenemos 
-$x$ aciertos y $w$ instancias que no están en la solución, aumetar el tamaño
-de una solución conllevaría a una posible $tasa\_clas = x / (w - 1) $,
-que supondría una mayor $tasa\_clas$ y por lo tanto una mejor solución. Sin embargo, 
-esto no puede estar más alejado de la realidad.
+Cada metaheurística se comporta de manera distinta, por lo
+que surge la necesidad de crear operadores de vencidad
+que mejor se acoplen a ellas.
 
+Se implementaron 5 operadores de vecindad, que se explican brevemente
+a continuacion:
+
+\begin{itemize}
+  \item \emph{oneRandomUnset}:
+    Este operador selecciona al
+    azar un bit ``prendido'' y lo ``apaga''. Esto se traduce
+    en ``sacar'' una instancia del conjunto de instancias solución.
+  \item \emph{upToNRandomFlips}: Este operador tiene como parametro
+    un $N$. En cada operación hace \emph{toggle} de un número aleatorio 
+    de bits que es mayor que $1$ y menor $N$, y en donde dichos bits 
+    se escogen aleatoriamente.
+  \item \emph{nRandomFlips}: Al igual que el operador anterior, 
+    requiere de un $N$. Este operador simplemente hace toggle de $N$ bits 
+    escogidos aleatoriamente.
+  \item \emph{percRandomFlips}: Este operador requiere como parametro $X$, que 
+    representa un porcentaje. La ideas es hacer \emph{toggle} de un porcentaje de la
+    cantidad de instancias del problema original. Es decir, si un problema tiene 1000
+    instancias, y el porcentaje escogido es $5 \%$, entonces se hará \emph{toggle} 
+    sobre un total de 50 bits de la solución factible
+\end{itemize}
 
 \section{Experimentos}
 
@@ -209,10 +220,10 @@ Se seleccionaron instancias de tamaño pequeño con menos de 1000 instancias y m
 
 \subsection{Entonación}
 
-Cada metaheuística se comporta de manera distinta. Entonar 
-los parametros de cada una de ellas requirió de una serie 
+Cada metaheuística requiere de distintos parametros para realizar
+su trabajo. Entonar cada una de ellos requirió de una serie 
 de pruebas sobre distintos problemas, parametrizando
-no solo dichos valores, sino hasta operadores de vencindad. 
+no solo valores necesarios para una metaheurística, sino también operadores de vencindad. 
 Por ejemplo, \emph{Simulated Annealing}, arrojaba mejores 
 resultados a medida que mayor era la \emph{temperatura} y menor el \emph{factor de decrecimiento},
 y usando como operador de vencidad \emph{percRandomFlips} con $5\%$. Sin embargo,

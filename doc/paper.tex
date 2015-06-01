@@ -153,30 +153,57 @@ El objetivo de un algoritmo es maximizar esta función, entonces si $evaluar(A) 
 
 
 \subsection{Operador}
-Ante la necesidad de movernos en el
-espacio de busqueda, surge la idea de un operador 
-que modifique de manera sutil (y rápida) una solución
-dada. 
-En nuestro caso, nuestro operador selecciona al
-azar un bit ``prendido'' y lo ``apaga'', que se traduce
-en ``sacar'' una instancia del conjunto de instancias solución.
 
-De esta manera, se consiguen soluciones cada vez más pequeñas y una tasa
-de aciertos $tasa\_clas$ cada vez más precisas: esto viene de si tenemos 
-$x$ aciertos y $w$ instancias que no están en la solución, aumetar el tamaño
-de una solución conllevaría a una posible $tasa\_clas = x / (w - 1) $,
-que supondría una mayor $tasa\_clas$ y por lo tanto una mejor solución. Sin embargo, 
-esto no puede estar más alejado de la realidad.
+Cada metaheurística se comporta de manera distinta, por lo
+que surge la necesidad de crear operadores de vencidad
+que mejor se acoplen a ellas.
 
+Se implementaron 5 operadores de vecindad, que se explican brevemente
+a continuacion:
+
+\begin{itemize}
+  \item \emph{oneRandomUnset}:
+    Este operador selecciona al
+    azar un bit ``prendido'' y lo ``apaga''. Esto se traduce
+    en ``sacar'' una instancia del conjunto de instancias solución.
+  \item \emph{upToNRandomFlips}: Este operador tiene como parametro
+    un $N$. En cada operación hace \emph{toggle} de un número aleatorio 
+    de bits que es mayor que $1$ y menor $N$, y en donde dichos bits 
+    se escogen aleatoriamente.
+  \item \emph{nRandomFlips}: Al igual que el operador anterior, 
+    requiere de un $N$. Este operador simplemente hace toggle de $N$ bits 
+    escogidos aleatoriamente.
+  \item \emph{percRandomFlips}: Este operador requiere como parametro $X$, que 
+    representa un porcentaje. La ideas es hacer \emph{toggle} de un porcentaje de la
+    cantidad de instancias del problema original. Es decir, si un problema tiene 1000
+    instancias, y el porcentaje escogido es $5 \%$, entonces se hará \emph{toggle} 
+    sobre un total de 50 bits de la solución factible
+\end{itemize}
 
 \section{Experimentos}
 
+\subsection{Datos}
+
+Los datos utilizados fueron
+
+\begin{table}[h]
+\begin{tabular}{ |l|l|l|l| }
+    \hline
+    Caso    & Instancias & Atributos \\ \hline
+    Iris & 150 & 5 \\ \hline
+    Glass & 214 & 10 \\ \hline
+    Pima & 768 & 9 \\ \hline
+\end{tabular}
+\caption{Casos de prueba}
+\label{tabla:1}
+\end{table}
+
 \subsection{Entonación}
 
-Cada metaheuística se comporta de manera distinta. Entonar 
-los parametros de cada una de ellas requirió de una serie 
+Cada metaheuística requiere de distintos parametros para realizar
+su trabajo. Entonar cada una de ellos requirió de una serie 
 de pruebas sobre distintos problemas, parametrizando
-no solo dichos valores, sino hasta operadores de vencindad. 
+no solo valores necesarios para una metaheurística, sino también operadores de vencindad. 
 Por ejemplo, \emph{Simulated Annealing}, arrojaba mejores 
 resultados a medida que mayor era la \emph{temperatura} y menor el \emph{factor de decrecimiento},
 y usando como operador de vencidad \emph{percRandomFlips} con $5\%$. Sin embargo,
@@ -185,6 +212,7 @@ de mayor tiempo (mayor
 diversificación). Es por esto que para los resultados finales, se consideró $temperatura = 15.000$ 
 y $factor = 1$, obteniendo así un equilibrio entre el tiempo de ejecución y calidad de la solución. 
 
+
 Para ILS, se probó con distintas combinaciones de las iteraciones totales (denominado tiempo en la literatura) e iteraciones locales. Se compara con el tanaño de la solución final. Se observa que respecto a esta medida, la combinación de máximo 500 iteraciones totales y máximo 50 iteraciones para la búsqueda local del problema Glass. Pero los valores varían para otros problemas.
 
 \begin{table}[h]
@@ -192,9 +220,9 @@ Para ILS, se probó con distintas combinaciones de las iteraciones totales (deno
     \hline
     I. total / I. local & Glass & Iris & Pima \\ \hline
     100 / 100 & 54.0351 & 1.53846 & 31.9249 \\ \hline
-    100 / 500 & 30.6667 & 1.11111 & -- \\ \hline
+    100 / 500 & 30.6667 & 1.11111 & 29.7652 \\ \hline
     100 / 50 & 38.7302 & 7.14286 & 28.4018 \\ \hline
-    500 / 100 & 38.3333 & 15.7143 & -- \\ \hline
+    500 / 100 & 38.3333 & 15.7143 & 28.9876 \\ \hline
     500 / 50 & 28.5714 & 5.33333 & 25.6621 \\ \hline
     50 / 100 & 27.7193 & 6.66667 & 26.8657 \\ \hline
     50 / 500 & 42.5397 & 10.303 & 34.3137 \\ \hline
@@ -223,6 +251,7 @@ Para SA, se juega con la temperatura máxima inicial como manera de modificar el
 \end{table}
 
 ~\
+
 
 Con TS, se juega con valores arbitrarios para el tamaño de la lista y el número de veces que se usa el operador sobre los datos en cada iteración.
 
@@ -259,11 +288,25 @@ Con las ditintas corridas se obtienen resultados promedios para cada caso y toma
 \label{tabla:2}
 \end{table}
 
+
 Se realizaron 
 hasta 15 pruebas con cada una de ellas en \emph{Glass}. Los gráficos 
 presentes sugieren que \emph{ILS} es la que mejor que se comporta para este problema, 
 tanto en promedio del tamaño de la solución final (\% del conjunto de instancias), 
 como en porcentaje de errores sobre el conjunto de validación.
+
+Los tiempos reportados para estos experimentos son
+
+\begin{table}[h]
+\begin{tabular}{ |l|l|l|l| }
+    \hline
+     & ILS & SA & TS  \\ \hline
+    Glass & 623s & 248s & 386s \\ \hline
+\end{tabular}
+\caption{Resultados para tamaño de solución}
+\label{tabla:2}
+\end{table}
+
 
 \begin{center}
   \includegraphics[scale=0.4]{val_errors.jpeg}~\\[1cm]

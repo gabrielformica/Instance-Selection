@@ -207,6 +207,20 @@ Se seleccionaron instancias de tamaño pequeño con menos de 1000 instancias y m
 \label{tabla:2}
 \end{table}
 
+\subsection{Entonación}
+
+Cada metaheuística se comporta de manera distinta. Entonar 
+los parametros de cada una de ellas requirió de una serie 
+de pruebas sobre distintos problemas, parametrizando
+no solo dichos valores, sino hasta operadores de vencindad. 
+Por ejemplo, \emph{Simulated Annealing}, arrojaba mejores 
+resultados a medida que mayor era la \emph{temperatura} y menor el \emph{factor de decrecimiento},
+y usando como operador de vencidad \emph{percRandomFlips} con $5\%$. Sin embargo,
+aumentar la temperatura y disminuir el factor de decrecimiento implica ejecuciones 
+de mayor tiempo (mayor
+diversificación). Es por esto que para los resultados finales, se consideró $temperatura = 15.000$ 
+y $factor = 1$, obteniendo así un equilibrio entre el tiempo de ejecución y calidad de la solución. 
+
 
 \subsection{Comparación}
 

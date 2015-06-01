@@ -344,17 +344,34 @@ int main(int argc, char *argv[]) {
     } else {
         out = &std::cout;
     }
-    double esum = std::accumulate(res.errors.begin(), res.errors.end(), 0.0);
-    double emean = esum / res.errors.size();
-    double vsum = std::accumulate(res.sizes.begin(), res.sizes.end(), 0.0);
-    double vmean = vsum / res.sizes.size();
-    double ssum = std::accumulate(res.val_errors.begin(), res.val_errors.end(), 0.0);
-    double smean = ssum / res.val_errors.size();
+    // double esum = std::accumulate(res.errors.begin(), res.errors.end(), 0.0);
+    // double emean = esum / res.errors.size();
+    // double vsum = std::accumulate(res.sizes.begin(), res.sizes.end(), 0.0);
+    // double vmean = vsum / res.sizes.size();
+    // double ssum = std::accumulate(res.val_errors.begin(), res.val_errors.end(), 0.0);
+    // double smean = ssum / res.val_errors.size();
+
+    *out << "Val_errors" << std::endl;
+    for (unsigned i = 0; i < res.val_errors.size(); ++i)  {
+        *out << res.val_errors[i] << " ";
+    }
+    *out << std::endl;
+    *out << "Sizes" << std::endl;
+    for (unsigned i = 0; i < res.sizes.size(); ++i)  {
+        *out << res.sizes[i] << " ";
+    }
+    *out << std::endl;
+    *out << "Errors" << std::endl;
+    for (unsigned i = 0; i < res.errors.size(); ++i)  {
+        *out << res.errors[i] << " ";
+    }
+    *out << std::endl;
 
 
-    *out << "Errors: " << emean << std::endl;
-    *out << "Size of solution %: " << smean << std::endl;
-    *out << "Validation errors: %: " << vmean << std::endl;
+    // *out << "Errors: " << emean << std::endl;
+    // *out << "Size of solution %: " << smean << std::endl;
+    // *out << "Validation errors: %: " << vmean << std::endl;
+
     rFile.close();
 
     return 0;

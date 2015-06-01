@@ -23,6 +23,8 @@
 \usepackage{url}
 \usepackage{latexsym}
 \usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\usepackage{color}
 
 %\setlength\titlebox{5cm}
 
@@ -204,6 +206,24 @@ Se seleccionaron instancias de tamaño pequeño con menos de 1000 instancias y m
 \caption{Datos medianos}
 \label{tabla:2}
 \end{table}
+
+
+\subsection{Comparación}
+
+Una vez decididos los parametros de cada metaheurística, se realizaron 
+hasta 15 pruebas con cada una de ellas en \emph{Glass}. Los gráficos 
+presentes sugieren que \emph{ILS} es la que mejor que se comporta para este problema, 
+tanto en promedio del tamaño de la solución final (\% del conjunto de instancias), 
+como en porcentaje de errores sobre el conjunto de validación.
+
+\begin{center}
+  \includegraphics[scale=0.4]{val_errors.jpeg}~\\[1cm]
+\end{center}
+
+\begin{center}
+  \includegraphics[scale=0.4]{sizes.jpeg}~\\[1cm]
+\end{center}
+
 
 
 

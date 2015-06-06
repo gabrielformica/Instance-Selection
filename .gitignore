@@ -11,3 +11,4 @@ data/*
 !data/medium/
 !data/large/
 scripts/*
+*.log

@@ -216,19 +216,19 @@ y $factor = 1$, obteniendo así un equilibrio entre el tiempo de ejecución y ca
 Para ILS, se probó con distintas combinaciones de las iteraciones totales (denominado tiempo en la literatura) e iteraciones locales. Se compara con el tanaño de la solución final. Se observa que respecto a esta medida, la combinación de máximo 500 iteraciones totales y máximo 50 iteraciones para la búsqueda local del problema Glass. Pero los valores varían para otros problemas.
 
 \begin{table}[h]
+\scalebox{0.6}{
 \begin{tabular}{ |l|l|l|l| }
     \hline
     I. total / I. local & Glass & Iris & Pima \\ \hline
-    100 / 100 & 54.0351 & 1.53846 & 31.9249 \\ \hline
-    100 / 500 & 30.6667 & 1.11111 & 29.7652 \\ \hline
-    100 / 50 & 38.7302 & 7.14286 & 28.4018 \\ \hline
-    500 / 100 & 38.3333 & 15.7143 & 28.9876 \\ \hline
-    500 / 50 & 28.5714 & 5.33333 & 25.6621 \\ \hline
-    50 / 100 & 27.7193 & 6.66667 & 26.8657 \\ \hline
-    50 / 500 & 42.5397 & 10.303 & 34.3137 \\ \hline
-    50 / 50 & 30 & 8.20513 & 35.1852 \\ \hline
+    100 / 100 & (54.0351, 46.4615) & (1.53846, 51.1922) & (31.9249, 49.1153) \\ \hline
+    100 / 50  & (38.7302, 48.4974) & (7.14286, 60.7353) & (28.4018, 49.2278) \\ \hline
+    500 / 50  & (28.5714, 49.0846) & (5.33333, 48.9383) & (25.6621, 46.8585) \\ \hline
+    50 / 100  & (27.7193, 49.9487) & (5.77778, 58.6173) & (26.8657, 49.6148) \\ \hline
+    50 / 500  & (42.5397, 49.5682) & (10.303, 50.7914)  & (34.3137, 49.4) \\ \hline
+    50 / 50   & (30, 51.5986) & (8.20513, 69.4686)      & (35.1852, 49.5211) \\ \hline
 \end{tabular}
-\caption{Entonación de parámetros ILS}
+}
+\caption{Entonación de parámetros ILS, donde la una tupla representa (\% Error de validación, \% Tamaño al que se reduce)}
 \label{tabla:1}
 \end{table}
 
@@ -239,14 +239,16 @@ Para SA, se juega con la temperatura máxima inicial como manera de modificar el
 ~\
 
 \begin{table}[h]
+\scalebox{0.6}{
 \begin{tabular}{ |l|l|l|l| }
     \hline
     Temp. & Glass & Iris & Pima \\ \hline
-    5000 & 35.3333 & 14.2857 & 33.2394 \\ \hline
-    10000 & 30.1587 & 7.14286 & 33.2394 \\ \hline
-    15000 & 30.7937 & 2.85714 & 31.5423 \\ \hline
+    5000  & (35.3333, 76.1168) & (14.2857, 85.1961) & (33.2394, 50.1578) \\ \hline
+    10000 & (30.1587, 63.0743) & (7.14286, 77.2549) & (33.2394, 50.2726) \\ \hline
+    15000 & (30.7937, 55.8895) & (2.85714, 76.1275) & (31.5423, 50.3281) \\ \hline
 \end{tabular}
-\caption{Entonación de parámetros SA}
+}
+\caption{Entonación de parámetros SA, donde la una tupla representa (\% Error de validación, \% Tamaño al que se reduce)}
 \label{tabla:2}
 \end{table}
 
@@ -258,17 +260,19 @@ Con TS, se juega con valores arbitrarios para el tamaño de la lista y el númer
 ~\
 
 \begin{table}[h]
+\scalebox{0.6}{
 \begin{tabular}{ |l|l|l|l| }
     \hline
     Lista / Tweaks & Glass & Iris & Pima \\ \hline
-    10 / 15 & 52.0635 & 1.90476 & 33.2381 \\ \hline
-    10 / 5 & 50.7937 & 6.66667 & 31.0502 \\ \hline
-    15 / 15 & 22.3333 & 1.888889 & 25.1852 \\ \hline
-    15 / 5 & 19.0 & 2.90476 & 33.5185 \\ \hline
-    5 / 15 & 28.5714 & 14.8718 & 35.4338 \\ \hline
-    5 / 5 & 30.4762 & 7.14286 & 39.3519 \\ \hline
+    10 / 15        & (52.0635, 72.7087) & (0, 68.8078)  & (33.2381, 45.9503) \\ \hline
+    10 / 5         & (50.7937, 75.1986) & (6.66667, 81.6296)  & (31.0502, 48.0671) \\ \hline
+    15 / 15        & (22.3333, 70.9966) & (0.888889, 73.3827) & (25.1852, 46.7816) \\ \hline
+    15 / 5         & (19.0, 73.8488)    & (0, 82.402)  & (33.5185,  47.749) \\ \hline
+    5 / 15         & (28.5714, 74.9568) & (8.3333, 70.5314)  & (35.4338, 47.012) \\ \hline
+    5 / 5          & (30.4762, 73.3679) & (7.14286, 83.4314)  & (39.3519, 48.841) \\ \hline
 \end{tabular}
-\caption{Entonación de parámetros TS}
+}
+\caption{Entonación de parámetros TS, donde la una tupla representa (\% Error de validación, \% Tamaño al que se reduce)}
 \label{tabla:2}
 \end{table}
 
@@ -277,6 +281,7 @@ Con TS, se juega con valores arbitrarios para el tamaño de la lista y el númer
 Con las ditintas corridas se obtienen resultados promedios para cada caso y tomando en cuenta cada metaheurística. Específicamente para el tamaño, se observa que para el caso de Glass, la búsqueda local obtiene en promedio mejores soluciones que las metaheurísticas de trayectoria. Pero en Pima, que es un caso más grande, las metaheurísticas de trayectoria son capacez de superar en desempeño a la búsqueda local.
 
 \begin{table}[h]
+\scalebox{0.6}{
 \begin{tabular}{ |l|l|l|l|l| }
     \hline
      & LS & ILS & SA & TS  \\ \hline
@@ -284,10 +289,10 @@ Con las ditintas corridas se obtienen resultados promedios para cada caso y toma
     Iris  & 6.2222 & 7.0018     & 8.0952  & 5.8966 \\ \hline
     Pima  & 43.6754 & 30.3922 & 32.6737       & 32.9629 \\ \hline
 \end{tabular}
-\caption{Resultados para tamaño de solución}
+}
+\caption{Resultados para error de validación promedio con parámetros entonados}
 \label{tabla:2}
 \end{table}
-
 
 Se realizaron 
 hasta 15 pruebas con cada una de ellas en \emph{Glass}. Los gráficos 
@@ -295,14 +300,16 @@ presentes sugieren que \emph{ILS} es la que mejor que se comporta para este prob
 tanto en promedio del tamaño de la solución final (\% del conjunto de instancias), 
 como en porcentaje de errores sobre el conjunto de validación.
 
-Los tiempos reportados para estos experimentos son
+Los tiempos reportados (por corrida) para estos experimentos son
 
 \begin{table}[h]
+\scalebox{0.6}{
 \begin{tabular}{ |l|l|l|l| }
     \hline
      & ILS & SA & TS  \\ \hline
-    Glass & 623s & 248s & 386s \\ \hline
+    Glass & 51.25 s & 74.29s & 10.8s\\ \hline
 \end{tabular}
+}
 \caption{Resultados para tamaño de solución}
 \label{tabla:2}
 \end{table}
@@ -315,10 +322,6 @@ Los tiempos reportados para estos experimentos son
 \begin{center}
   \includegraphics[scale=0.4]{sizes.jpeg}~\\[1cm]
 \end{center}
-
-
-
-
 
 % include your own bib file like this:
 %\bibliographystyle{acl}

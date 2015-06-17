@@ -7,8 +7,11 @@ doc/paperNotes*
 src/instance_selection
 !data/
 data/*
-!data/small/
-!data/medium/
-!data/large/
+data/raw/*
+!data/raw/
+!data/raw/small
+!data/raw/medium
+!data/raw/large
+!data/10fold/
 scripts/*
 *.log

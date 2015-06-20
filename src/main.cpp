@@ -1,3 +1,5 @@
+#include <sys/types.h>
+#include <sys/stat.h>
 #include <iostream>
 #include <getopt.h>
 #include <fstream>
@@ -57,7 +59,6 @@ pds load_data_basic(std::string file_name_str, int partition) {
 
     std::vector<int> val_pos;
     
-    srand(time(NULL));
     for(unsigned i = 0; i < val_size; ++i) {
         int j = rand() % tra_size;
         val_pos.push_back(j);
@@ -93,8 +94,78 @@ pds load_data_basic(std::string file_name_str, int partition) {
     return make_pair(training, validation);
 }
 
-void load_data_tenfold(std::string file_name_str, vps *datasets) {
-    
+void load_data_tenfold(std::string path, vps &datasets) {
+    if (path[path.size()-1] == '/') path.erase(path.end()-1);
+    size_t basename_pos = path.rfind("/");
+    string basename = path.substr(basename_pos+1, path.size());
+
+
+
+    for(int i = 1; i <= 10; ++i) {
+        int insts_size, num_attrs;
+        double attr;
+        std::string tra_filename = path + "/" + basename + "-10-" + to_string(i) + "tra.dat";
+        std::string val_filename = path + "/" + basename + "-10-" + to_string(i) + "tst.dat";
+
+        cout << tra_filename << endl;
+        cout << val_filename << endl;
+
+        const char *tra_filename_str = tra_filename.c_str();
+        const char *val_filename_str = val_filename.c_str();
+
+        FILE *tra_file = fopen(tra_filename_str, "r");
+        FILE *val_file = fopen(val_filename_str, "r");
+
+        if (tra_file) printf("File: %s\n", tra_filename_str);
+        else {
+            perror("ERROR at data load");
+            exit(1);
+        }
+
+        if (val_file) printf("File: %s\n", val_filename_str);
+        else {
+            perror("ERROR at data load");
+            exit(1);
+        }
+
+        if (fscanf(tra_file, "%d %d", &insts_size, &num_attrs) != 2) {
+            printf("ERROR at data load: file malformed\n");
+            exit(1);
+        }
+
+        IS::Dataset training   = IS::Dataset();
+        
+        for(int j = 0; j < insts_size; ++j) {
+            IS::Instance tra;
+            for(int k = 0; k < num_attrs-1; ++k) { 
+                fscanf(tra_file, "%lf", &attr);
+                tra.push_back(attr);
+            }
+            fscanf(tra_file, "%lf", &attr);
+            tra.setCategory(attr);
+            training.push_back(tra);
+        }
+
+        IS::Dataset validation = IS::Dataset();
+
+        if (fscanf(val_file, "%d %d", &insts_size, &num_attrs) != 2) {
+            printf("ERROR at data load: file malformed\n");
+            exit(1);
+        }
+
+        for(int j = 0; j < insts_size; ++j) {
+            IS::Instance val;
+            for(int k = 0; k < num_attrs-1; ++k) { 
+                fscanf(tra_file, "%lf", &attr);
+                val.push_back(attr);
+            }
+            fscanf(tra_file, "%lf", &attr);
+            val.setCategory(attr);
+            validation.push_back(val);
+        }
+
+        datasets.push_back(make_pair(training, validation));
+    }
 
     return;
 }
@@ -264,7 +335,7 @@ int main(int argc, char *argv[]) {
     std::string out_fn;
 
     while (1) {
-        opt = getopt_long(argc, argv, "dhf:g:m:o:x:n:r:", long_options, &option_index);
+        opt = getopt_long(argc, argv, "dhf:g:m:o:x:n:r:t:", long_options, &option_index);
         if (opt == -1) break;
         opt = char(opt);
 
@@ -281,6 +352,7 @@ int main(int argc, char *argv[]) {
             case 'n': flag_n = true; runs = atoi(optarg); break;
             case 'r': flag_r = true; out_fn = optarg; break;
             case 'd': flag_d = true; break;
+            case 't': flag_t = true; file_name = optarg; break;
             case '?': break;
         }
     }
@@ -288,17 +360,26 @@ int main(int argc, char *argv[]) {
     if (flag_h) return 0; // Print help and exit
 
     // Checking and exit in case of error
-    if (! flag_f and ! flag_d) error_("You have to specify a file");  
     if (! flag_g and ! flag_d) error_("You have to specify a metaheuristic"); 
+    if (  flag_f and   flag_t) error_("You cannot use -f and -t together");
     if (! flag_x and ! flag_d) error_("You have to specify a tweaker");
+    if ((! flag_f and ! flag_d) and (! flag_t)) error_("You have to specify a file");  
     if (! flag_n and ! flag_d) runs = 1;
 
     // TODO: Make this a parameter
     int part = 10;
 
-    std::pair<ds, ds> dataset = load_data_basic(file_name, part);
-    IS::Dataset training   = dataset.first;
-    IS::Dataset validation = dataset.second;
+    vps datasets;
+    IS::Dataset training;
+    IS::Dataset validation;
+
+    if (flag_f) {
+        std::pair<ds, ds> dataset = load_data_basic(file_name, part);
+        training   = dataset.first;
+        validation = dataset.second;
+    } else if (flag_t) {
+        load_data_tenfold(file_name, datasets);
+    }
 
     if (flag_d) {
         print_dispersions(training);
@@ -320,34 +401,39 @@ int main(int argc, char *argv[]) {
     results res;
 
 
-    for(unsigned i = 0; i < runs; ++i) {
-        IS::Solution solution(training.size());
-        metaheuristic->optimize(training, solution);
+    for(int i = 0; i < 10; ++i) {
+        training = datasets[i].first;
+        validation = datasets[i].second;
 
-        // Checking quality of final solution
-        std::vector<double> categories;
-        categories.assign(validation.size(), -1);
+        for(int j = 0; j < runs; ++j) {
+            IS::Solution solution(training.size());
+            metaheuristic->optimize(training, solution);
 
-        std::bitset<MAX> bits = solution.getBits();
-        IS::Dataset final;
-        for(unsigned i = 0; i < training.size(); ++i) {
-            if(bits[i]) final.push_back(training[i]);
+            // Checking quality of final solution
+            std::vector<double> categories;
+            categories.assign(validation.size(), -1);
+
+            std::bitset<MAX> bits = solution.getBits();
+            IS::Dataset final;
+            for(int k = 0; k < training.size(); ++k) {
+                if(bits[k]) final.push_back(training[k]);
+            }
+
+            metaheuristic->oneNN(final, validation, categories);
+
+            int errors = 0;
+            for (int k = 0; k < validation.size(); k++)
+                if (validation[k].getCategory() != categories[k])
+                    errors++;
+
+            double clas_rate = (1.0 * errors) / (1.0 * validation.size());
+            double perc_redc = (1.0 * final.size()) / (1.0 * training.size());
+            double fitness = 0.5 * clas_rate + (1 - 0.5) * perc_redc;
+
+            res.errors.push_back(errors);
+            res.val_errors.push_back((errors * 100.0) / (validation.size() * 1.0));
+            res.sizes.push_back((final.size() * 100.0) / (training.size() * 1.0));
         }
-
-        metaheuristic->oneNN(final, validation, categories);
-
-        int errors = 0;
-        for (int i = 0; i < validation.size(); i++)
-            if (validation[i].getCategory() != categories[i])
-                errors++;
-
-        double clas_rate = (1.0 * errors) / (1.0 * validation.size());
-        double perc_redc = (1.0 * final.size()) / (1.0 * training.size());
-        double fitness = 0.5 * clas_rate + (1 - 0.5) * perc_redc;
-
-        res.errors.push_back(errors);
-        res.val_errors.push_back((errors * 100.0) / (validation.size() * 1.0));
-        res.sizes.push_back((final.size() * 100.0) / (training.size() * 1.0));
     }
 
 

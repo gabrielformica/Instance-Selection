@@ -5,12 +5,13 @@ using namespace std;
 
 /* Metaheuristics methods */
 
-double Metaheuristic::calc_distance(const IS::Instance &a, const IS::Instance &b) {
+double Metaheuristic::calc_distance(const IS::Instance &a, 
+                                    const IS::Instance &b) const {
     return a.calcDistance(b);
 }
 
-double Metaheuristic::find_nearest(const IS::Dataset &p, const IS::Instance &a) {
-    double imin = 1.0 * MAX;
+double Metaheuristic::find_nearest(const IS::Dataset &p, const IS::Instance &a) const {
+    double imin = 10000000;
     double category;
     for (IS::Dataset::const_iterator it = p.begin(); it < p.end(); ++it) {
         double dist = calc_distance(*it, a);
@@ -28,7 +29,7 @@ double Metaheuristic::find_nearest(const IS::Dataset &p, const IS::Instance &a) 
 
 void Metaheuristic::oneNN(const IS::Dataset &training, 
                           const IS::Dataset &result, 
-                          std::vector<double> &category) {
+                          std::vector<double> &category) const {
 
     for (int i = 0; i < result.size(); i++)
         category[i] = find_nearest(training, result[i]);
@@ -36,9 +37,11 @@ void Metaheuristic::oneNN(const IS::Dataset &training,
 
 double Metaheuristic::quality(const IS::Dataset &T, 
                               const IS::Solution &S,
-                              double alpha) {
+                              double alpha) const {
 
     std::bitset<MAX> bits = S.getBits();
+    if (bits.count() == 0) return 0.5;
+
     IS::Dataset training, result;
     std::vector<double> category;
     int j = 0;
@@ -75,7 +78,7 @@ double Metaheuristic::quality(const IS::Dataset &T,
 
 /* Hill Climbing */
 
-void HillClimbing::optimize(const IS::Dataset &T, IS::Solution &S) {
+void HillClimbing::optimize(const IS::Dataset &T, IS::Solution &S) const {
     std::cout << ">>>> Running Hill Climbing" << std::endl;
     S.setSize(T.size());
     S.generateRandom();
@@ -105,14 +108,14 @@ void HillClimbing::optimize(const IS::Dataset &T, IS::Solution &S) {
         if(iter_total % 100 == 0 and iter_total != 0) {
             cout << "Total iterations: " << iter_total << endl;
             cout << "Best fitness so far: " << q_max << endl;
-            cout << "Solution size: " << S.bitsOn() << endl << endl;
+            cout << "Solution size: " << S.getBits().count() << endl << endl;
         }
     }
 }
 
 /* Simulated Annealing  */
 
-void SimulatedAnnealing::optimize(const IS::Dataset &T, IS::Solution &S) {
+void SimulatedAnnealing::optimize(const IS::Dataset &T, IS::Solution &S) const {
     assert(T.size() == S.getSize());
     std::cout << ">>>> Running Simulated Annealing" << std::endl;
     S.setSize(T.size());
@@ -154,7 +157,7 @@ void SimulatedAnnealing::optimize(const IS::Dataset &T, IS::Solution &S) {
 
 /* ILS */
 
-void ILS::optimize(const IS::Dataset &T, IS::Solution &S) {
+void ILS::optimize(const IS::Dataset &T, IS::Solution &S) const {
     std::cout << ">>>> Running ILS" << std::endl;
     S.setSize(T.size());
     S.generateRandom();
@@ -210,7 +213,7 @@ void ILS::optimize(const IS::Dataset &T, IS::Solution &S) {
 
 /* Tabu */
 
-void Tabu::optimize(const IS::Dataset &T, IS::Solution &best) {
+void Tabu::optimize(const IS::Dataset &T, IS::Solution &best) const {
     std::cout << ">>>> Running Tabu" << std::endl;
     IS::Solution S(T.size());
     S.generateRandom();  // First random solution

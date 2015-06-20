@@ -21,12 +21,6 @@ void IS::Solution::copy(const Solution &a) {
     bits |= a.bits;
 }
 
-int IS::Solution::bitsOn() {
-    int on = 0;
-    for(unsigned i = 0; i < size; ++i) if(bits[i]) on++;
-    return on;
-}
-
 double IS::Instance::calcDistance(const IS::Instance &b) const {
     const IS::Instance &a = *this;
     double dist = 0.0;

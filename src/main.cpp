@@ -215,6 +215,10 @@ Tweaker *choose_tweaker(std::string tweaker_str) {
         // Print error and exit
         if (toa_counter != 2) error_("weightedRandom needs two argument");
         return new weightedRandom(tweaker_optional_arg[0], tweaker_optional_arg[1]);
+    } else if (tweaker_str == "weightedRandomPlus") {
+        // Print error and exit
+        if (toa_counter != 2) error_("weightedRandomPlus needs two argument");
+        return new weightedRandomPlus(tweaker_optional_arg[0], tweaker_optional_arg[1]);
     }
 
     return NULL;

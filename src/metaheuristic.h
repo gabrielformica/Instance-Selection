@@ -35,7 +35,6 @@ class SimulatedAnnealing : public Metaheuristic {
     void optimize(const IS::Dataset &T, IS::Solution &R);
 };
 
-
 class ILS : public Metaheuristic {
   private:
     int li, ti, pp;

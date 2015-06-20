@@ -11,6 +11,7 @@ void oneRandomUnset::tweak(IS::Solution &S) {
     bits[j-1] = 0;
     S.setBits(bits);
 }
+
 void upToNRandomFlips::tweak(IS::Solution &S) {
     std::bitset<MAX> bits = S.getBits();
     int size = S.getSize();
@@ -67,9 +68,25 @@ void weightedRandomPlus::tweak(IS::Solution &S) {
     int size = S.getSize();
     int n = (perc * size) / 100;
 
-    for (int i = 0; i < n; ++i) {
-        int j = (rand() % size);
-        bits.flip(j);
+    double reduc = ((double) reduc_weight) / 100.0;
+    for (int k = 0; k < n; k++) {
+        double prob = ((double) rand() / (double) RAND_MAX);
+        // Select a random bit on, and set it off 
+        if (bits.count() > 0 and reduc - prob > EPSILON) { 
+            int random_bit_on = (rand() % bits.count()) + 1;
+            int i, j;
+            for (j = 0, i = 0; j < size && i < random_bit_on; j++) 
+                if (bits.test(j)) i++;
+            assert(bits.test(j-1));
+            bits[j-1] = 0;
+        } else { // Select a random bit off, and set it on
+            int random_bit_off = (rand() % (size - bits.count())) + 1;
+            int i, j;
+            for (j = 0, i = 0; j < size && i < random_bit_off; j++) 
+                if (! bits.test(j)) i++;
+            assert(! bits.test(j-1));
+            bits[j-1] = 1;
+        }
     }
     S.setBits(bits);
 }

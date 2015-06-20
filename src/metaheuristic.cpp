@@ -39,6 +39,8 @@ double Metaheuristic::quality(const IS::Dataset &T,
                               double alpha) {
 
     std::bitset<MAX> bits = S.getBits();
+    if (bits.count() == 0) return 0.5;
+
     IS::Dataset training, result;
     std::vector<double> category;
     int j = 0;

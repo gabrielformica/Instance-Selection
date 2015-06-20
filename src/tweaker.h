@@ -3,6 +3,8 @@
 
 #include "is.h"
 
+const double EPSILON = 0.00001;
+
 class Tweaker {
   public:
     virtual void tweak(IS::Solution &S) = 0;
@@ -37,5 +39,22 @@ class percRandomFlips : public Tweaker {
     void tweak(IS::Solution &S);
 };
 
+class weightedRandom: public Tweaker {
+  private:
+    int perc;
+    int reduc_weight;
+  public:
+    weightedRandom(int p, int r) : perc(p), reduc_weight(r){ }
+    void tweak(IS::Solution &S);
+};
+
+class weightedRandomPlus: public Tweaker {
+  private:
+    int perc;
+    int reduc_weight;
+  public:
+    weightedRandomPlus(int p, int r) : perc(p), reduc_weight(r){ }
+    void tweak(IS::Solution &S);
+};
 
 #endif

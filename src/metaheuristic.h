@@ -7,8 +7,6 @@
 #include "is.h"
 #include "tweaker.h"
 
-const double epsilon = 0.00001;
-
 class Metaheuristic {
   protected:
     Tweaker *tweaker;

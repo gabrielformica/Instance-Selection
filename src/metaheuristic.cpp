@@ -14,7 +14,7 @@ double Metaheuristic::find_nearest(const IS::Dataset &p, const IS::Instance &a) 
     double category;
     for (IS::Dataset::const_iterator it = p.begin(); it < p.end(); ++it) {
         double dist = calc_distance(*it, a);
-        if (dist < epsilon) {
+        if (dist < EPSILON) {
             category = (*it).getCategory();
             break;
         }
@@ -60,12 +60,13 @@ double Metaheuristic::quality(const IS::Dataset &T,
     double fitness = alpha * clas_rate + (1 - alpha) * perc_redc;
 
     // XXX: Print
-    // cout << "Hubo un total de " << count << " aciertos" << endl;
-    // cout << "Result es de tamanio: " << result.size() << endl;
-    // cout << "La relación es: " << clas_rate << endl;
-    // cout << "El tamaño de T es: " << T.size() << endl;
-    // cout << "El porcentaje de reducción es: " << perc_redc << endl;
-    // cout << "El fitness es : " << fitness << endl << endl;
+     cout << "Hubo un total de " << count << " aciertos" << endl;
+     cout << "Result es de tamanio: " << result.size() << endl;
+     cout << "La relación es: " << clas_rate << endl;
+     cout << "El tamaño de T es: " << T.size() << endl;
+     cout << "El tamaño de training es: " << training.size() << endl;
+     cout << "El porcentaje de reducción es: " << perc_redc << endl;
+     cout << "El fitness es : " << fitness << endl << endl;
 
     assert(fitness <= 1.0);
     return fitness;
@@ -131,23 +132,23 @@ void SimulatedAnnealing::optimize(const IS::Dataset &T, IS::Solution &S) {
         double qr = quality(T, R, 0.5), qs = quality(T, S, 0.5);
         double qb = quality(T, best, 0.5);
         // Random number between 0 and 1
-        double r = ((double) rand() / (RAND_MAX));
-        double prob = -1.0;
-        if (t > epsilon) prob = exp((qr - qs) / t);
+        double r = ((double) rand() / (double) (RAND_MAX));
+        double prob = -5.0;
+        if (t > 0) prob = exp((1.0 * (qr - qs)) / ((1.0) * t));
 
-        if (qr > qs || (prob - r > epsilon)) {
+        if (qr > qs || (prob - r > EPSILON)) {
             S.setBits(R.getBits());
             qs = qr;
         }
         t -= dec_factor;  // Decreasing temperature
         // cout << "temperatura = " << t << endl;
         
-        if (qs > qb) { 
+        if (qs > qb) {
             best.setBits(S.getBits());
             qb = qs;
         }
 
-        if (qb > 0.95 || t <= epsilon) break;
+        if (qb > 0.95 || t <= EPSILON) break;
     }
 }
 
@@ -248,7 +249,7 @@ void Tabu::optimize(const IS::Dataset &T, IS::Solution &best) {
             }
 
             double qs = quality(T, S, 0.5), qb = quality(T, best, 0.5);
-            double q_max = std::max(qs, qb);
+            q_max = std::max(qs, qb);
             if (qs > qb) best.copy(S);
         }
         // TODO: Tune iter_total and iter_old

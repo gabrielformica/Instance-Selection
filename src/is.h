@@ -9,7 +9,7 @@
 #include <bitset>
 #include <cstdlib>
 #include <ctime>
-#define MAX 20000
+#define MAX 8000 
 
 using namespace std;
 

@@ -211,7 +211,12 @@ Tweaker *choose_tweaker(std::string tweaker_str) {
         // Print error and exit
         if (toa_counter != 1) error_("percRandomFlips needs one argument");
         return new percRandomFlips(tweaker_optional_arg[0]);
+    } else if (tweaker_str == "weightedRandom") {
+        // Print error and exit
+        if (toa_counter != 2) error_("weightedRandom needs two argument");
+        return new weightedRandom(tweaker_optional_arg[0], tweaker_optional_arg[1]);
     }
+
     return NULL;
 }
 

@@ -56,16 +56,16 @@ double Metaheuristic::quality(const IS::Dataset &T,
             count++;
 
     double clas_rate = (1.0 * count) / (1.0 * result.size());
-    double perc_redc = (1.0 * result.size()) / (1.0 * T.size());
+    double perc_redc = (1.0 * training.size()) / (1.0 * T.size());
     double fitness = alpha * clas_rate + (1 - alpha) * perc_redc;
 
     // XXX: Print
-    // cout << "Hubo un total de " << count << " aciertos" << endl;
-    // cout << "Result es de tamanio: " << result.size() << endl;
-    // cout << "La relación es: " << clas_rate << endl;
-    // cout << "El tamaño de T es: " << T.size() << endl;
-    // cout << "El porcentaje de reducción es: " << perc_redc << endl;
-    // cout << "El fitness es : " << fitness << endl << endl;
+    cout << "Hubo un total de " << count << " aciertos" << endl;
+    cout << "Result es de tamanio: " << training.size() << endl;
+    cout << "La relación es: " << clas_rate << endl;
+    cout << "El tamaño de T es: " << T.size() << endl;
+    cout << "El porcentaje de reducción es: " << perc_redc << endl;
+    cout << "El fitness es : " << fitness << endl << endl;
 
     assert(fitness <= 1.0);
     return fitness;

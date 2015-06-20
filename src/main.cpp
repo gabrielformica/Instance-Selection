@@ -12,6 +12,8 @@
 #include "is.h"
 
 typedef IS::Dataset ds;
+typedef std::pair<ds, ds> pds;
+typedef std::vector<pds> vps;
 
 int metaheuristic_optional_arg[10];
 int moa_counter = 0;
@@ -27,7 +29,7 @@ typedef struct results {
 
 
 
-std::pair<ds, ds> load_data(std::string file_name_str, int partition) {
+pds load_data_basic(std::string file_name_str, int partition) {
     const char *file_name = file_name_str.c_str();
     FILE *input = fopen(file_name, "r");
     int insts_size, num_attrs;
@@ -90,6 +92,14 @@ std::pair<ds, ds> load_data(std::string file_name_str, int partition) {
 
     return make_pair(training, validation);
 }
+
+void load_data_tenfold(std::string file_name_str, vps *datasets) {
+    
+
+    return;
+}
+
+
 
 void print_help() {
     std::cout << "Usage: ./instance_selection [OPTIONS]" << std::endl;
@@ -240,6 +250,7 @@ int main(int argc, char *argv[]) {
     bool flag_n = false;
     bool flag_x = false;
     bool flag_r = false;
+    bool flag_t = false;
     memset(metaheuristic_optional_arg, 0, sizeof(metaheuristic_optional_arg));
     memset(tweaker_optional_arg, 0, sizeof(tweaker_optional_arg));
 
@@ -280,7 +291,7 @@ int main(int argc, char *argv[]) {
     // TODO: Make this a parameter
     int part = 10;
 
-    std::pair<ds, ds> dataset = load_data(file_name, part);
+    std::pair<ds, ds> dataset = load_data_basic(file_name, part);
     IS::Dataset training   = dataset.first;
     IS::Dataset validation = dataset.second;
 
@@ -303,8 +314,8 @@ int main(int argc, char *argv[]) {
     metaheuristic->setTweaker(tweaker);
     results res;
 
+
     for(unsigned i = 0; i < runs; ++i) {
-        /* code */
         IS::Solution solution(training.size());
         metaheuristic->optimize(training, solution);
 

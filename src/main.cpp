@@ -48,7 +48,7 @@ IS::Dataset load_data_basic(std::string file_name_str) {
         exit(1);
     }
     
-    IS::Dataset ds(insts_size);
+    IS::Dataset ds(insts_size, num_attrs);
     double x;
     for (int i = 0; i < insts_size; i++) {
         IS::Instance ins;
@@ -439,6 +439,7 @@ int main(int argc, char *argv[]) {
     if (flag_f) {
         IS::Dataset dataset = load_data_basic(file_name);
         IS::Solution solution(dataset.size());
+        //std::cout << dataset.toString() << std::endl; 
         metaheuristic->optimize(dataset, solution);
     } else if (flag_t) {
         load_data_tenfold(file_name, datasets);

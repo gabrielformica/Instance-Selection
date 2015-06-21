@@ -21,6 +21,7 @@ namespace IS {
         double getCategory() const { return category; }
         void setCategory(double c) { category = c; }
         double calcDistance(const Instance &a) const;
+        std::string toString() const;
     }; 
 
     class Solution {
@@ -53,11 +54,13 @@ namespace IS {
         int attrs;
       public:
         Dataset() { };
-        Dataset(const Dataset& a) : vector<Instance>(a.begin(), a.end()), attrs(a.getAttrs()) { };
-        Dataset(int N) : std::vector<Instance>(N) {};
+        Dataset(const Dataset& a) : vector<Instance>(a.begin(), a.end()), 
+                                    attrs(a.getAttrs()) { };
+        Dataset(int N, int a) : std::vector<Instance>(N), attrs(a) {};
         void setAttrs(int a) { attrs = a; }
         int getAttrs() const { return attrs; }
         void getDispersions(std::vector<double> &dispersion) const;
+        std::string toString() const;
     };
 }
 

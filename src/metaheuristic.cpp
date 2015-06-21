@@ -80,6 +80,7 @@ double Metaheuristic::quality(const IS::Dataset &T,
 
 void HillClimbing::optimize(const IS::Dataset &T, IS::Solution &S) const {
     std::cout << ">>>> Running Hill Climbing" << std::endl;
+    std::cout << ">>>> quality = " << max_quality << std::endl;
     S.setSize(T.size());
     S.generateRandom();
     double q_max, old_q = -1;
@@ -102,7 +103,7 @@ void HillClimbing::optimize(const IS::Dataset &T, IS::Solution &S) const {
             iter_old = 0;
         }
         // TODO: Pass these values as parameters
-        if (q_max > 0.95 or iter_old == 1000) break;
+        if (q_max > max_quality or iter_old == 1000) break;
         old_q = q_max;
 
         if(iter_total % 100 == 0 and iter_total != 0) {
@@ -118,6 +119,7 @@ void HillClimbing::optimize(const IS::Dataset &T, IS::Solution &S) const {
 void SimulatedAnnealing::optimize(const IS::Dataset &T, IS::Solution &S) const {
     assert(T.size() == S.getSize());
     std::cout << ">>>> Running Simulated Annealing" << std::endl;
+    std::cout << ">>>> quality = " << max_quality << std::endl;
     S.setSize(T.size());
     S.generateRandom();   // Initial solution
 
@@ -151,7 +153,7 @@ void SimulatedAnnealing::optimize(const IS::Dataset &T, IS::Solution &S) const {
             qb = qs;
         }
 
-        if (qb > 0.95 || t <= EPSILON) break;
+        if (qb > max_quality || t <= EPSILON) break;
     }
 }
 
@@ -159,6 +161,7 @@ void SimulatedAnnealing::optimize(const IS::Dataset &T, IS::Solution &S) const {
 
 void ILS::optimize(const IS::Dataset &T, IS::Solution &S) const {
     std::cout << ">>>> Running ILS" << std::endl;
+    std::cout << ">>>> quality = " << max_quality << std::endl;
     S.setSize(T.size());
     S.generateRandom();
 
@@ -191,7 +194,7 @@ void ILS::optimize(const IS::Dataset &T, IS::Solution &S) const {
             } else {
                 iter_old = 0;
             }
-            if (q_max > 0.95 or iter_old == max_iter) break;
+            if (q_max > max_quality or iter_old == max_iter) break;
             old_q = q_max;
         }
 
@@ -207,7 +210,7 @@ void ILS::optimize(const IS::Dataset &T, IS::Solution &S) const {
         tweaker.tweak(S);
 
         iter++;
-        if (q_max > 0.95 or iter == max_out_iter) break;
+        if (q_max > max_quality or iter == max_out_iter) break;
     }
 }
 
@@ -215,6 +218,7 @@ void ILS::optimize(const IS::Dataset &T, IS::Solution &S) const {
 
 void Tabu::optimize(const IS::Dataset &T, IS::Solution &best) const {
     std::cout << ">>>> Running Tabu" << std::endl;
+    std::cout << ">>>> quality = " << max_quality << std::endl;
     IS::Solution S(T.size());
     S.generateRandom();  // First random solution
     int max_length = (length * T.size() / 100);
@@ -256,7 +260,7 @@ void Tabu::optimize(const IS::Dataset &T, IS::Solution &best) const {
             if (qs > qb) best.copy(S);
         }
         // TODO: Tune iter_total and iter_old
-        if (q_max > 0.95 || iter_total == 10000 || iter_old == 1000) break;
+        if (q_max > max_quality || iter_total == 10000 || iter_old == 1000) break;
 
         if (old_q == q_max) {
           iter_old ++;  

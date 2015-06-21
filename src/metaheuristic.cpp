@@ -81,8 +81,6 @@ double Metaheuristic::quality(const IS::Dataset &T,
 void HillClimbing::optimize(const IS::Dataset &T, IS::Solution &S) const {
     std::cout << ">>>> Running Hill Climbing" << std::endl;
     std::cout << ">>>> quality = " << max_quality << std::endl;
-    S.setSize(T.size());
-    S.generateRandom();
     double q_max, old_q = -1;
     int iter_old = 0, iter_total = 0;
     while (1) {
@@ -124,8 +122,6 @@ void SimulatedAnnealing::optimize(const IS::Dataset &T, IS::Solution &S) const {
     assert(T.size() == S.getSize());
     std::cout << ">>>> Running Simulated Annealing" << std::endl;
     std::cout << ">>>> quality = " << max_quality << std::endl;
-    S.setSize(T.size());
-    S.generateRandom();   // Initial solution
 
     IS::Solution best(S);  // Best solution
 
@@ -172,8 +168,6 @@ std::string SimulatedAnnealing::output_params() const {
 void ILS::optimize(const IS::Dataset &T, IS::Solution &S) const {
     std::cout << ">>>> Running ILS" << std::endl;
     std::cout << ">>>> quality = " << max_quality << std::endl;
-    S.setSize(T.size());
-    S.generateRandom();
 
     IS::Solution best(S);
     IS::Solution home_base(S);
@@ -237,13 +231,12 @@ std::string ILS::output_params() const {
 void Tabu::optimize(const IS::Dataset &T, IS::Solution &best) const {
     std::cout << ">>>> Running Tabu" << std::endl;
     std::cout << ">>>> quality = " << max_quality << std::endl;
-    IS::Solution S(T.size());
+    IS::Solution S(best);
     S.generateRandom();  // First random solution
     int max_length = (length * T.size() / 100);
 
     std::deque<IS::Solution> tabu_list;   // Tabu list
     tabu_list.push_back(S);
-    best.copy(S);
     double q_max, old_q = -1;
     int iter_old = 0, iter_total = 0;
     while (1) {

@@ -35,3 +35,4 @@ void run_tenfold(const vps &datasets,
                  const Metaheuristic *metaheuristic, 
                  int runs);
 
+IS::Dataset load_dataset(const char *filename);

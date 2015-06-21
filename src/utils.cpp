@@ -43,68 +43,14 @@ void load_data_tenfold(std::string path, vps &datasets) {
     string basename = path.substr(basename_pos+1, path.size());
 
     for(int i = 1; i <= 10; ++i) {
-        int insts_size, num_attrs;
-        double attr;
         std::string tra_filename = path + "/" + basename + "-10-" + to_string(i) + "tra.dat";
         std::string val_filename = path + "/" + basename + "-10-" + to_string(i) + "tst.dat";
-
-        cout << tra_filename << endl;
-        cout << val_filename << endl;
-
         const char *tra_filename_str = tra_filename.c_str();
         const char *val_filename_str = val_filename.c_str();
 
-        FILE *tra_file = fopen(tra_filename_str, "r");
-        FILE *val_file = fopen(val_filename_str, "r");
-
-        if (tra_file) printf("File: %s\n", tra_filename_str);
-        else {
-            perror("ERROR at data load");
-            exit(1);
-        }
-
-        if (val_file) printf("File: %s\n", val_filename_str);
-        else {
-            perror("ERROR at data load");
-            exit(1);
-        }
-
-        if (fscanf(tra_file, "%d %d", &insts_size, &num_attrs) != 2) {
-            printf("ERROR at data load: file malformed\n");
-            exit(1);
-        }
-
-        IS::Dataset training   = IS::Dataset();
+        IS::Dataset training   = load_dataset(tra_filename_str);
+        IS::Dataset validation = load_dataset(val_filename_str);
         
-        for(int j = 0; j < insts_size; ++j) {
-            IS::Instance tra;
-            for(int k = 0; k < num_attrs-1; ++k) { 
-                fscanf(tra_file, "%lf", &attr);
-                tra.push_back(attr);
-            }
-            fscanf(tra_file, "%lf", &attr);
-            tra.setCategory(attr);
-            training.push_back(tra);
-        }
-
-        IS::Dataset validation = IS::Dataset();
-
-        if (fscanf(val_file, "%d %d", &insts_size, &num_attrs) != 2) {
-            printf("ERROR at data load: file malformed\n");
-            exit(1);
-        }
-
-        for(int j = 0; j < insts_size; ++j) {
-            IS::Instance val;
-            for(int k = 0; k < num_attrs-1; ++k) { 
-                fscanf(tra_file, "%lf", &attr);
-                val.push_back(attr);
-            }
-            fscanf(tra_file, "%lf", &attr);
-            val.setCategory(attr);
-            validation.push_back(val);
-        }
-
         datasets.push_back(make_pair(training, validation));
     }
 }
@@ -149,7 +95,8 @@ void print_help() {
 }
 
 void error_(std::string msg) {
-    std::cout << "ERROR: " <<  msg << std::endl;
+    const char *error_msg = ("ERROR: " + msg).c_str();
+    perror(error_msg);
     exit(1);
 }
 
@@ -323,5 +270,30 @@ void run_tenfold(const vps &datasets, const Metaheuristic *metaheuristic, int ru
     // *out << "Validation errors: %: " << vmean << std::endl;
 
     //rFile.close();
+}
 
+IS::Dataset load_dataset(const char *filename) {
+    int insts, attrs;
+    double attr;
+
+    FILE *file = fopen(filename, "r");
+    if (!file) error_("ERROR at dataload");
+
+    if (fscanf(file, "%d %d", &insts, &attrs) != 2)
+        error_("ERROR at data load: file malformed\n");
+
+    IS::Dataset dataset(insts, attrs);
+
+    for(int i = 0; i < insts; ++i) {
+        IS::Instance instance;
+        for(int j = 0; j < attrs-1; ++j) {
+            fscanf(file, "%lf", &attr);
+            instance.push_back(attr);
+        }
+        fscanf(file, "%lf", &attr);
+        instance.setCategory(attr);
+        dataset[i] = instance;
+    }
+
+    return dataset;
 }

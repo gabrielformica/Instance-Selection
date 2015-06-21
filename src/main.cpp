@@ -105,7 +105,7 @@ int main(int argc, char *argv[]) {
         IS::Dataset dataset = load_data_basic(file_name);
         // Initial random solution
         IS::Solution solution(dataset.size());
-        solution.generateRandom(); 
+        // solution.generateRandom(); 
         metaheuristic->optimize(dataset, solution);
     } else if (flag_t) {
         vps datasets;

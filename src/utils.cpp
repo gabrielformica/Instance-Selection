@@ -197,7 +197,11 @@ results run_tenfold(const vps &datasets, const Metaheuristic *metaheuristic, int
     results res;
     IS::Dataset training, validation;
 
+    cout << "Datasets: " << datasets.size() << endl;
+    cout << "Runs: " << runs << endl;
+
     for(int i = 0; i < 10; ++i) {
+        cout << BOLDGREEN << "Running fold" << RESET << endl;
         training = datasets[i].first;
         validation = datasets[i].second;
 
@@ -222,9 +226,9 @@ results run_tenfold(const vps &datasets, const Metaheuristic *metaheuristic, int
                 if (validation[k].getCategory() != categories[k])
                     errors++;
 
-            double clas_rate = (1.0 * errors) / (1.0 * validation.size());
-            double perc_redc = (1.0 * final.size()) / (1.0 * training.size());
-            double fitness = 0.5 * clas_rate + (1 - 0.5) * perc_redc;
+            // double clas_rate = (1.0 * errors) / (1.0 * validation.size());
+            // double perc_redc = (1.0 * final.size()) / (1.0 * training.size());
+            // double fitness = 0.5 * clas_rate + (1 - 0.5) * perc_redc;
 
             res.errors.push_back(errors);
             res.val_errors.push_back((errors * 100.0) / (validation.size() * 1.0));
@@ -310,7 +314,7 @@ void output_results(const results &res,
     std::ofstream out_file;
     
     if(flag_r) {
-        out_fn += "_" + metaheuristic->output_params();
+        out_fn += "_" + metaheuristic->output_params() + ".result";
         out_file.open(out_fn, std::ios::out);
         out = &out_file;
     } else {

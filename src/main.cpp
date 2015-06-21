@@ -31,6 +31,7 @@ int main(int argc, char *argv[]) {
         {"tweaker-optional-arg", required_argument, 0, 'o'},
         {"tweaker", required_argument, 0, 'x'},
         {"results", required_argument, 0, 'r'},
+        {"debugging", no_argument, 0, 'a'},
         {0, 0, 0, 0}
     };
 
@@ -46,6 +47,7 @@ int main(int argc, char *argv[]) {
     bool flag_x = false;
     bool flag_r = false;
     bool flag_t = false;
+    bool flag_a = false;
     memset(metaheuristic_optional_arg, 0, sizeof(metaheuristic_optional_arg));
     memset(tweaker_optional_arg, 0, sizeof(tweaker_optional_arg));
 
@@ -71,6 +73,7 @@ int main(int argc, char *argv[]) {
             case 'r': flag_r = true; out_fn = optarg; break;
             case 'd': flag_d = true; break;
             case 't': flag_t = true; file_name = optarg; break;
+            case 'a': flag_a = true;  break;
             case '?': break;
         }
     }
@@ -107,6 +110,7 @@ int main(int argc, char *argv[]) {
         IS::Solution solution(dataset.size());
         solution.generateRandom(); 
         metaheuristic->optimize(dataset, solution);
+        if (flag_a) debug_print(dataset, solution);
     } else if (flag_t) {
         vps datasets;
         load_data_tenfold(file_name, datasets);

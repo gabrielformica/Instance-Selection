@@ -42,3 +42,4 @@ void output_results(const results &res,
                     bool flag_r,
                     std::string out_fn);
 
+void debug_print(const IS::Dataset &dataset, const IS::Solution &solution);

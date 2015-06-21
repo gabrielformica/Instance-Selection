@@ -70,6 +70,7 @@ void print_help() {
     std::cout << "-h, --help\t\t\t\tPrint this help" << std::endl;  
     std::cout << "-f, --file\t-Needed-\t\tExpect a file name" << std::endl; 
     std::cout << "-d, --disp\t\t\t\tPrint dispersion vector" << std::endl; 
+    std::cout << "-a, --debugging\t\t\t\tPrint for debugging" << std::endl;  
 
     // Metaheuristic
     std::cout << "-g, --metaheuristic [NAME]     -Needed-\tSpecify metaheuristic"; 
@@ -332,4 +333,34 @@ void output_results(const results &res,
        *out << res.errors[i] << " ";
     }
     *out << std::endl;
+}
+
+void debug_print(const IS::Dataset &dataset, const IS::Solution &solution) {
+   HillClimbing meta;
+   std::cout << "----------------------------------------- " << std::endl;
+   meta.quality(dataset, solution, 0.5);
+   std::cout << "----------------------------------------- " << std::endl;
+   std::cout << "Imprimiendo en archivos respectivos" << std::endl;
+   assert(dataset.size() == solution.getSize());
+   std::string sol_name = "scripts/solution.txt", comp_name = "scripts/complement.txt";
+
+   std::ofstream sol_out, comp_out; 
+
+   // Opening files
+   sol_out.open(sol_name, std::ios::out);
+   comp_out.open(comp_name, std::ios::out);
+
+   // Printing to files
+   std::bitset<MAX> bits = solution.getBits();
+   for (int i = 0; i < dataset.size(); i++) {
+      if (bits.test(i)) sol_out << dataset[i].toString() << std::endl;
+      else comp_out << dataset[i].toString() << std::endl;
+   }
+   std::cout << "Se imprimieron " << to_string(bits.count()) << " lineas en ";
+   std::cout << "solution.txt" << std::endl;
+
+   std::cout << "Se imprimieron " << to_string(dataset.size() - bits.count()); 
+   std::cout << " lineas en complement.txt" << std::endl;;
+   sol_out.close();
+   comp_out.close();
 }

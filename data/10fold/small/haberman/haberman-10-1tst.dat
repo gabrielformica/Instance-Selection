@@ -1,11 +1,3 @@
-@relation haberman
-@attribute Age integer [30  83]
-@attribute Year integer [58  69]
-@attribute Positive integer [0  52]
-@attribute Survival {positive  negative}
-@inputs Age  Year  Positive
-@outputs Survival
-@data
 64  68  0  negative
 55  58  1  negative
 54  59  7  negative

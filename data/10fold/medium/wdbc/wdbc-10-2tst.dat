@@ -1,38 +1,4 @@
-@relation wdbc
-@attribute Radius1 real [6.981  28.11]
-@attribute Texture1 real [9.71  39.28]
-@attribute Perimeter1 real [43.79  188.5]
-@attribute Area1 real [143.5  2501.0]
-@attribute Smoothness1 real [0.053  0.163]
-@attribute Compactness1 real [0.019  0.345]
-@attribute Concavity1 real [0.0  0.427]
-@attribute Concave_points1 real [0.0  0.201]
-@attribute Symmetry1 real [0.106  0.304]
-@attribute Fractal_dimension1 real [0.05  0.097]
-@attribute Radius2 real [0.112  2.873]
-@attribute Texture2 real [0.36  4.885]
-@attribute Perimeter2 real [0.757  21.98]
-@attribute Area2 real [6.802  542.2]
-@attribute Smoothness2 real [0.0020  0.031]
-@attribute Compactness2 real [0.0020  0.135]
-@attribute Concavity2 real [0.0  0.396]
-@attribute Concave_points2 real [0.0  0.053]
-@attribute Symmetry2 real [0.0080  0.079]
-@attribute Fractal_dimension2 real [0.0010  0.03]
-@attribute Radius3 real [7.93  36.04]
-@attribute Texture3 real [12.02  49.54]
-@attribute Perimeter3 real [50.41  251.2]
-@attribute Area3 real [185.2  4254.0]
-@attribute Smoothness3 real [0.071  0.223]
-@attribute Compactness3 real [0.027  1.058]
-@attribute Concavity3 real [0.0  1.252]
-@attribute Concave_points3 real [0.0  0.291]
-@attribute Symmetry3 real [0.156  0.664]
-@attribute Fractal_dimension3 real [0.055  0.208]
-@attribute Class {M  B}
-@inputs Radius1  Texture1  Perimeter1  Area1  Smoothness1  Compactness1  Concavity1  Concave_points1  Symmetry1  Fractal_dimension1  Radius2  Texture2  Perimeter2  Area2  Smoothness2  Compactness2  Concavity2  Concave_points2  Symmetry2  Fractal_dimension2  Radius3  Texture3  Perimeter3  Area3  Smoothness3  Compactness3  Concavity3  Concave_points3  Symmetry3  Fractal_dimension3
-@outputs Class
-@data
+57 31
 14.54  27.54  96.73  658.8  0.114  0.16  0.164  0.074  0.23  0.071  0.37  1.033  2.879  32.55  0.0060  0.042  0.047  0.011  0.019  0.0050  17.46  37.13  124.1  943.2  0.168  0.658  0.703  0.171  0.422  0.134  M
 15.34  14.26  102.5  704.4  0.107  0.214  0.208  0.098  0.252  0.07  0.439  0.71  3.384  44.91  0.0070  0.053  0.064  0.023  0.037  0.0040  18.07  19.08  125.1  980.9  0.139  0.595  0.63  0.239  0.467  0.099  M
 17.14  16.4  116.0  912.7  0.119  0.228  0.223  0.14  0.304  0.074  1.046  0.976  7.276  111.4  0.0080  0.038  0.037  0.024  0.023  0.0070  22.25  21.4  152.4  1461.0  0.154  0.395  0.385  0.255  0.407  0.106  M

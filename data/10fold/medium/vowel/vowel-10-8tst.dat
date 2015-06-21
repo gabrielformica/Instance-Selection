@@ -1,21 +1,4 @@
-@relation vowel
-@attribute TT integer [0  1]
-@attribute SpeakerNumber integer [0  14]
-@attribute Sex integer [0  1]
-@attribute F0 real [-5.211  -0.941]
-@attribute F1 real [-1.274  5.074]
-@attribute F2 real [-2.487  1.431]
-@attribute F3 real [-1.409  2.377]
-@attribute F4 real [-2.127  1.831]
-@attribute F5 real [-0.836  2.327]
-@attribute F6 real [-1.537  1.403]
-@attribute F7 real [-1.293  2.039]
-@attribute F8 real [-1.613  1.309]
-@attribute F9 real [-1.68  1.396]
-@attribute Class {0  1  2  3  4  5  6  7  8  9  10}
-@inputs TT  SpeakerNumber  Sex  F0  F1  F2  F3  F4  F5  F6  F7  F8  F9
-@outputs Class
-@data
+99 14
 0  0  0  -2.135  0.954  -1.632  0.121  -0.704  1.6  -0.628  0.713  -0.903  -0.027  2
 0  0  0  -3.673  1.811  -1.405  1.621  0.044  1.572  -0.453  0.745  -0.066  -0.733  9
 0  0  0  -3.165  0.408  -0.971  1.207  -0.298  1.921  -0.215  0.723  -0.492  -0.425  1

@@ -1,17 +1,3 @@
-@relation saheart
-@attribute Sbp integer [101  218]
-@attribute Tobacco real [0.0  31.2]
-@attribute Ldl real [0.98  15.33]
-@attribute Adiposity real [6.74  42.49]
-@attribute Famhist {Present  Absent}
-@attribute Typea integer [13  78]
-@attribute Obesity real [14.7  46.58]
-@attribute Alcohol real [0.0  147.19]
-@attribute Age integer [15  64]
-@attribute Chd {0  1}
-@inputs Sbp  Tobacco  Ldl  Adiposity  Famhist  Typea  Obesity  Alcohol  Age
-@outputs Chd
-@data
 114  4.08  4.59  14.6  Present  62  23.11  6.72  58  1
 158  2.6  7.46  34.07  Present  61  29.3  53.28  62  1
 148  5.5  7.1  25.31  Absent  56  29.84  3.6  48  0

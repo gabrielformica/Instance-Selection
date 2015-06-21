@@ -1,13 +1,4 @@
-@relation phoneme
-@attribute Aa real [-1.7  4.107]
-@attribute Ao real [-1.327  4.378]
-@attribute Dcl real [-1.823  3.199]
-@attribute Iy real [-1.581  2.826]
-@attribute Sh real [-1.284  2.719]
-@attribute Class {0  1}
-@inputs Aa  Ao  Dcl  Iy  Sh
-@outputs Class
-@data
+540 6
 0.279  0.99  2.555  -0.738  0.0  0
 1.404  1.531  0.476  1.601  -0.424  0
 0.532  1.963  -0.355  0.191  -0.122  0

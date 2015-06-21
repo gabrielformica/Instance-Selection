@@ -31,7 +31,7 @@ typedef struct results {
 
 
 
-pds load_data_basic(std::string file_name_str, int partition) {
+IS::Dataset load_data_basic(std::string file_name_str) {
     const char *file_name = file_name_str.c_str();
     FILE *input = fopen(file_name, "r");
     int insts_size, num_attrs;
@@ -48,58 +48,26 @@ pds load_data_basic(std::string file_name_str, int partition) {
         exit(1);
     }
     
-    int val_size = insts_size / 10;
-    int tra_size = insts_size - val_size;
-
-    // Two datasets are built: One for validation and one for training
-    IS::Dataset validation = IS::Dataset();
-    IS::Dataset training   = IS::Dataset();
-    training.setAttrs(num_attrs);
-    validation.setAttrs(num_attrs);
-
-    std::vector<int> val_pos;
-    
-    for(unsigned i = 0; i < val_size; ++i) {
-        int j = rand() % tra_size;
-        val_pos.push_back(j);
-    }
-    assert(val_pos.size() == val_size);
-
-    for(unsigned i = 0; i < insts_size; ++i) {
-        if(std::find(val_pos.begin(), val_pos.end(), i) != val_pos.end()) {
-            /* validation instance */
-            double attr;
-            IS::Instance val;
-            for(unsigned j = 0; j < num_attrs-1; ++j) { 
-                fscanf(input, "%lf", &attr);
-                val.push_back(attr);
-            }
-            fscanf(input, "%lf", &attr);
-            val.setCategory(attr);
-            validation.push_back(val);
-        } else {
-            /* not a validation instance */
-            double attr;
-            IS::Instance tra;
-            for(unsigned j = 0; j < num_attrs-1; ++j) { 
-                fscanf(input, "%lf", &attr);
-                tra.push_back(attr);
-            }
-            fscanf(input, "%lf", &attr);
-            tra.setCategory(attr);
-            training.push_back(tra);
+    IS::Dataset ds(insts_size);
+    double x;
+    for (int i = 0; i < insts_size; i++) {
+        IS::Instance ins;
+        for (int j = 0; j < num_attrs -1; j++) {
+            fscanf(input, "%lf", &x);
+            ins.push_back(x);
         }
+        fscanf(input, "%lf", &x); // reading class
+        ins.setCategory(x);
+        ds[i] = ins;
     }
-
-    return make_pair(training, validation);
+    fclose(input);
+    return ds;
 }
 
 void load_data_tenfold(std::string path, vps &datasets) {
     if (path[path.size()-1] == '/') path.erase(path.end()-1);
     size_t basename_pos = path.rfind("/");
     string basename = path.substr(basename_pos+1, path.size());
-
-
 
     for(int i = 1; i <= 10; ++i) {
         int insts_size, num_attrs;
@@ -166,8 +134,6 @@ void load_data_tenfold(std::string path, vps &datasets) {
 
         datasets.push_back(make_pair(training, validation));
     }
-
-    return;
 }
 
 
@@ -305,6 +271,86 @@ Tweaker *choose_tweaker(std::string tweaker_str) {
     return NULL;
 }
 
+void run_tenfold(const vps &datasets, const Metaheuristic *metaheuristic, int runs) {
+    results res;
+    IS::Dataset training, validation;
+
+    for(int i = 0; i < 10; ++i) {
+        training = datasets[i].first;
+        validation = datasets[i].second;
+
+        for(int j = 0; j < runs; ++j) {
+            IS::Solution solution(training.size());
+            metaheuristic->optimize(training, solution);
+
+            // Checking quality of final solution
+            std::vector<double> categories;
+            categories.assign(validation.size(), -1);
+
+            std::bitset<MAX> bits = solution.getBits();
+            IS::Dataset final;
+            for(int k = 0; k < training.size(); ++k) {
+                if(bits[k]) final.push_back(training[k]);
+            }
+
+            metaheuristic->oneNN(final, validation, categories);
+
+            int errors = 0;
+            for (int k = 0; k < validation.size(); k++)
+                if (validation[k].getCategory() != categories[k])
+                    errors++;
+
+            double clas_rate = (1.0 * errors) / (1.0 * validation.size());
+            double perc_redc = (1.0 * final.size()) / (1.0 * training.size());
+            double fitness = 0.5 * clas_rate + (1 - 0.5) * perc_redc;
+
+            res.errors.push_back(errors);
+            res.val_errors.push_back((errors * 100.0) / (validation.size() * 1.0));
+            res.sizes.push_back((final.size() * 100.0) / (training.size() * 1.0));
+        }
+    }
+
+    // std::ostream *out;
+   // std::ofstream rFile;
+
+   // if(flag_r) {
+   //     rFile.open(out_fn, std::ios::out);
+   //     out = &rFile;
+   // } else {
+   //     out = &std::cout;
+   // }
+    // double esum = std::accumulate(res.errors.begin(), res.errors.end(), 0.0);
+    // double emean = esum / res.errors.size();
+    // double vsum = std::accumulate(res.sizes.begin(), res.sizes.end(), 0.0);
+    // double vmean = vsum / res.sizes.size();
+    // double ssum = std::accumulate(res.val_errors.begin(), res.val_errors.end(), 0.0);
+    // double smean = ssum / res.val_errors.size();
+
+    //*out << "Val_errors" << std::endl;
+    //for (unsigned i = 0; i < res.val_errors.size(); ++i)  {
+    //    *out << res.val_errors[i] << " ";
+    //}
+    //*out << std::endl;
+    //*out << "Sizes" << std::endl;
+    //for (unsigned i = 0; i < res.sizes.size(); ++i)  {
+    //    *out << res.sizes[i] << " ";
+    //}
+    //*out << std::endl;
+    //*out << "Errors" << std::endl;
+    //for (unsigned i = 0; i < res.errors.size(); ++i)  {
+    //    *out << res.errors[i] << " ";
+    //}
+    //*out << std::endl;
+
+
+    // *out << "Errors: " << emean << std::endl;
+    // *out << "Size of solution %: " << smean << std::endl;
+    // *out << "Validation errors: %: " << vmean << std::endl;
+
+    //rFile.close();
+
+}
+
 int main(int argc, char *argv[]) {
 
     static struct option long_options[] = {
@@ -377,19 +423,6 @@ int main(int argc, char *argv[]) {
     IS::Dataset training;
     IS::Dataset validation;
 
-    if (flag_f) {
-        std::pair<ds, ds> dataset = load_data_basic(file_name, part);
-        training   = dataset.first;
-        validation = dataset.second;
-    } else if (flag_t) {
-        load_data_tenfold(file_name, datasets);
-    }
-
-    if (flag_d) {
-        print_dispersions(training);
-        return 0;
-    }
-
     Metaheuristic *metaheuristic = choose_metaheuristic(metaheuristic_str);
     if (!metaheuristic) {
         std::cerr << "Error: No metaheuristic by that name." << std::endl;
@@ -401,84 +434,23 @@ int main(int argc, char *argv[]) {
         exit(1);
     }
 
-    metaheuristic->setTweaker(tweaker);
-    results res;
+    metaheuristic->setTweaker(tweaker); // Setting tweaker
 
+    if (flag_f) {
+        IS::Dataset dataset = load_data_basic(file_name);
+        IS::Solution solution(dataset.size());
+        metaheuristic->optimize(dataset, solution);
+    } else if (flag_t) {
+        load_data_tenfold(file_name, datasets);
+        run_tenfold(datasets, metaheuristic, runs);
+    }
 
-    for(int i = 0; i < 10; ++i) {
-        training = datasets[i].first;
-        validation = datasets[i].second;
-
-        for(int j = 0; j < runs; ++j) {
-            IS::Solution solution(training.size());
-            metaheuristic->optimize(training, solution);
-
-            // Checking quality of final solution
-            std::vector<double> categories;
-            categories.assign(validation.size(), -1);
-
-            std::bitset<MAX> bits = solution.getBits();
-            IS::Dataset final;
-            for(int k = 0; k < training.size(); ++k) {
-                if(bits[k]) final.push_back(training[k]);
-            }
-
-            metaheuristic->oneNN(final, validation, categories);
-
-            int errors = 0;
-            for (int k = 0; k < validation.size(); k++)
-                if (validation[k].getCategory() != categories[k])
-                    errors++;
-
-            double clas_rate = (1.0 * errors) / (1.0 * validation.size());
-            double perc_redc = (1.0 * final.size()) / (1.0 * training.size());
-            double fitness = 0.5 * clas_rate + (1 - 0.5) * perc_redc;
-
-            res.errors.push_back(errors);
-            res.val_errors.push_back((errors * 100.0) / (validation.size() * 1.0));
-            res.sizes.push_back((final.size() * 100.0) / (training.size() * 1.0));
-        }
+    if (flag_d) {
+        print_dispersions(training);
+        return 0;
     }
 
 
-    std::ostream *out;
-    std::ofstream rFile;
-
-    if(flag_r) {
-        rFile.open(out_fn, std::ios::out);
-        out = &rFile;
-    } else {
-        out = &std::cout;
-    }
-    // double esum = std::accumulate(res.errors.begin(), res.errors.end(), 0.0);
-    // double emean = esum / res.errors.size();
-    // double vsum = std::accumulate(res.sizes.begin(), res.sizes.end(), 0.0);
-    // double vmean = vsum / res.sizes.size();
-    // double ssum = std::accumulate(res.val_errors.begin(), res.val_errors.end(), 0.0);
-    // double smean = ssum / res.val_errors.size();
-
-    *out << "Val_errors" << std::endl;
-    for (unsigned i = 0; i < res.val_errors.size(); ++i)  {
-        *out << res.val_errors[i] << " ";
-    }
-    *out << std::endl;
-    *out << "Sizes" << std::endl;
-    for (unsigned i = 0; i < res.sizes.size(); ++i)  {
-        *out << res.sizes[i] << " ";
-    }
-    *out << std::endl;
-    *out << "Errors" << std::endl;
-    for (unsigned i = 0; i < res.errors.size(); ++i)  {
-        *out << res.errors[i] << " ";
-    }
-    *out << std::endl;
-
-
-    // *out << "Errors: " << emean << std::endl;
-    // *out << "Size of solution %: " << smean << std::endl;
-    // *out << "Validation errors: %: " << vmean << std::endl;
-
-    rFile.close();
-
+   
     return 0;
 }

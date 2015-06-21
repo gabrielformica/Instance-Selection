@@ -21,7 +21,7 @@ IS::Dataset load_data_basic(std::string file_name_str) {
         exit(1);
     }
     
-    IS::Dataset ds(insts_size);
+    IS::Dataset dataset(insts_size, num_attrs);
     double x;
     for (int i = 0; i < insts_size; i++) {
         IS::Instance ins;
@@ -31,10 +31,10 @@ IS::Dataset load_data_basic(std::string file_name_str) {
         }
         fscanf(input, "%lf", &x); // reading class
         ins.setCategory(x);
-        ds[i] = ins;
+        dataset[i] = ins;
     }
     fclose(input);
-    return ds;
+    return dataset;
 }
 
 void load_data_tenfold(std::string path, vps &datasets) {

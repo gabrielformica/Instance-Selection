@@ -21,6 +21,15 @@ void IS::Solution::copy(const Solution &a) {
     bits |= a.bits;
 }
 
+std::string IS::Instance::toString() const {
+    std::string str = "";
+    const IS::Instance &a = *this;
+    for (int i = 0; i < a.size(); i++)
+        str += std::to_string(a[i]) + " ";
+    str += std::to_string(category);
+    return str;
+}
+
 double IS::Instance::calcDistance(const IS::Instance &b) const {
     const IS::Instance &a = *this;
     double dist = 0.0;
@@ -37,4 +46,14 @@ void IS::Dataset::getDispersions(std::vector<double> &dispersion) const {
     const IS::Dataset &a = *this;
     for (int i = 0; i < a.size(); i++)
         dispersion[i] = a[i].calcDistance(dummy);
+}
+
+std::string IS::Dataset::toString() const {
+    std::string str = std::to_string(size()) + " " + std::to_string(attrs);
+    str += "\n";
+    // Getting string representation of instances
+    const IS::Dataset &a = *this;  
+    for (int i = 0; i < a.size(); i++) 
+        str += a[i].toString() + "\n";
+    return str;
 }

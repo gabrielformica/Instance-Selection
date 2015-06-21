@@ -108,6 +108,7 @@ int main(int argc, char *argv[]) {
     if (flag_f) {
         IS::Dataset dataset = load_data_basic(file_name);
         IS::Solution solution(dataset.size());
+        //std::cout << dataset.toString() << std::endl; 
         metaheuristic->optimize(dataset, solution);
     } else if (flag_t) {
         vps datasets;

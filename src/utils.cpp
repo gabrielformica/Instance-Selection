@@ -50,7 +50,6 @@ void load_data_tenfold(std::string path, vps &datasets) {
 
         IS::Dataset training   = load_dataset(tra_filename_str);
         IS::Dataset validation = load_dataset(val_filename_str);
-        
         datasets.push_back(make_pair(training, validation));
     }
 }
@@ -193,7 +192,7 @@ Tweaker *choose_tweaker(std::string tweaker_str,
 }
 
 
-void run_tenfold(const vps &datasets, const Metaheuristic *metaheuristic, int runs) {
+results run_tenfold(const vps &datasets, const Metaheuristic *metaheuristic, int runs) {
     results res;
     IS::Dataset training, validation;
 
@@ -231,6 +230,8 @@ void run_tenfold(const vps &datasets, const Metaheuristic *metaheuristic, int ru
             res.sizes.push_back((final.size() * 100.0) / (training.size() * 1.0));
         }
     }
+
+    return res;
 
     // std::ostream *out;
    // std::ofstream rFile;

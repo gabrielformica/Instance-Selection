@@ -113,7 +113,7 @@ int main(int argc, char *argv[]) {
     } else if (flag_t) {
         vps datasets;
         load_data_tenfold(file_name, datasets);
-        run_tenfold(datasets, metaheuristic, runs);
+        results res = run_tenfold(datasets, metaheuristic, runs);
     }
 
     if (flag_d) {
@@ -121,8 +121,6 @@ int main(int argc, char *argv[]) {
         print_dispersions(dataset);
         return 0;
     }
-
-
    
     return 0;
 }

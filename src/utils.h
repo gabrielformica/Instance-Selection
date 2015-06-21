@@ -31,7 +31,7 @@ Tweaker *choose_tweaker(std::string tweaker_str,
                         int (&tweaker_optional_arg)[10],
                         int toa_counter);
 
-void run_tenfold(const vps &datasets, 
+results run_tenfold(const vps &datasets, 
                  const Metaheuristic *metaheuristic, 
                  int runs);
 

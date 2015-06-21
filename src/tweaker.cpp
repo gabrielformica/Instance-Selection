@@ -43,7 +43,6 @@ void percRandomFlips::tweak(IS::Solution &S) {
 
     for (int i = 0; i < n; ++i) {
         int j = (rand() % size);
-        cout << "j = " << j << endl;
         bits.flip(j);
     }
     S.setBits(bits);

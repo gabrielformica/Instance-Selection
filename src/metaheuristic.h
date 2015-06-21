@@ -13,6 +13,7 @@ class Metaheuristic {
     double max_quality = 0.95; 
   public:
     virtual void optimize(const IS::Dataset &T, IS::Solution &R) const = 0;
+    virtual std::string output_params() const = 0;
     void setTweaker(Tweaker *tw) { tweaker = tw; };
     Tweaker* getTweaker() const { return tweaker; };
     double quality(const IS::Dataset &T, const IS::Solution &S, double alpha) const;
@@ -28,6 +29,7 @@ class Metaheuristic {
 class HillClimbing : public Metaheuristic {
   public: 
     void optimize(const IS::Dataset &T, IS::Solution &R) const;
+    std::string output_params() const;
 };
 
 class SimulatedAnnealing : public Metaheuristic {
@@ -36,6 +38,7 @@ class SimulatedAnnealing : public Metaheuristic {
   public: 
     SimulatedAnnealing(int t, int d): temperature(t), dec_factor(d) { };
     void optimize(const IS::Dataset &T, IS::Solution &R) const;
+    std::string output_params() const;
 };
 
 class ILS : public Metaheuristic {
@@ -50,6 +53,7 @@ class ILS : public Metaheuristic {
     void setTotalIter(int t) { ti = t; }
     void setPerturbPerc(int p) { pp = p; }
     void optimize(const IS::Dataset &T, IS::Solution &R) const;
+    std::string output_params() const;
 };
 
 class Tabu : public Metaheuristic {
@@ -58,6 +62,7 @@ class Tabu : public Metaheuristic {
   public:
     Tabu(int l, int n) : length(l), number_of_tweaks(n) { };
     void optimize(const IS::Dataset &T, IS::Solution &R) const;
+    std::string output_params() const;
 };
 
 

@@ -114,6 +114,10 @@ void HillClimbing::optimize(const IS::Dataset &T, IS::Solution &S) const {
     }
 }
 
+std::string HillClimbing::output_params() const {
+    return "HillC_";
+}
+
 /* Simulated Annealing  */
 
 void SimulatedAnnealing::optimize(const IS::Dataset &T, IS::Solution &S) const {
@@ -155,6 +159,12 @@ void SimulatedAnnealing::optimize(const IS::Dataset &T, IS::Solution &S) const {
 
         if (qb > max_quality || t <= EPSILON) break;
     }
+}
+
+std::string SimulatedAnnealing::output_params() const {
+    std::string params = "SimulAnn_" + std::to_string(temperature) + "_";
+    params += std::to_string(dec_factor);
+    return params;
 }
 
 /* ILS */
@@ -214,6 +224,14 @@ void ILS::optimize(const IS::Dataset &T, IS::Solution &S) const {
     }
 }
 
+std::string ILS::output_params() const {
+    std::string params = "ILS_" + std::to_string(ti) + "_";
+    params += std::to_string(li) + "_";
+    params += std::to_string(pp);
+    return params;
+}
+
+
 /* Tabu */
 
 void Tabu::optimize(const IS::Dataset &T, IS::Solution &best) const {
@@ -270,4 +288,10 @@ void Tabu::optimize(const IS::Dataset &T, IS::Solution &best) const {
 
         old_q = q_max;
     }
+}
+
+std::string Tabu::output_params() const {
+    std::string params = "Tabu_" + std::to_string(length) + "_";
+    params += std::to_string(number_of_tweaks);
+    return params;
 }

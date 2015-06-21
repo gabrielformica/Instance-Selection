@@ -36,3 +36,9 @@ results run_tenfold(const vps &datasets,
                  int runs);
 
 IS::Dataset load_dataset(const char *filename);
+
+void output_results(const results &res, 
+                    const Metaheuristic *metaheuristic,
+                    bool flag_r,
+                    std::string out_fn);
+

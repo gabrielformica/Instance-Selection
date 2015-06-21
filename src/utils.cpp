@@ -1,5 +1,6 @@
 #include <algorithm>
 #include <iostream>
+#include <fstream>
 #include <cstdio>
 #include "metaheuristic.h"
 #include "utils.h"
@@ -233,6 +234,7 @@ results run_tenfold(const vps &datasets, const Metaheuristic *metaheuristic, int
 
     return res;
 
+
     // std::ostream *out;
    // std::ofstream rFile;
 
@@ -297,4 +299,37 @@ IS::Dataset load_dataset(const char *filename) {
     }
 
     return dataset;
+}
+
+void output_results(const results &res, 
+                    const Metaheuristic *metaheuristic,
+                    bool flag_r,
+                    std::string out_fn) {
+
+    std::ostream *out;
+    std::ofstream out_file;
+    
+    if(flag_r) {
+        out_fn += "_" + metaheuristic->output_params();
+        out_file.open(out_fn, std::ios::out);
+        out = &out_file;
+    } else {
+       out = &std::cout;
+    }
+
+    *out << "Val_errors" << std::endl;
+    for (unsigned i = 0; i < res.val_errors.size(); ++i)  {
+       *out << res.val_errors[i] << " ";
+    }
+    *out << std::endl;
+    *out << "Sizes" << std::endl;
+    for (unsigned i = 0; i < res.sizes.size(); ++i)  {
+       *out << res.sizes[i] << " ";
+    }
+    *out << std::endl;
+    *out << "Errors" << std::endl;
+    for (unsigned i = 0; i < res.errors.size(); ++i)  {
+       *out << res.errors[i] << " ";
+    }
+    *out << std::endl;
 }

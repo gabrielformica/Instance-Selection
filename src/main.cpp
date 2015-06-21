@@ -50,8 +50,7 @@ int main(int argc, char *argv[]) {
     memset(tweaker_optional_arg, 0, sizeof(tweaker_optional_arg));
 
     // We need these three things
-    std::string file_name, metaheuristic_str, tweaker_str;
-    std::string out_fn;
+    std::string file_name, metaheuristic_str, tweaker_str, out_fn;
 
     while (1) {
         opt = getopt_long(argc, argv, "dhf:g:m:o:x:n:r:t:", long_options, &option_index);
@@ -82,11 +81,8 @@ int main(int argc, char *argv[]) {
     if (! flag_g and ! flag_d) error_("You have to specify a metaheuristic"); 
     if (  flag_f and   flag_t) error_("You cannot use -f and -t together");
     if (! flag_x and ! flag_d) error_("You have to specify a tweaker");
-    if ((! flag_f and ! flag_d) and (! flag_t)) error_("You have to specify a file");  
+    if ((! flag_f and ! flag_d) and (!flag_t)) error_("You have to specify a file");  
     if (! flag_n and ! flag_d) runs = 1;
-
-    // TODO: Make this a parameter
-    int part = 10;
 
     Metaheuristic *metaheuristic = choose_metaheuristic(metaheuristic_str, 
                                     metaheuristic_optional_arg, 
@@ -114,6 +110,7 @@ int main(int argc, char *argv[]) {
         vps datasets;
         load_data_tenfold(file_name, datasets);
         results res = run_tenfold(datasets, metaheuristic, runs);
+        output_results(res, metaheuristic, flag_r, out_fn);
     }
 
     if (flag_d) {

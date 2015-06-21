@@ -29,7 +29,7 @@ namespace IS {
         std::bitset<MAX> bits;
         int size;
       public:
-        Solution(int N) : size(N) { };
+        Solution(int N) : size(N) { generateRandom(); };
         Solution(std::bitset<MAX> a, int N) : bits(a), size(N) { };
         Solution(const Solution &a) : bits(a.getBits()), size(a.getSize()) { };
         int getSize() const { return size; };

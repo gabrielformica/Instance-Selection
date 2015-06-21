@@ -15,3 +15,4 @@ data/raw/*
 !data/10fold/
 scripts/*
 *.log
+data/10fold/change.sh

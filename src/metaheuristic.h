@@ -10,6 +10,7 @@
 class Metaheuristic {
   protected:
     Tweaker *tweaker;
+    double max_quality = 0.95; 
   public:
     virtual void optimize(const IS::Dataset &T, IS::Solution &R) const = 0;
     void setTweaker(Tweaker *tw) { tweaker = tw; };
@@ -20,6 +21,8 @@ class Metaheuristic {
                const IS::Dataset &result, 
                std::vector<double> &category) const;
     double calc_distance(const IS::Instance &a, const IS::Instance &b) const; 
+    double get_max_quality() const { return max_quality; };
+    void set_max_quality(double x) { max_quality = x; }
 };
 
 class HillClimbing : public Metaheuristic {

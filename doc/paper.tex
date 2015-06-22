@@ -34,7 +34,8 @@
 % in the camera-ready version and ask you to change it back.
 
 
-\title{Selección de Instancias}
+\title{Comparación de Metaheurísticas y Algoritmos Poblacionales
+       para Selección de Instancias}
 
 \author{Formica, Gabriel\\
   Universidad Simón Bolívar\\
@@ -49,8 +50,31 @@
 
 \begin{document}
 \maketitle
+\section{Introducción}
+  En este artículo se considera el problema de Selección de Instancias, como
+  estrategia de reducción de datos para Minería de Datos. Dado un conjunto de
+  instancias de datos, el problema de 
+  \textit{Selección de Instancias} (IS por sus siglas en inglés), busca
+  escoger un subconjunto de instancias de menor cardinalidad que el conjunto original
+  que mantenga o mejore la clasificación de las muestras a ser usadas como un conjunto
+  de entrenamiento. 
+  
+  En el presente artículo se implementan 3 Metaheurísticas de trayectorias 
+  (Hill CLimb, ILS, Tabú) y 2 Metaheurísticas poblacionales (Algoritmo Memético y 
+  Algoritmo Genético), mostrando para cada una de ellas los resultados 
+  y tiempos de corrida al aplicarlas sobre diferentes conjuntos de datos.
+
+  Este artículo se organiza en 6 secciones. Se comienza con una definición
+  formal del problema, en donde se explica la terminología relevante a SI. 
+  Posteriormente, se describe la representación de las soluciones, así 
+  como también el proceso de generación de soluciones iniciales. Se continúa
+  con los algoritmos y metaheurísticas usadas, mostrando el pseudocódigo de cada
+  una de ellas. Seguido a esto, se describen cada uno de los conjuntos de datos usados
+  en los experimentos. Finalmente, se presentan los resultados experimentales y se 
+  concluye en base a dicho resultados.
+
 \begin{abstract}
-  El problema de \textit{Selección de Instancias} (IS por sus siglas en inglés), busca
+  El problema de \textit{Selección de Instancias}  busca
   escoger un subconjunto de instancias de menor cardinalidad del conjunto original
   que mantenga o mejore la clasificación de las muestras a ser usadas como un conjunto
   de entrenamiento. En este articulo se considera la resolución de este problema

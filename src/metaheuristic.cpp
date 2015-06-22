@@ -200,7 +200,7 @@ void ILS::optimize(const IS::Dataset &T, IS::Solution &S) const {
                 local_iter = 0;
             } else local_iter++;
 
-            std::cout << "ITER ---XXXXXX " << local_iter << std::endl;
+            // std::cout << "ITER ---XXXXXX " << local_iter << std::endl;
             if (q_max > max_quality or local_iter == max_iter) break;
         }
 
@@ -211,10 +211,10 @@ void ILS::optimize(const IS::Dataset &T, IS::Solution &S) const {
         if (qs > qb) best.setBits(S.getBits());
         // Flipping 25% of bits for perturb
         // TODO: This CAN be an argument
-        cout << ">>> Perturbing <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" << endl;
+        // cout << ">>> Perturbing <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" << endl;
         //weightedRandomPlus tweaker = weightedRandomPlus(perc, 50);
         int perc = S.getSize() / getPerturbPerc();
-        cout << "perc ---> " << perc << endl;
+        // cout << "perc ---> " << perc << endl;
         nRandomFlips tweaker = nRandomFlips(perc);
         tweaker.tweak(S);
 

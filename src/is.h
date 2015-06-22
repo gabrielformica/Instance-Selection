@@ -28,12 +28,15 @@ namespace IS {
       private:
         std::bitset<MAX> bits;
         int size;
+        double fitness;
       public:
         Solution(int N) : size(N) { generateRandom(); };
         Solution(std::bitset<MAX> a, int N) : bits(a), size(N) { };
         Solution(const Solution &a) : bits(a.getBits()), size(a.getSize()) { };
         int getSize() const { return size; };
         void setSize(int n) { size = n; };
+        void setFitness(double f) { fitness = f; };
+        double getFitness() const { return fitness; };
         std::bitset<MAX> getBits() const { return bits; };
         void setBits(const std::bitset<MAX> &a) { bits = a; }
         void generateRandom(); 
@@ -46,6 +49,15 @@ namespace IS {
         void copy(const Solution &a);
         bool operator==(const Solution &b) const {
             return (size == b.size && bits == b.bits);
+        }
+        bool operator<(const Solution& y) const {
+            const IS::Solution &x = *this;
+            std::bitset<MAX> bx = x.getBits();
+            std::bitset<MAX> by = y.getBits();
+            for (int i = size; i >= 0; i--) {
+                if (bx[i] ^ by[i]) return by[i];
+            }
+            return false;
         }
     };
 

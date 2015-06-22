@@ -58,9 +58,9 @@ class ILS : public Metaheuristic {
 
 class Tabu : public Metaheuristic {
   private:
-    int length, number_of_tweaks;
+    int length, number_of_tweaks, iter_limit;
   public:
-    Tabu(int l, int n) : length(l), number_of_tweaks(n) { };
+    Tabu(int l, int n, int i) : length(l), number_of_tweaks(n), iter_limit(i) { };
     void optimize(const IS::Dataset &T, IS::Solution &R) const;
     std::string output_params() const;
 };

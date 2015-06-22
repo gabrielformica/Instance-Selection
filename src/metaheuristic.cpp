@@ -63,13 +63,13 @@ double Metaheuristic::quality(const IS::Dataset &T,
     double fitness = alpha * clas_rate + (1 - alpha) * perc_redc;
 
     // // XXX: Print
-      cout << "Hubo un total de " << count << " aciertos" << endl;
-      cout << "Result es de tamanio: " << result.size() << endl;
-      cout << "La relación es: " << clas_rate << endl;
-      cout << "El tamaño de T es: " << T.size() << endl;
-      cout << "El tamaño de training es: " << training.size() << endl;
-      cout << "El porcentaje de reducción es: " << perc_redc << endl;
-      cout << "El fitness es : " << fitness << endl << endl;
+      //cout << "Hubo un total de " << count << " aciertos" << endl;
+      //cout << "Result es de tamanio: " << result.size() << endl;
+      //cout << "La relación es: " << clas_rate << endl;
+      //cout << "El tamaño de T es: " << T.size() << endl;
+      //cout << "El tamaño de training es: " << training.size() << endl;
+      //cout << "El porcentaje de reducción es: " << perc_redc << endl;
+      //cout << "El fitness es : " << fitness << endl << endl;
 
     assert(fitness <= 1.0);
     return fitness;
@@ -238,16 +238,14 @@ void Tabu::optimize(const IS::Dataset &T, IS::Solution &best) const {
     std::cout << ">>>> Running Tabu" << std::endl;
     std::cout << ">>>> quality = " << max_quality << std::endl;
     IS::Solution S(best);
-    S.generateRandom();  // First random solution
     int max_length = (length * T.size() / 100);
 
-    std::deque<IS::Solution> tabu_list;   // Tabu list
-    tabu_list.push_back(S);
-    double q_max, old_q = -1;
-    int iter_old = 0, iter_total = 0;
+    std::deque<IS::Solution> tl;   // Tabu list
+    tl.push_back(S);
+    double q_max, q_BEST = -1;
+    int iter_old = 0;
     while (1) {
-        iter_total++;
-        if (tabu_list.size() > max_length) tabu_list.pop_front();
+        while (tl.size() > max_length) tl.pop_front();
         IS::Solution R(S);
         tweaker->tweak(R); 
 
@@ -255,37 +253,33 @@ void Tabu::optimize(const IS::Dataset &T, IS::Solution &best) const {
             IS::Solution W(S); 
             tweaker->tweak(W);
 
-            // Checking if W is in tabu list
-            std::deque<IS::Solution>::iterator it;
-            it = std::find(tabu_list.begin(), tabu_list.end(), W);
-            bool is_in = it != tabu_list.end();
-            if (! is_in) {
+            // if W is not int tabu list
+            if (std::find(tl.begin(), tl.end(), W) == tl.end()) {
                 double qw = quality(T, W, 0.5), qr = quality(T, R, 0.5);
-                if (qw > qr || std::find(tabu_list.begin(), tabu_list.end(), R)
-                               != tabu_list.end())
-                R.copy(W);
+                if (qw > qr || std::find(tl.begin(), tl.end(), R)
+                               != tl.end()) 
+                    R.copy(W);
             }
 
-            // R is not in L
-            if (std::find(tabu_list.begin(), tabu_list.end(), R) == tabu_list.end()) {
-                S.copy(R);
-                tabu_list.push_back(R);
-            }
-
-            double qs = quality(T, S, 0.5), qb = quality(T, best, 0.5);
-            q_max = std::max(qs, qb);
-            if (qs > qb) best.copy(S);
         }
+        // R is not in L and r is better
+        bool R_is_better = quality(T, R, 0.5) > quality(T, S, 0.5);
+        if (std::find(tl.begin(), tl.end(), R) == tl.end() and R_is_better) {
+            S.copy(R);
+            tl.push_back(R);
+        }
+
+        double qs = quality(T, S, 0.5), qb = quality(T, best, 0.5);
+        q_max = std::max(qs, qb);
+        if (qs > qb) best.copy(S);
         // TODO: Tune iter_total and iter_old
-        if (q_max > max_quality || iter_total == 10000 || iter_old == 1000) break;
 
-        if (old_q == q_max) {
-          iter_old ++;  
-        } else {
+        if (q_max > q_BEST) {
+            q_BEST = q_max;
             iter_old = 0;
-        }
+        } else iter_old++;  
 
-        old_q = q_max;
+        if (q_max > max_quality || iter_old == iter_limit) break;
     }
 }
 

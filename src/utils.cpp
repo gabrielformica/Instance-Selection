@@ -146,10 +146,11 @@ Metaheuristic *choose_metaheuristic(std::string metaheuristic_str,
         return new SimulatedAnnealing(t, d);
     } else if (metaheuristic_str == "Tabu") {
         // Print error and exit
-        if (moa_counter != 2) error_("Tabu needs two arguments");
+        if (moa_counter != 3) error_("Tabu needs three arguments");
         int l = metaheuristic_optional_arg[0]; 
         int n = metaheuristic_optional_arg[1];
-        return new Tabu(l, n);
+        int i = metaheuristic_optional_arg[2];
+        return new Tabu(l, n, i);
     } else if (metaheuristic_str == "ILS") {
         
         // Print error and exit

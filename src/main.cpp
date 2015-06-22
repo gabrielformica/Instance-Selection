@@ -10,6 +10,7 @@
 #include <cstdio>
 #include <ctime>
 #include "metaheuristic.h"
+#include "populationbased.h"
 #include "tweaker.h"
 #include "utils.h"
 #include "is.h"

@@ -11,6 +11,8 @@ class Metaheuristic {
   protected:
     Tweaker *tweaker;
     double max_quality = 0.95; 
+    int iterations = 1000;
+    int no_change_best = 500;
   public:
     virtual void optimize(const IS::Dataset &T, IS::Solution &R) const = 0;
     virtual std::string output_params() const = 0;

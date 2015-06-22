@@ -7,6 +7,7 @@ import System.Environment
 import Data.Functor
 import Data.Function
 import Data.List
+import Numeric
 
 type Instance = ([Double], Int)
 
@@ -29,7 +30,15 @@ loadData fileName = readFile fileName >>= return . lines >>= return . (map words
     where toDouble       = (map (map (\x -> read x :: Double)))
           toInstance xs  = (init xs, (fromInteger $ floor $ last xs) :: Int)
 
+percReduc :: [a] -> [a] -> Double
+percReduc a b = (fromIntegral lb) / (fromIntegral $ la + lb)
+    where la = length a
+          lb = length b
+
 main = do
     solution   <- loadData "solution.txt"
     complement <- loadData "complement.txt"
-    putStrLn $ show $ corrects complement $ knn solution complement 
+    putStrLn $ ">>>> Aciertos = " ++  (show $ corrects complement $ knn solution complement)
+    putStrLn $ "Tamaño de solucion = " ++ (show $ length solution)
+    putStrLn $ "Tamaño de T = " ++ (show $ (length solution) + (length complement))
+    putStrLn $ "Porcentaje de reduccion = " ++  (show $ percReduc solution complement)

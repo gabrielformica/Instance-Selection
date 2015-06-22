@@ -1,55 +1,77 @@
 #include "metaheuristic.h"
 #include "populationbased.h"
+#include "utils.h"
 
 
-Population PopulationBased::generatePopulation(int size) const {
-    Population population;
-    for(int i = 0; i < popsize; ++i) population.insert(IS::Solution(size));
-    return population;
+void PopulationBased::generatePopulation(Population &population, int size) const {
+    while (population.empty() || population.size() < popsize)
+        population.insert(IS::Solution(size));
 }
 
 
 void Hybrid::optimize(const IS::Dataset &ds, IS::Solution &sol) const {
-    Population population = generatePopulation(sol.getSize());
+    std::cout << ">>>> Running Hybrid algorithm" << std::endl;
+    Population population;
+    generatePopulation(population, sol.getSize());
     IS::Solution best = IS::Solution(*(population.begin()));
-    best.setFitness(quality(ds, best, 0.5));
+    double best_fitness = quality(ds, best, 0.5);
+    best.setFitness(best_fitness);
     int iter = 0, iter_old = 0;
-    double old_q = -1.0;
+    double old_best = -1.0;
 
     while(1) {
         iter++;
         Population::const_iterator sit;
+        local_search->set_max_quality(std::min(best.getFitness() + 0.1, 0.95));
+        Population new_pop;
         for (sit = population.begin(); sit != population.end(); sit++) {
             IS::Solution p = IS::Solution(*sit);
             local_search->optimize(ds, p);
-            p.setFitness(quality(ds, p, 0.5));
-            if (p.getFitness() > best.getFitness()) {
+            double p_fitness = quality(ds, p, 0.5);
+            p.setFitness(p_fitness);
+            new_pop.insert(p);
+            if (p_fitness > best_fitness) {
                 best.copy(p);
+                best_fitness = p_fitness;
             }
         }
-        if (best.getFitness() - old_q < EPSILON) iter_old++;
+        if (best_fitness - old_best < EPSILON) {
+            for (int i = 0; i < 10; i++) {
+                std::cout << BOLDGREEN << "HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH";
+                std::cout  << RESET << std::endl;
+            }
+            iter_old++;
+        }
         else {
-            old_q = best.getFitness();
+            std::cout << "BEST = " << best_fitness << " , old_best = " << old_best << endl;
+            old_best = best_fitness;
             iter_old = 0;
         }
-        bool stop = best.getFitness() >= max_quality or iter == iterations;
+        population = new_pop;
+        generatePopulation(population, sol.getSize());
+        assert(population.size() == popsize);
+        
+        bool stop = best_fitness > max_quality or iter == iterations;
         stop = stop or iter_old == no_change_best;
+        for (int i = 0; i < 10; i++) {
+            std::cout << CYAN << "KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK";
+            std::cout  << RESET << std::endl;
+        }
         if (stop) break;
         Population breeded = breed(population);
-        population = breeded;
     }
     sol.copy(best);
 }
 
 Population PopulationBased::breed(const Population &p) const {
     Population breeded;
-    for(int i = 0; i < popsize/2; ++i) {
+    for (int i = 0; i < popsize/2; ++i) {
         IS::Solution c1 = tourneySelection(p, 3);
         IS::Solution c2 = tourneySelection(p, 3);
         while (c1 == c2) c2 = tourneySelection(p, 3);
         Children recombination(c1, c2);
-        mutation->tweak(c1);
-        mutation->tweak(c2);
+        tweaker->tweak(c1);
+        tweaker->tweak(c2);
         breeded.insert(c1);
         breeded.insert(c2);
     }
@@ -64,7 +86,7 @@ IS::Solution PopulationBased::tourneySelection(const Population &p, int s) const
     for(int i = 0; i < s-1; ++i) {
         sit = p.begin();
         advance(sit, (rand() % popsize));
-        if(best.getFitness() < (*sit).getFitness()) {
+        if (best.getFitness() < (*sit).getFitness()) {
             best.copy(*sit);
         }
     }

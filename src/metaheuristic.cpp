@@ -63,13 +63,13 @@ double Metaheuristic::quality(const IS::Dataset &T,
     double fitness = alpha * clas_rate + (1 - alpha) * perc_redc;
 
     // // XXX: Print
-      //cout << "Hubo un total de " << count << " aciertos" << endl;
-      //cout << "Result es de tamanio: " << result.size() << endl;
-      //cout << "La relación es: " << clas_rate << endl;
-      //cout << "El tamaño de T es: " << T.size() << endl;
-      //cout << "El tamaño de training es: " << training.size() << endl;
-      //cout << "El porcentaje de reducción es: " << perc_redc << endl;
-      //cout << "El fitness es : " << fitness << endl << endl;
+      cout << "Hubo un total de " << count << " aciertos" << endl;
+      cout << "Result es de tamanio: " << result.size() << endl;
+      cout << "La relación es: " << clas_rate << endl;
+      cout << "El tamaño de T es: " << T.size() << endl;
+      cout << "El tamaño de training es: " << training.size() << endl;
+      cout << "El porcentaje de reducción es: " << perc_redc << endl;
+      cout << "El fitness es : " << fitness << endl << endl;
 
     assert(fitness <= 1.0);
     return fitness;
@@ -176,7 +176,7 @@ void ILS::optimize(const IS::Dataset &T, IS::Solution &S) const {
     int global_iter = 0;
     
     // TODO: Tune this
-    int max_out_iter = getTotalIter();
+    int max_out_iter = iterations;
     int max_iter = getLocalIter(); 
     std::cout << "local iter = " << max_iter << endl;
 
@@ -225,7 +225,7 @@ void ILS::optimize(const IS::Dataset &T, IS::Solution &S) const {
 }
 
 std::string ILS::output_params() const {
-    std::string params = "ILS_" + std::to_string(ti) + "_";
+    std::string params = "ILS_" + std::to_string(iterations) + "_";
     params += std::to_string(li) + "_";
     params += std::to_string(pp);
     return params;
@@ -279,7 +279,7 @@ void Tabu::optimize(const IS::Dataset &T, IS::Solution &best) const {
             iter_old = 0;
         } else iter_old++;  
 
-        if (q_max > max_quality || iter_old == iter_limit) break;
+        if (q_max > max_quality || iter_old == iterations) break;
     }
 }
 

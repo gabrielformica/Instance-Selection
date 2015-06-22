@@ -4,6 +4,7 @@
 #include <cstdio>
 #include <ctime>
 #include "metaheuristic.h"
+#include "populationbased.h"
 #include "utils.h"
 
 IS::Dataset load_data_basic(std::string file_name_str) {
@@ -133,6 +134,21 @@ void print_dispersions(const IS::Dataset &dataset) {
     std::cout << endl;
 }
 
+Metaheuristic *choose_population(std::string population_str, 
+                                   Metaheuristic *local_search,
+                                   int (&population_optional_arg)[10],
+                                   int poa_counter) {
+
+   local_search->set_no_change_best(50);
+   PopulationBased *pb; 
+   if (population_str == "Hybrid") {
+      if (poa_counter != 1) error_("Hybrid needs Population size as argument");
+      return new Hybrid(population_optional_arg[0], local_search);
+   }
+   error_("The Population based algorithm you are providing doesn't exist");
+   return NULL;   // Shut up warning
+}
+
 Metaheuristic *choose_metaheuristic(std::string metaheuristic_str, 
                                     int (&metaheuristic_optional_arg)[10],
                                     int moa_counter) {
@@ -245,46 +261,6 @@ results run_tenfold(const vps &datasets, const Metaheuristic *metaheuristic, int
     }
 
     return res;
-
-
-    // std::ostream *out;
-   // std::ofstream rFile;
-
-   // if(flag_r) {
-   //     rFile.open(out_fn, std::ios::out);
-   //     out = &rFile;
-   // } else {
-   //     out = &std::cout;
-   // }
-    // double esum = std::accumulate(res.errors.begin(), res.errors.end(), 0.0);
-    // double emean = esum / res.errors.size();
-    // double vsum = std::accumulate(res.sizes.begin(), res.sizes.end(), 0.0);
-    // double vmean = vsum / res.sizes.size();
-    // double ssum = std::accumulate(res.val_errors.begin(), res.val_errors.end(), 0.0);
-    // double smean = ssum / res.val_errors.size();
-
-    //*out << "Val_errors" << std::endl;
-    //for (unsigned i = 0; i < res.val_errors.size(); ++i)  {
-    //    *out << res.val_errors[i] << " ";
-    //}
-    //*out << std::endl;
-    //*out << "Sizes" << std::endl;
-    //for (unsigned i = 0; i < res.sizes.size(); ++i)  {
-    //    *out << res.sizes[i] << " ";
-    //}
-    //*out << std::endl;
-    //*out << "Errors" << std::endl;
-    //for (unsigned i = 0; i < res.errors.size(); ++i)  {
-    //    *out << res.errors[i] << " ";
-    //}
-    //*out << std::endl;
-
-
-    // *out << "Errors: " << emean << std::endl;
-    // *out << "Size of solution %: " << smean << std::endl;
-    // *out << "Validation errors: %: " << vmean << std::endl;
-
-    //rFile.close();
 }
 
 IS::Dataset load_dataset(const char *filename) {

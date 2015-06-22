@@ -21,6 +21,9 @@ int moa_counter = 0;
 int tweaker_optional_arg[10];
 int toa_counter = 0;
 
+int population_optional_arg[10];
+int poa_counter = 0;
+
 int main(int argc, char *argv[]) {
 
     static struct option long_options[] = {
@@ -28,6 +31,7 @@ int main(int argc, char *argv[]) {
         {"file", required_argument, 0, 'f'},
         {"disp", no_argument, 0, 'd'},
         {"metaheuristic", required_argument, 0, 'g'},
+        {"population-base", required_argument, 0, 'p'},
         {"meta-optional-arg", required_argument, 0, 'm'},
         {"tweaker-optional-arg", required_argument, 0, 'o'},
         {"tweaker", required_argument, 0, 'x'},
@@ -49,14 +53,16 @@ int main(int argc, char *argv[]) {
     bool flag_r = false;
     bool flag_t = false;
     bool flag_a = false;
+    bool flag_P = false;
     memset(metaheuristic_optional_arg, 0, sizeof(metaheuristic_optional_arg));
     memset(tweaker_optional_arg, 0, sizeof(tweaker_optional_arg));
+    memset(population_optional_arg, 0, sizeof(population_optional_arg));
 
     // We need these three things
-    std::string file_name, metaheuristic_str, tweaker_str, out_fn;
+    std::string file_name, metaheuristic_str, tweaker_str, out_fn, population_str;
 
     while (1) {
-        opt = getopt_long(argc, argv, "dhf:g:m:o:x:n:r:t:", long_options, &option_index);
+        opt = getopt_long(argc, argv, "dhf:g:m:o:x:n:r:t:p:P:", long_options, &option_index);
         if (opt == -1) break;
         opt = char(opt);
 
@@ -75,6 +81,9 @@ int main(int argc, char *argv[]) {
             case 'd': flag_d = true; break;
             case 't': flag_t = true; file_name = optarg; break;
             case 'a': flag_a = true;  break;
+            case 'P': flag_P = true; population_str = optarg; break;
+            case 'p': population_optional_arg[poa_counter++] = atoi(optarg); 
+                      break;
             case '?': break;
         }
     }
@@ -104,6 +113,15 @@ int main(int argc, char *argv[]) {
     }
 
     metaheuristic->setTweaker(tweaker); // Setting tweaker
+
+    if (flag_P) {
+        Metaheuristic *ls = metaheuristic;
+        metaheuristic = choose_population(population_str, ls, 
+                                          population_optional_arg, poa_counter);
+        metaheuristic->setTweaker(tweaker);
+        metaheuristic->set_iterations(100);
+    }
+
 
     if (flag_f) {
         IS::Dataset dataset = load_data_basic(file_name);

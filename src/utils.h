@@ -25,6 +25,7 @@ typedef struct results {
     std::vector<int> errors;
     std::vector<float> sizes;
     std::vector<float> val_errors;
+    std::vector<double> times;
 } result;
 
 

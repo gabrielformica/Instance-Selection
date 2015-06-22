@@ -2,6 +2,7 @@
 #include <iostream>
 #include <fstream>
 #include <cstdio>
+#include <ctime>
 #include "metaheuristic.h"
 #include "utils.h"
 
@@ -208,6 +209,8 @@ results run_tenfold(const vps &datasets, const Metaheuristic *metaheuristic, int
         validation = datasets[i].second;
 
         for(int j = 0; j < runs; ++j) {
+            clock_t start = clock();
+            double duration;
             IS::Solution solution(training.size());
             metaheuristic->optimize(training, solution);
 
@@ -220,6 +223,8 @@ results run_tenfold(const vps &datasets, const Metaheuristic *metaheuristic, int
             for(int k = 0; k < training.size(); ++k) {
                 if(bits[k]) final.push_back(training[k]);
             }
+
+            duration = ( std::clock() - start ) / (double) CLOCKS_PER_SEC;
 
             metaheuristic->oneNN(final, validation, categories);
 
@@ -235,6 +240,7 @@ results run_tenfold(const vps &datasets, const Metaheuristic *metaheuristic, int
             res.errors.push_back(errors);
             res.val_errors.push_back((errors * 100.0) / (validation.size() * 1.0));
             res.sizes.push_back((final.size() * 100.0) / (training.size() * 1.0));
+            res.times.push_back(duration);
         }
     }
 
@@ -338,6 +344,12 @@ void output_results(const results &res,
        *out << res.errors[i] << " ";
     }
     *out << std::endl;
+    *out << "Times" << std::endl;
+    for (unsigned i = 0; i < res.times.size(); ++i)  {
+       *out << res.times[i] << " ";
+    }
+    *out << std::endl;
+
 }
 
 void debug_print(const IS::Dataset &dataset, const IS::Solution &solution) {

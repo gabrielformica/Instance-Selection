@@ -63,13 +63,13 @@ double Metaheuristic::quality(const IS::Dataset &T,
     double fitness = alpha * clas_rate + (1 - alpha) * perc_redc;
 
     // // XXX: Print
-     // cout << "Hubo un total de " << count << " aciertos" << endl;
-     // cout << "Result es de tamanio: " << result.size() << endl;
-     // cout << "La relación es: " << clas_rate << endl;
-     // cout << "El tamaño de T es: " << T.size() << endl;
-     // cout << "El tamaño de training es: " << training.size() << endl;
-     // cout << "El porcentaje de reducción es: " << perc_redc << endl;
-     // cout << "El fitness es : " << fitness << endl << endl;
+      cout << "Hubo un total de " << count << " aciertos" << endl;
+      cout << "Result es de tamanio: " << result.size() << endl;
+      cout << "La relación es: " << clas_rate << endl;
+      cout << "El tamaño de T es: " << T.size() << endl;
+      cout << "El tamaño de training es: " << training.size() << endl;
+      cout << "El porcentaje de reducción es: " << perc_redc << endl;
+      cout << "El fitness es : " << fitness << endl << endl;
 
     assert(fitness <= 1.0);
     return fitness;
@@ -172,19 +172,21 @@ void ILS::optimize(const IS::Dataset &T, IS::Solution &S) const {
     IS::Solution best(S);
     IS::Solution home_base(S);
 
-    double q_max, old_q = -1;
-    int iter_old = 0, iter = 0;
+    double q_max, q_BEST = -1.0;
+    int global_iter = 0;
     
     // TODO: Tune this
     int max_out_iter = getTotalIter();
+    int max_iter = getLocalIter(); 
+    std::cout << "local iter = " << max_iter << endl;
 
     while(1) {
         // Local search
 
         // TODO: Ideally some tuneable number of iterations
         // 500 to 1000 random comes to mind
-        int max_iter = getLocalIter(); 
         cout << ">>> Running local search" << endl;
+        int local_iter = 0;
         while(1) {
             IS::Solution R(S);
             tweaker->tweak(R); 
@@ -193,13 +195,13 @@ void ILS::optimize(const IS::Dataset &T, IS::Solution &S) const {
                 S.setBits(R.getBits());
 
             q_max = std::max(q1, q2);
-            if (old_q == q_max) {
-              iter_old ++;  
-            } else {
-                iter_old = 0;
-            }
-            if (q_max > max_quality or iter_old == max_iter) break;
-            old_q = q_max;
+            if (q_max > q_BEST) {
+                q_BEST = q_max;
+                local_iter = 0;
+            } else local_iter++;
+
+            std::cout << "ITER ---XXXXXX " << local_iter << std::endl;
+            if (q_max > max_quality or local_iter == max_iter) break;
         }
 
         // Compare and (maybe) perturb
@@ -209,13 +211,17 @@ void ILS::optimize(const IS::Dataset &T, IS::Solution &S) const {
         if (qs > qb) best.setBits(S.getBits());
         // Flipping 25% of bits for perturb
         // TODO: This CAN be an argument
-        cout << ">>> Perturbing" << endl;
-        nRandomFlips tweaker = nRandomFlips(S.getSize() / getPerturbPerc());
+        cout << ">>> Perturbing <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" << endl;
+        //weightedRandomPlus tweaker = weightedRandomPlus(perc, 50);
+        int perc = S.getSize() / getPerturbPerc();
+        cout << "perc ---> " << perc << endl;
+        nRandomFlips tweaker = nRandomFlips(perc);
         tweaker.tweak(S);
 
-        iter++;
-        if (q_max > max_quality or iter == max_out_iter) break;
+        global_iter++;
+        if (q_max > max_quality or global_iter == max_out_iter) break;
     }
+    S.copy(best);
 }
 
 std::string ILS::output_params() const {

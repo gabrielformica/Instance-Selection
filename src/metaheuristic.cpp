@@ -80,11 +80,15 @@ double Metaheuristic::quality(const IS::Dataset &T,
 
 void HillClimbing::optimize(const IS::Dataset &T, IS::Solution &S) const {
     std::cout << ">>>> Running Hill Climbing" << std::endl;
-    std::cout << ">>>> quality = " << max_quality << std::endl;
-    double q_max, old_q = -1;
-    int iter_old = 0, iter_total = 0;
+    std::cout << "quality = " << max_quality << std::endl;
+    std::cout << "ite_limit = " << ite_limit << std::endl;
+    std::cout << "no_change_best = " << no_change_best << std::endl;
+    std::cout << ">>>>>>>>>>>>>>>>>>>>" << std::endl;
+
+    double q_max, q_best = -1;
+    int no_change = 0, iter = 0;
     while (1) {
-        iter_total++;
+        iter++;
         IS::Solution R(S);
         tweaker->tweak(R); 
         // assert((S.getBits() ^ R.getBits()).count() == 1);
@@ -95,20 +99,16 @@ void HillClimbing::optimize(const IS::Dataset &T, IS::Solution &S) const {
             S.setBits(R.getBits());
         
         q_max = std::max(q1, q2);
-        if (old_q == q_max) {
-          iter_old ++;  
+        if (q_best > q_max) {
+            no_change++;  
         } else {
-            iter_old = 0;
+            q_best = q_max;
+            no_change = 0;
         }
         // TODO: Pass these values as parameters
-        if (q_max > max_quality or iter_old == 1000) break;
-        old_q = q_max;
-
-        if(iter_total % 100 == 0 and iter_total != 0) {
-            cout << "Total iterations: " << iter_total << endl;
-            cout << "Best fitness so far: " << q_max << endl;
-            cout << "Solution size: " << S.getBits().count() << endl << endl;
-        }
+        bool stop = q_max > max_quality or no_change == no_change_best;
+        stop = stop || iter == ite_limit;
+        if (stop) break;
     }
 }
 
@@ -167,27 +167,27 @@ std::string SimulatedAnnealing::output_params() const {
 
 void ILS::optimize(const IS::Dataset &T, IS::Solution &S) const {
     std::cout << ">>>> Running ILS" << std::endl;
-    std::cout << ">>>> quality = " << max_quality << std::endl;
+    std::cout << "quality = " << max_quality << std::endl;
+    std::cout << "ite_limit = " << ite_limit << std::endl;
+    std::cout << "no_change_best = " << no_change_best << std::endl;
+    std::cout << ">>>>>>>>>>>>>>>>>>>>" << std::endl;
 
     IS::Solution best(S);
     IS::Solution home_base(S);
 
     double q_max, q_BEST = -1.0;
     int global_iter = 0;
-    
-    // TODO: Tune this
-    int max_out_iter = iterations;
-    int max_iter = getLocalIter(); 
-    std::cout << "local iter = " << max_iter << endl;
+
+    int max_out_iter = ite_limit;
+    int no_change = 0;
+    int max_local_iter = getLocalIter(); 
 
     while(1) {
+        global_iter++;
         // Local search
-
-        // TODO: Ideally some tuneable number of iterations
-        // 500 to 1000 random comes to mind
-        cout << ">>> Running local search" << endl;
         int local_iter = 0;
         while(1) {
+            local_iter++;
             IS::Solution R(S);
             tweaker->tweak(R); 
             double q1 = quality(T, R, 0.5), q2 = quality(T, S, 0.5);
@@ -195,37 +195,34 @@ void ILS::optimize(const IS::Dataset &T, IS::Solution &S) const {
                 S.setBits(R.getBits());
 
             q_max = std::max(q1, q2);
-            if (q_max > q_BEST) {
-                q_BEST = q_max;
-                local_iter = 0;
-            } else local_iter++;
-
-            // std::cout << "ITER ---XXXXXX " << local_iter << std::endl;
-            if (q_max > max_quality or local_iter == max_iter) break;
+            bool stop = q_max > max_quality or local_iter == max_local_iter;
+            if (stop) break;
         }
 
         // Compare and (maybe) perturb
         double qs = quality(T, S, 0.5);
         double qb = quality(T, best, 0.5);
 
-        if (qs > qb) best.setBits(S.getBits());
-        // Flipping 25% of bits for perturb
-        // TODO: This CAN be an argument
-        // cout << ">>> Perturbing <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" << endl;
+        if (qs > qb) { 
+            best.setBits(S.getBits());
+            no_change = 0;
+        } else {
+            no_change++;
+        }
         //weightedRandomPlus tweaker = weightedRandomPlus(perc, 50);
         int perc = S.getSize() / getPerturbPerc();
-        // cout << "perc ---> " << perc << endl;
         nRandomFlips tweaker = nRandomFlips(perc);
         tweaker.tweak(S);
 
-        global_iter++;
-        if (q_max > max_quality or global_iter == max_out_iter) break;
+        bool stop = q_max > max_quality or global_iter == max_out_iter;
+        stop = stop or no_change == no_change_best;
+        if (stop) break;
     }
     S.copy(best);
 }
 
 std::string ILS::output_params() const {
-    std::string params = "ILS_" + std::to_string(iterations) + "_";
+    std::string params = "ILS_" + std::to_string(ite_limit) + "_";
     params += std::to_string(li) + "_";
     params += std::to_string(pp);
     return params;
@@ -236,15 +233,22 @@ std::string ILS::output_params() const {
 
 void Tabu::optimize(const IS::Dataset &T, IS::Solution &best) const {
     std::cout << ">>>> Running Tabu" << std::endl;
-    std::cout << ">>>> quality = " << max_quality << std::endl;
+    std::cout << "quality = " << max_quality << std::endl;
+    std::cout << "ite_limit = " << ite_limit << std::endl;
+    std::cout << "no_change_best = " << no_change_best << std::endl;
+    std::cout << "Number of Tweaks = " << number_of_tweaks << std::endl;
+    std::cout << "Length of the list = " << length << std::endl;
+    std::cout << ">>>>>>>>>>>>>>>>>>>>" << std::endl;
+
     IS::Solution S(best);
     int max_length = (length * T.size() / 100);
 
     std::deque<IS::Solution> tl;   // Tabu list
     tl.push_back(S);
     double q_max, q_BEST = -1;
-    int iter_old = 0;
+    int no_change = 0, iter = 0;
     while (1) {
+        iter++;
         while (tl.size() > max_length) tl.pop_front();
         IS::Solution R(S);
         tweaker->tweak(R); 
@@ -272,14 +276,16 @@ void Tabu::optimize(const IS::Dataset &T, IS::Solution &best) const {
         double qs = quality(T, S, 0.5), qb = quality(T, best, 0.5);
         q_max = std::max(qs, qb);
         if (qs > qb) best.copy(S);
-        // TODO: Tune iter_total and iter_old
+        // TODO: Tune iter_total and no_change
 
         if (q_max > q_BEST) {
             q_BEST = q_max;
-            iter_old = 0;
-        } else iter_old++;  
+            no_change = 0;
+        } else no_change++;  
 
-        if (q_max > max_quality || iter_old == iterations) break;
+        bool stop = q_max > max_quality || no_change == no_change_best;
+        stop = stop || iter == ite_limit;
+        if (stop) break;
     }
 }
 

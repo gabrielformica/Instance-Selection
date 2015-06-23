@@ -154,28 +154,26 @@ Metaheuristic *choose_metaheuristic(std::string metaheuristic_str,
                                     int moa_counter) {
     Metaheuristic *metaheuristic;
     if (metaheuristic_str == "HillClimbing") {
-        return new HillClimbing();
-    } else if (metaheuristic_str == "SimulatedAnnealing") {
-        // Print error and exit
-        if (moa_counter != 2) error_("SimulatedAnnealing needs two arguments");
-        int t = metaheuristic_optional_arg[0]; 
-        int d = metaheuristic_optional_arg[1];
-        return new SimulatedAnnealing(t, d);
+        if (moa_counter != 2) error_("HillClimbing needs two arguments");
+        int i = metaheuristic_optional_arg[0];
+        int nc = metaheuristic_optional_arg[1];
+        return new HillClimbing(i, nc);
     } else if (metaheuristic_str == "Tabu") {
         // Print error and exit
-        if (moa_counter != 3) error_("Tabu needs three arguments");
+        if (moa_counter != 4) error_("Tabu needs four arguments");
         int l = metaheuristic_optional_arg[0]; 
         int n = metaheuristic_optional_arg[1];
         int i = metaheuristic_optional_arg[2];
-        return new Tabu(l, n, i);
+        int nc = metaheuristic_optional_arg[3];
+        return new Tabu(l, n, i, nc);
     } else if (metaheuristic_str == "ILS") {
-        
         // Print error and exit
-        if (moa_counter != 3) error_("ILS needs three arguments");
+        if (moa_counter != 4) error_("ILS needs four arguments");
         int l = metaheuristic_optional_arg[0]; 
         int t = metaheuristic_optional_arg[1];
-        int p = metaheuristic_optional_arg[2];
-        return new ILS(l, t, p);
+        int i = metaheuristic_optional_arg[2];
+        int nc = metaheuristic_optional_arg[3];
+        return new ILS(l, t, i, nc);
     }
     error_("The metaheuristic you are providing doesn't exist");
     return NULL;   // Shut up warning
@@ -329,7 +327,7 @@ void output_results(const results &res,
 }
 
 void debug_print(const IS::Dataset &dataset, const IS::Solution &solution) {
-   HillClimbing meta;
+   HillClimbing meta = HillClimbing(0,0);
    std::cout << "----------------------------------------- " << std::endl;
    meta.quality(dataset, solution, 0.5);
    std::cout << "----------------------------------------- " << std::endl;

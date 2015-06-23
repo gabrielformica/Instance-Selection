@@ -20,8 +20,9 @@ class PopulationBased : public Metaheuristic {
                                                    const IS::Solution &sb) 
                                                    const;
     Population selection(const Population &sa, const Population &sb) const;
-    void generatePopulation(Population &p, int size) const;
+    void generatePopulation(Population &population, int size, const IS::Dataset &ds) const;
     IS::Solution tourneySelection(const set<IS::Solution> &p, int s) const;
+    IS::Solution findBest(const Population &p) const;
 };
 
 class Hybrid : public PopulationBased {
@@ -40,6 +41,7 @@ class SGA : public PopulationBased {
     std::string output_params() const { return ""; };
     SGA(int p, Metaheuristic *ls, double cp, double mp): 
         PopulationBased(p, ls), cross_p(cp), mutation_p(mp) { };
+    SGA(int p, Metaheuristic *ls) : PopulationBased(p, ls) { };
 };
 
 #endif

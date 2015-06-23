@@ -201,6 +201,7 @@ es también $n_{r} \le Pr$, se escogerá un bit aleatoremanete y que esté
 se escogerá aleatoreamente un bit \emph{apagdo} para prenderlo. A continuación
 se presenta el pseudo-código del operador. \\
 
+
     {\fontsize{10}{10}\selectfont
     \begin{algorithmic}
         \Function{weightedRandomPlus}{$S: Solucion$, $sz: Entero$, 
@@ -225,101 +226,101 @@ se presenta el pseudo-código del operador. \\
   y  que \emph{prenderBitApagado} escoge un aleatoreamente un bit apagado.
 
 \clearpage
-\section{Experimentos}
 
-\subsection{Datos}
+\section{Evaluación Experimental}
 
-Los datos utilizados fueron
+La tarea principal de la evaluación experimental en este trabajo es evaluar el desempeño de distintas metaheurísticas sobre varios conjuntos de datos. Dicho desempeño se mide mediante tres indicadores: 
+\begin{itemize}
+\item Porcentaje reducción 
+    Porcentaje al cual se reduce el conjunto de entrenamiento
+\item Tasa de errores de validación
+    Tasa de errores de clasificación del conjunto de validación usando el conjunto de entrenamiento reducido.
+\item tiempo de ejecución
+    Tiempo de ejecución de una corrida de la metaheurística
+\end{itemize}
+
+
+\subsection{Conjuntos de datos}
+Los conjuntos de datos se escogieron intentando alcanzar un balance entre tener conjuntos similares entre sí en función de número de instancias y número de atributos, y conjuntos de datos que fueran diversos entre sí, tratando de abarcar el máximo espacio posible del universo de conjuntos de datos.
+
+Los datos son obtenidos de KEEL 
+Data-Mining Software Tool [hay que poner el link en referencias].
+En la siguientes tablas se muestran los conjuntos de datos considerados pequeños, medianos y grandes respectivamente.
 
 \begin{table}[h]
-\begin{tabular}{ |l|l|l|l| }
+\begin{tabular}{ |l|l|l|l|l| }
     \hline
-    Caso    & Instancias & Atributos \\ \hline
-    Iris & 150 & 5 \\ \hline
-    Glass & 214 & 10 \\ \hline
-    Pima & 768 & 9 \\ \hline
+    Caso    & Instancias & Atributos & Clases \\ \hline
+    bupa & 345  & 6 &  2 \\ \hline
+    ecoli & 336 & 7 & 8 \\ \hline
+    glass & 214 & 9 & 10 \\ \hline
+    haberman & 306 & 3 & 2 \\ \hline
+    hayes-roth & 160 & 4 & 3 \\ \hline
+    ionosphere & 351 & 33 & 2 \\ \hline
+    iris & 150 & 4 & 5 \\ \hline
+    monk-2 & 432 & 6 & 2 \\ \hline
+    newthyroid & 215  & 5 & 3 \\ \hline
+    saheart & 462 & 9 & 2 \\ \hline
+    sonar & 208 & 60 & 2 \\ \hline
+    wine & 178 & 13 & 3 \\ \hline
 \end{tabular}
-\caption{Casos de prueba}
+\caption{Conjuntos de datos pequeños}
 \label{tabla:1}
 \end{table}
 
-\subsection{Entonación}
-
-Cada metaheuística requiere de distintos parametros para realizar
-su trabajo. Entonar cada una de ellos requirió de una serie 
-de pruebas sobre distintos problemas, parametrizando
-no solo valores necesarios para una metaheurística, sino también operadores de vencindad. 
-Por ejemplo, \emph{Simulated Annealing}, arrojaba mejores 
-resultados a medida que mayor era la \emph{temperatura} y menor el \emph{factor de decrecimiento},
-y usando como operador de vencidad \emph{percRandomFlips} con $5\%$. Sin embargo,
-aumentar la temperatura y disminuir el factor de decrecimiento implica ejecuciones 
-de mayor tiempo (mayor
-diversificación). Es por esto que para los resultados finales, se consideró $temperatura = 15.000$ 
-y $factor = 1$, obteniendo así un equilibrio entre el tiempo de ejecución y calidad de la solución. 
-
-
-Para ILS, se probó con distintas combinaciones de las iteraciones totales (denominado tiempo en la literatura) e iteraciones locales. Se compara con el tanaño de la solución final. Se observa que respecto a esta medida, la combinación de máximo 500 iteraciones totales y máximo 50 iteraciones para la búsqueda local del problema Glass. Pero los valores varían para otros problemas.
-
 \begin{table}[h]
-\scalebox{0.6}{
-\begin{tabular}{ |l|l|l|l| }
+\begin{tabular}{ |l|l|l|l|l| }
     \hline
-    I. total / I. local & Glass & Iris & Pima \\ \hline
-    100 / 100 & (54.0351, 46.4615) & (1.53846, 51.1922) & (31.9249, 49.1153) \\ \hline
-    100 / 50  & (38.7302, 48.4974) & (7.14286, 60.7353) & (28.4018, 49.2278) \\ \hline
-    500 / 50  & (28.5714, 49.0846) & (5.33333, 48.9383) & (25.6621, 46.8585) \\ \hline
-    50 / 100  & (27.7193, 49.9487) & (5.77778, 58.6173) & (26.8657, 49.6148) \\ \hline
-    50 / 500  & (42.5397, 49.5682) & (10.303, 50.7914)  & (34.3137, 49.4) \\ \hline
-    50 / 50   & (30, 51.5986) & (8.20513, 69.4686)      & (35.1852, 49.5211) \\ \hline
+    Caso    & Instancias & Atributos & Clases \\ \hline
+    balance & 625  & 4 &  3 \\ \hline
+    pima & 768  & 8 &  2 \\ \hline
+    tic-tac-toe & 958  & 9 &  2 \\ \hline
+    vehicle & 846  & 18 &  4 \\ \hline
 \end{tabular}
-}
-\caption{Entonación de parámetros ILS, donde la una tupla representa (\% Error de validación, \% Tamaño al que se reduce)}
+\caption{Conjuntos de datos medianos}
 \label{tabla:1}
 \end{table}
 
-~\
+\begin{table}[h]
+\begin{tabular}{ |l|l|l|l|l| }
+    \hline
+    Caso    & Instancias & Atributos & Clases \\ \hline
+    banana & 5300  & 2 &  2 \\ \hline
+    abalone & 4174  & 8 &  28 \\ \hline
+\end{tabular}
+\caption{Conjuntos de datos grandes}
+\label{tabla:1}
+\end{table}
 
-Para SA, se juega con la temperatura máxima inicial como manera de modificar el comportamiento de problema.
+\subsection{Preparación de datos}
 
-~\
+Cada experimento se ejecuta particionando el conjunto de datos en dos partes: entrenamiento y validación. La manera de hacer esto es que cada instancia tiene 90\% de probabilidad de estar en entrenamiento y 10\% de estar en validación. Para garantizar que no exista un sesgo en la escogencia de esta partición, se usa la técnica de validación cruzada en 10 grupos. Esto consiste en dividir el conjunto de datos D en 10 partes iguales $D_1, D_2, ..., D_{10}$. En función de estas particiones, se definen los pares $(D \setminus D_i, D_i)$. Cada metaheurística es evaluada usando estos pares y sobre cada par haciendo 5 corridas distintas.
+
+
+\subsection{Parámetros}
+
+Cada metaheurística se entonó hasta encontrar los parámetros que mejoraban el desempeño de la misma.
 
 \begin{table}[h]
-\scalebox{0.6}{
-\begin{tabular}{ |l|l|l|l| }
+\scalebox{0.8}{
+\begin{tabular}{ |l|l|l|l|l| }
     \hline
-    Temp. & Glass & Iris & Pima \\ \hline
-    5000  & (35.3333, 76.1168) & (14.2857, 85.1961) & (33.2394, 50.1578) \\ \hline
-    10000 & (30.1587, 63.0743) & (7.14286, 77.2549) & (33.2394, 50.2726) \\ \hline
-    15000 & (30.7937, 55.8895) & (2.85714, 76.1275) & (31.5423, 50.3281) \\ \hline
+    Parámetro & ILS & Tabu & Hibrído & SGA  \\ \hline
+    Iter. totales & 1000 & 1000 & 50 & 1000 \\ \hline
+    Iter. locales & 100 & 100     & 10  & 100 \\ \hline
+    Iter. sin cambio & 20 & 50     & 5  & 50 \\ \hline
+    Tamaño de lista & - & 10    & -  & - \\ \hline
+    \# de Tweaks & - & 5     & -  & - \\ \hline
+    Población & - & -     & 20  & 30 \\ \hline
 \end{tabular}
 }
-\caption{Entonación de parámetros SA, donde la una tupla representa (\% Error de validación, \% Tamaño al que se reduce)}
+\caption{Parámetros usados en metaheurísticas}
 \label{tabla:2}
 \end{table}
 
-~\
+\subsection{Ejecuciones}
+Los experimentos se corrieron sobre computadoras de procesador Intel(R) Core(TM) i7-3770 CPU @ 3.40GHz, con 8 GB de RAM sobre un sistema Debian Linux.
 
-
-Con TS, se juega con valores arbitrarios para el tamaño de la lista y el número de veces que se usa el operador sobre los datos en cada iteración.
-
-~\
-
-\begin{table}[h]
-\scalebox{0.6}{
-\begin{tabular}{ |l|l|l|l| }
-    \hline
-    Lista / Tweaks & Glass & Iris & Pima \\ \hline
-    10 / 15        & (52.0635, 72.7087) & (0, 68.8078)  & (33.2381, 45.9503) \\ \hline
-    10 / 5         & (50.7937, 75.1986) & (6.66667, 81.6296)  & (31.0502, 48.0671) \\ \hline
-    15 / 15        & (22.3333, 70.9966) & (0.888889, 73.3827) & (25.1852, 46.7816) \\ \hline
-    15 / 5         & (19.0, 73.8488)    & (0, 82.402)  & (33.5185,  47.749) \\ \hline
-    5 / 15         & (28.5714, 74.9568) & (8.3333, 70.5314)  & (35.4338, 47.012) \\ \hline
-    5 / 5          & (30.4762, 73.3679) & (7.14286, 83.4314)  & (39.3519, 48.841) \\ \hline
-\end{tabular}
-}
-\caption{Entonación de parámetros TS, donde la una tupla representa (\% Error de validación, \% Tamaño al que se reduce)}
-\label{tabla:2}
-\end{table}
 
 \subsection{Comparación}
 

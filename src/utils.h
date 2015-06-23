@@ -1,3 +1,13 @@
+/**
+  * @file
+  * @author Gabriel Formica <gabrielformica93@gmail.com>
+  * @author Melecio Ponte <pontezambrano@gmail.com>
+  *
+  * @section Description
+  *
+  * Utils classes
+  */
+
 #include "is.h"
 #define RESET   "\033[0m"
 #define BLACK   "\033[30m"      /* Black */
@@ -21,6 +31,7 @@ typedef IS::Dataset ds;
 typedef std::pair<ds, ds> pds;
 typedef std::vector<pds> vps;
 
+/* Struct for savin results */
 typedef struct results {
     std::vector<int> errors;
     std::vector<float> sizes;

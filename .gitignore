@@ -16,3 +16,4 @@ data/raw/*
 scripts/*
 *.log
 data/10fold/change.sh
+doc/results/

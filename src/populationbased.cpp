@@ -24,7 +24,7 @@ void Hybrid::optimize(const IS::Dataset &ds, IS::Solution &sol) const {
         Population new_pop;  // New population 
         bool best_changed = false;
         for (sit = population.begin(); sit != population.end(); sit++) {
-            local_search->set_max_quality(std::min(best.getFitness() + 0.1, 0.95));
+            local_search->set_max_quality(std::min(best.getFitness() + 0.95, 0.95));
             IS::Solution p = IS::Solution(*sit);
             local_search->optimize(ds, p);
             p.setFitness(quality(ds, p, 0.5)); 
@@ -70,15 +70,15 @@ Population PopulationBased::breed(const IS::Dataset &ds, const Population &p) co
         IS::Solution c1(children.first), c2(children.second);
         tweaker->tweak(c1);
         tweaker->tweak(c2);
-        //double q_children = quality(ds, c1, 0.5) + quality(ds, c2, 0.5);
-        //double q_parents = quality(ds, p1, 0.5) + quality(ds, p2, 0.5);
-        //if (q_children > q_parents) {  // Elitist
-        breeded.insert(c1);
-        breeded.insert(c2);
-        //} else {
-        //    breeded.insert(p1);
-        //    breeded.insert(p2);
-        //}
+        double q_children = quality(ds, c1, 0.5) + quality(ds, c2, 0.5);
+        double q_parents = quality(ds, p1, 0.5) + quality(ds, p2, 0.5);
+        if (q_children > q_parents) {  // Elitist
+            breeded.insert(c1);
+            breeded.insert(c2);
+        } else {
+            breeded.insert(p1);
+            breeded.insert(p2);
+        }
     }
     return breeded;
 }

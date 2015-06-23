@@ -25,6 +25,7 @@ void Hybrid::optimize(const IS::Dataset &ds, IS::Solution &sol) const {
         bool best_changed = false;
         for (sit = population.begin(); sit != population.end(); sit++) {
             local_search->set_max_quality(std::min(best.getFitness() + 0.95, 0.95));
+            std::cout << "Best -----> " << best.getFitness() << std::endl;
             IS::Solution p = IS::Solution(*sit);
             local_search->optimize(ds, p);
             p.setFitness(quality(ds, p, 0.5)); 

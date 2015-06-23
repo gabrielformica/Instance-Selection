@@ -120,7 +120,7 @@ int main(int argc, char *argv[]) {
                                           population_optional_arg, poa_counter);
         metaheuristic->setTweaker(tweaker);
         metaheuristic->set_no_change_best(5);
-        metaheuristic->set_ite_limit(50);
+        metaheuristic->set_ite_limit(10);
     }
 
 

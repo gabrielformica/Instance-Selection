@@ -17,7 +17,7 @@ class PopulationBased : public Metaheuristic {
   public:
     PopulationBased(int p, Metaheuristic *ls) : popsize(p), local_search(ls) { };
     set<IS::Solution> breed(const set<IS::Solution> &p) const;
-    pair<IS::Solution, IS::Solution> recombination(const IS::Solution &sa, 
+    Children recombination(const IS::Solution &sa, 
                                                    const IS::Solution &sb) 
                                                    const;
     void selection(set<IS::Solution> &sa, const set<IS::Solution> &sb);
@@ -30,7 +30,17 @@ class Hybrid : public PopulationBased {
     void optimize(const IS::Dataset &ds, IS::Solution &sol) const;
     std::string output_params() const { return ""; };
     Hybrid(int p, Metaheuristic *ls): PopulationBased(p, ls) { };
-    // set<IS::Solution> breed(set<IS::Solution> &p);
+};
+
+class SGA : public PopulationBased {
+  protected:
+    double cross_p;
+    double mutation_p;
+  public:
+    void optimize(const IS::Dataset &ds, IS::Solution &sol) const;
+    std::string output_params() const { return ""; };
+    SGA(int p, Metaheuristic *ls, double cp, double mp): 
+        PopulationBased(p, ls), cross_p(cp), mutation_p(mp) { };
 };
 
 #endif

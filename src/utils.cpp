@@ -139,7 +139,6 @@ Metaheuristic *choose_population(std::string population_str,
                                    int (&population_optional_arg)[10],
                                    int poa_counter) {
 
-   local_search->set_no_change_best(50);
    PopulationBased *pb; 
    if (population_str == "Hybrid") {
       if (poa_counter != 1) error_("Hybrid needs Population size as argument");

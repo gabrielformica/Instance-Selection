@@ -139,21 +139,56 @@ El objetivo de un algoritmo es maximizar esta función, entonces si $evaluar(A) 
 
 \section{Algoritmos}
 
-    \subsection{Búsqueda local}
-    Para la búsqueda local se hace uso de un algoritmo inspirado en \emph{hill-climbing} el cual toma una solución inicial y tiene como objetivo mejorarla haciendo uso de un operador $op: S \to S$. \\
+    Para los algoritmos basados en poblaciones, se utilizó como operador de mutación el cruce en un punto (\emph{one-point crossover}), mientras que para la selección se usó la técnica de torneo (\emph{tourney selection}) con un torneo de tamaño 3.
 
-    {\fontsize{10}{10}\selectfont
+    \subsection{Algoritmo poblacional híbrido (memético)}
+    Para la busqueda poblacional híbrida se considera una combinación de la noción de población y mutación con la búsqueda local clásica.
+
+    {\fontsize{9}{12}\selectfont
     \begin{algorithmic}
-        \Function{BusquedaLocal}{$T: Problema$}
-            \State $S \gets solucionAleatoria()$
+        \Function{Híbrido}{$T: Problema$}
+            \State $Mejor \gets \Call{solucionAleatoria}$
+            \State $P \gets \Call{poblacionAleatoria}$
             \While{$\lnot condicionDeParada$}
-                \State $R \gets S$
-                \State $R \gets operador(R)$
-                \If{\Call{calidad}{R,T} $<$ \Call{calidad}{S,T}}
-                    \State $S \gets R$
+                \For{Cada $P_i$ en $P$}
+                  \State $P_i \gets \Call{busquedaLocal}{T}$
+                    \If{\Call{calidad}{$P_i$} $>$ \Call{calidad}{$Mejor$}}
+                        \State $Mejor \gets P_i$
+                    \EndIf
+                \EndFor
+            \State $P \gets \Call{reproducir}{P}$
+            \EndWhile
+            \State return $Mejor$
+        \EndFunction
+    \end{algorithmic}
+    }
+
+    ~\ 
+
+    Como condición de parada se establece que el mínimo de calidad de una solución sea $0.95$ y una cantidad determinada de iteraciones en las cuales la solución no cambie. Adicionalmente, siempre se favorece la descendencia al reproducir la población.
+
+    \subsection{SGA}
+    Para el SGA se considera utiliza un criterio de selección elitista, es decir, los hijos sólo reemplazan a los padres si son mejores. \\
+
+    {\fontsize{10}{12}\selectfont
+    \begin{algorithmic}
+        \Function{SGA}{$T: Problema$}
+            \State $P \gets \Call{poblacionAleatoria}$
+            \State $Mejor \gets $ mejor individuo en P
+            \While{$\lnot condicionDeParada$}
+                \State $P_1 \gets $ Seleccion de indv. de P  
+                \State $P_2 \gets $ Seleccion de indv. de P 
+                \State $c_1,c_2 \gets $ recombinar $P_1 y P_2$
+                \State Mutar $c_1$ y $c_2$ 
+                \If{$c_1$ y $c_2$ son mejores que $P_1$ y $P_2$}
+                    \State Reemplazar
+                \EndIf
+                \State $Mejor' \gets $ mejor individuo en P 
+                \If{$Mejor'$ $>$ $Mejor$}
+                    \State $Mejor \gets Mejor'$
                 \EndIf
             \EndWhile
-            \State return $S$
+            \State return $Mejor$
         \EndFunction
     \end{algorithmic}
     }
@@ -321,297 +356,123 @@ Cada metaheurística se entonó hasta encontrar los parámetros que mejoraban el
 \subsection{Ejecuciones}
 Los experimentos se corrieron sobre computadores de procesador Intel(R) Core(TM) i7-3770 CPU @ 3.40GHz, con 8 GB de RAM sobre un sistema Debian Linux.
 
+\clearpage
 
 \subsection{Resultados}
+    
+\begin{table}[h]
+\scalebox{0.6}{
+\begin{tabular}{ |l|l|l|l|l|l| }
+    \hline
+        \multicolumn{6}{ |c| }{Casos de prueba pequeños} \\
+    \hline
+    Caso & Heuristica & Err val & Tam Reduc & Error & Tiempo \\ \hline
+    \multirow{4}{*}{Abalone}   & Tabu     & 78.8211     & 0.09902 & 329    & 62.30 \\
+                               & ILS      & 77.60396    & 0.11925 & 323.2  & 336.89 \\
+                               & Memetico & 78.35113    & 0.1378  & 327.04 & 160.96 \\
+                               & SGA      & 80.1339     & 0.52334 & 334.48 & 44.45\\ \hline
+    \multirow{4}{*}{Bupa} & Tabu     & 35.13766   & 0.97264      &  12.12  & 0.5884 \\
+                             & ILS      & 31.28007   & 0.889045     &  10.8   & 4.1052 \\
+                             & Memetico & 33.99377   & 0.92767      &  11.72  & 1.7144 \\
+                             & SGA      & 39.48908   & 1.320954     &  13.62  & 0.3142\\ \hline
+    \multirow{4}{*}{Ecoli}   & Tabu     & 30.85025   & 2.55893      &  10.38  & 0.6244 \\
+                             & ILS      & 26.52584   & 4.028173     &  8.92   & 7.0984 \\
+                             & Memetico & 29.12677   & 3.643914     &  9.8    & 1.9566 \\
+                             & SGA      & 28.8253    & 5.3836       &  9.7    & 0.3122\\ \hline
+    \multirow{4}{*}{Glass}   & Tabu     & 40.26272   & 4.080946     &  8.66   & 0.3336 \\
+                             & ILS      & 37.98743   & 4.327704     &  8.22   & 3.7046 \\
+                             & Memetico & 38.22237   & 4.659532     &  8.24   & 1.2344 \\
+                             & SGA      & 38.49303   & 8.02254      &  8.3    & 0.18\\ \hline
+    \multirow{4}{*}{Haberman}   & Tabu     & 25.86667   & 0.994915     &  7.9    & 0.429 \\
+                                & ILS      & 25.80216   & 0.893281     &  7.88   & 2.9763 \\
+                                & Memetico & 26.38925   & 0.944243     &  8.06   & 1.0734 \\
+                                & SGA      & 26.41724   & 0.58108      &  8.08   & 0.1846\\ \hline
+    \multirow{4}{*}{Ionosphere}   & Tabu     & 16.07302   & 2.272815     &  5.64   & 1.5468 \\
+                                  & ILS      & 13.40159   & 2.279123     &  4.7    & 15.304 \\
+                                  & Memetico & 15.16667   & 2.044946     &  5.32   & 5.7892 \\
+                                  & SGA      & 17.27461   & 4.868776     &  6.06   & 1.0562\\ \hline
+    \multirow{4}{*}{Iris}   & Tabu     & 5.733331   & 3.970368     &  0.86   & 0.0348 \\
+                            & ILS      & 5.73333    & 3.659257     &  0.86   & 0.0152 \\
+                            & Memetico & 6.39999    & 3.99999      &  0.96   & 0.1462 \\
+                            & SGA      & 5.86666    & 4.992591     &  0.88   & 0.452\\ \hline
+    \multirow{4}{*}{Monk-2}   & Tabu     & 19.3827    & 1.419281     &  8.32   & 0.8218 \\
+                              & ILS      & 11.77317   & 1.389261     &  5.1    & 7.9858 \\
+                              & Memetico & 15.78001   & 1.394267     &  6.82   & 2.5364 \\
+                              & SGA      & 18.3673    & 4.473317     &  7.96   & 0.4278\\ \hline
+    \multirow{4}{*}{Newthyroid}   & Tabu     & 11.64502   & 2.53245      &  2.5    & 0.2808 \\
+                                  & ILS      & 9.748918   & 2.191604     &  2.1    & 2.1954 \\
+                                  & Memetico & 10.49351   & 2.811653     &  2.6    & 0.7974 \\
+                                  & SGA      & 11.70563   & 5.405375     &  2.52   & 0.1154\\ \hline
+    \multirow{4}{*}{Saheart}  & Tabu     & 33.50879   & 0.683068     &  15.48  & 1.0738 \\
+                              & ILS      & 32.72987   & 0.586793     &  15.12  & 5.7216 \\
+                              & Memetico & 33.91212   & 0.69262      &  15.66  & 2.9838 \\
+                              & SGA      & 34.41073   & 0.471327     &  15.9   & 0.6406\\ \hline
+    \multirow{4}{*}{Sonar}  & Tabu     & 39.0095    & 1.891115     &  8.1    & 1.067 \\
+                            & ILS      & 33.8666    & 1.698715     &  7.04   & 8.053 \\
+                            & Memetico & 32.32379   & 2.275174     &  6.72   & 4.1412 \\
+                            & SGA      & 35.09998   & 6.571566     &  7.3    & 0.719\\ \hline
+    \multirow{4}{*}{Wine} & Tabu     & 28.10458   &  2.32212     &  5.0      & 0.3314 \\
+                          & ILS      & 28.9085    &  2.322049    &  5.14   & 2.5746 \\
+                          & Memetico & 28.69935   &  2.11015     &  5.1    & 0.9834 \\
+                          & SGA      & 30.24836   &  3.258773    &  5.38   & 0.1628\\ \hline
+    \multirow{4}{*}{Saheart}  & Tabu     & 33.50879   & 0.683068     &  15.48  & 1.0738 \\
+                              & ILS      & 32.72987   & 0.586793     &  15.12  & 5.7216 \\
+                              & Memetico & 33.91212   & 0.69262      &  15.66  & 2.9838 \\
+                              & SGA      & 34.41073   & 0.471327     &  15.9   & 0.6406\\ \hline
+\end{tabular}
+}
+\end{table}
+
+\newpage
 
 \begin{table}[h]
 \scalebox{0.6}{
-\begin{tabular}{ |l|l|l|l|l| }
+\begin{tabular}{ |l|l|l|l|l|l| }
     \hline
-             &  Err Val    & Tamaño Reduc &  Err    & Tiempo (segundos)\\ \hline
-    Tabu     & 78.8211     & 0.09902      &  329    &  62.30\\ \hline
-    ILS      & 77.60396    & 0.11925      &  323.2  &  336.89\\ \hline
-    Memético & 78.35113    & 0.1378       &  327.04 &  160.96\\ \hline
-    SGA      & 80.1339     & 0.52334      &  334.48 &  44.45\\ \hline
+        \multicolumn{6}{ |c| }{Casos de prueba medianos} \\
+    \hline
+    Caso & Heuristica & Err val & Tam Reduc & Error & Tiempo \\ \hline
+    \multirow{4}{*}{Australian}   & Tabu     & 33.3913    & 0.42512  & 23.04 & 2.6786 \\
+                                  & ILS      & 31.5072    & 0.412238 & 21.74 & 15.253 \\
+                                  & Memetico & 33.42028   & 0.412238 & 23.06 & 8.322 \\
+                                  & SGA      & 37.2463    & 1.07246  & 25.7  & 2.018\\ \hline
+    \multirow{4}{*}{Balance} & Tabu     & 16.2951    &  0.5155      &  10.18  & 1.3566 \\
+                             & ILS      & 12.8966    &  0.444467    &  8.06   & 10.0512 \\
+                             & Memetico & 14.2838    &  0.462071    &  8.92   & 4.0198 \\
+                             & SGA      & 20.70254   &  2.179019    &  12.94  & 0.7512\\ \hline
+    \multirow{4}{*}{Pima}   & Tabu     & 26.13381   & 0.355893     &  20.08  & 2.2424 \\
+                            & ILS      & 25.74077   & 0.32985      &  18.78  & 12.0942 \\
+                            & Memetico & 26.20867   & 0.3240552    &  20.14  & 6.8738 \\
+                            & SGA      & 30.4033    & 0.8534       &  23.36  & 16198.0\\ \hline
+    \multirow{4}{*}{Tic-Tac-Toe}   & Tabu     & 34.52851   & 0.4338048    &  33.08  & 3.063 \\
+                                   & ILS      & 33.0         & 1.16216      &  31.62  & 16.518 \\
+                                   & Memetico & 34.09035   & 0.9440143    &  32.66  & 10.2386 \\
+                                   & SGA      & 34.75614   & 0.3804321    &  33.3   & 2.5356\\ \hline
+    \multirow{4}{*}{Vehicle}  & Tabu     & 49.09916   & 3.123149     & 41.54   & 41.54 \\
+                              & ILS      & 46.66246   & 3.070576     & 39.48   & 56.56 \\
+                              & Memetico & 47.49272   & 3.054687     & 40.18   & 18.8208 \\
+                              & SGA      & 45.90784   & 4.85396      & 38.84   & 3.509\\ \hline
+    \multirow{4}{*}{WDBC} & Tabu     & 8.681703   & 0.7069326    & 4.94    & 2.3308 \\
+                          & ILS      & 9.489349   & 0.601433     & 5.4     & 0.5102 \\
+                          & Memetico & 8.365288   & 0.7850499    & 4.76    & 7.4894 \\
+                          & SGA      & 9.243108   & 1.241914     & 5.25    & 2.1942\\ \hline
 \end{tabular}
 }
-\caption{Resultados promedios para Abalone}
-\label{tabla:3}
 \end{table}
 
 \begin{table}[h]
 \scalebox{0.6}{
-\begin{tabular}{ |l|l|l|l|l| }
+\begin{tabular}{ |l|l|l|l|l|l| }
     \hline
-             &  Err Val    & Tamaño Reduc &  Err    & Tiempo (segundos)\\ \hline
-    Tabu     &  33.3913    & 0.42512      &  23.04  & 2.6786           \\ \hline
-    ILS      &  31.5072    & 0.412238     &  21.74  & 15.253           \\ \hline
-    Memético &  33.42028   & 0.412238     &  23.06  & 8.322            \\ \hline
-    SGA      &  37.2463    & 1.07246      &  25.7   & 2.018            \\ \hline
+        \multicolumn{6}{ |c| }{Casos de prueba grandes} \\
+    \hline
+    Caso & Heuristica & Err val & Tam Reduc & Error & Tiempo \\ \hline
+    \multirow{4}{*}{Banana} & Tabu     & 13.28302   & 3.937526     &  70.4   & 53.3222 \\
+                            & ILS      & 13.31699   & 1.305241     &  70.58  & 591.7742 \\
+                            & Memetico & 14.02265   & 1.47631      &  74.32  & 172.797 \\
+                            & SGA      & 14.49056   & 2.111949     &  76.8   & 35.232\\ \hline
 \end{tabular}
 }
-\caption{Resultados promedios para Australian}
-\label{tabla:4}
-\end{table}
-
-\begin{table}[h]
-\scalebox{0.6}{
-\begin{tabular}{ |l|l|l|l|l| }
-    \hline
-             &  Err Val    & Tamaño Reduc &  Err    & Tiempo (segundos)\\ \hline
-    Tabu     &  16.2951    &  0.5155      &  10.18  & 1.3566           \\ \hline
-    ILS      &  12.8966    &  0.444467    &  8.06   & 10.0512          \\ \hline
-    Memético &  14.2838    &  0.462071    &  8.92   & 4.0198          \\ \hline
-    SGA      &  20.70254   &  2.179019    &  12.94  & 0.7512          \\ \hline
-\end{tabular}
-}
-\caption{Resultados promedios para Balance}
-\label{tabla:5}
-\end{table}
-
-\begin{table}[h]
-\scalebox{0.6}{
-\begin{tabular}{ |l|l|l|l|l| }
-    \hline
-             &  Err Val    & Tamaño Reduc &  Err    & Tiempo (segundos)\\ \hline
-    Tabu     &  35.13766   & 0.97264      &  12.12  & 0.5884           \\ \hline
-    ILS      &  31.28007   & 0.889045     &  10.8   & 4.1052           \\ \hline
-    Memético &  33.99377   & 0.92767      &  11.72  & 1.7144           \\ \hline
-    SGA      &  39.48908   & 1.320954     &  13.62  & 0.3142           \\ \hline
-\end{tabular}
-}
-\caption{Resultados promedios para Bupa}
-\label{tabla:6}
-\end{table}
-
-\begin{table}[h]
-\scalebox{0.6}{
-\begin{tabular}{ |l|l|l|l|l| }
-    \hline
-             &  Err Val    & Tamaño Reduc &  Err    & Tiempo (segundos)\\ \hline
-    Tabu     &  30.85025   & 2.55893      &  10.38  & 0.6244          \\ \hline
-    ILS      &  26.52584   & 4.028173     &  8.92   & 7.0984          \\ \hline
-    Memético &  29.12677   & 3.643914     &  9.8    & 1.9566          \\ \hline
-    SGA      &  28.8253    & 5.3836       &  9.7    & 0.3122         \\ \hline
-\end{tabular}
-}
-\caption{Resultados promedios para Ecoli}
-\label{tabla:7}
-\end{table}
-
-\begin{table}[h]
-\scalebox{0.6}{
-\begin{tabular}{ |l|l|l|l|l| }
-    \hline
-             &  Err Val    & Tamaño Reduc &  Err    & Tiempo (segundos)\\ \hline
-    Tabu     &  40.26272   & 4.080946     &  8.66   & 0.3336          \\ \hline
-    ILS      &  37.98743   & 4.327704     &  8.22   & 3.7046          \\ \hline
-    Memético &  38.22237   & 4.659532     &  8.24   & 1.2344          \\ \hline
-    SGA      &  38.49303   & 8.02254      &  8.3    & 0.18           \\ \hline
-\end{tabular}
-}
-\caption{Resultados promedios para Glass}
-\label{tabla:8}
-\end{table}
-
-\begin{table}[h]
-\scalebox{0.6}{
-\begin{tabular}{ |l|l|l|l|l| }
-    \hline
-             &  Err Val    & Tamaño Reduc &  Err    & Tiempo (segundos)\\ \hline
-    Tabu     &  25.86667   & 0.994915     &  7.9    & 0.429            \\ \hline
-    ILS      &  25.80216   & 0.893281     &  7.88   & 2.9763           \\ \hline
-    Memético &  26.38925   & 0.944243     &  8.06   & 1.0734           \\ \hline
-    SGA      &  26.41724   & 0.58108      &  8.08   & 0.1846           \\ \hline
-\end{tabular}
-}
-\caption{Resultados promedios para Haberman}
-\label{tabla:9}
-\end{table}
-
-\begin{table}[h]
-\scalebox{0.6}{
-\begin{tabular}{ |l|l|l|l|l| }
-    \hline
-             &  Err Val    & Tamaño Reduc &  Err    & Tiempo (segundos)\\ \hline
-    Tabu     &  16.07302   & 2.272815     &  5.64   & 1.5468           \\ \hline
-    ILS      &  13.40159   & 2.279123     &  4.7    & 15.304           \\ \hline
-    Memético &  15.16667   & 2.044946     &  5.32   & 5.7892           \\ \hline
-    SGA      &  17.27461   & 4.868776     &  6.06   & 1.0562           \\ \hline
-\end{tabular}
-}
-\caption{Resultados promedios para Ionosphere}
-\label{tabla:8}
-\end{table}
-
-\begin{table}[h]
-\scalebox{0.6}{
-\begin{tabular}{ |l|l|l|l|l| }
-    \hline
-             &  Err Val    & Tamaño Reduc &  Err    & Tiempo (segundos)\\ \hline
-    Tabu     &  5.733331   & 3.970368     &  0.86   & 0.0348           \\ \hline
-    ILS      &  5.73333    & 3.659257     &  0.86   & 0.0152           \\ \hline
-    Memético &  6.39999    & 3.99999      &  0.96   & 0.1462           \\ \hline
-    SGA      &  5.86666    & 4.992591     &  0.88   & 0.452            \\ \hline
-\end{tabular}
-}
-\caption{Resultados promedios para Iris}
-\label{tabla:9}
-\end{table}
-
-\begin{table}[h]
-\scalebox{0.6}{
-\begin{tabular}{ |l|l|l|l|l| }
-    \hline
-             &  Err Val    & Tamaño Reduc &  Err    & Tiempo (segundos)\\ \hline
-    Tabu     &  19.3827    & 1.419281     &  8.32   & 0.8218          \\ \hline
-    ILS      &  11.77317   & 1.389261     &  5.1    & 7.9858          \\ \hline
-    Memético &  15.78001   & 1.394267     &  6.82   & 2.5364          \\ \hline
-    SGA      &  18.3673    & 4.473317     &  7.96   & 0.4278          \\ \hline
-\end{tabular}
-}
-\caption{Resultados promedios para Monk-2}
-\label{tabla:10}
-\end{table}
-
-\clearpage
-
-\begin{table}[h]
-\scalebox{0.6}{
-\begin{tabular}{ |l|l|l|l|l| }
-    \hline
-             &  Err Val    & Tamaño Reduc &  Err    & Tiempo (segundos)\\ \hline
-    Tabu     &  11.64502   & 2.53245      &  2.5    & 0.2808          \\ \hline
-    ILS      &  9.748918   & 2.191604     &  2.1    & 2.1954          \\ \hline
-    Memético &  10.49351   & 2.811653     &  2.6    & 0.7974          \\ \hline
-    SGA      &  11.70563   & 5.405375     &  2.52   & 0.1154         \\ \hline
-\end{tabular}
-}
-\caption{Resultados promedios para Newthyroid}
-\label{tabla:10}
-\end{table}
-
-\begin{table}[h]
-\scalebox{0.6}{
-\begin{tabular}{ |l|l|l|l|l| }
-    \hline
-             &  Err Val    & Tamaño Reduc &  Err    & Tiempo (segundos)\\ \hline
-    Tabu     &  26.13381   & 0.355893     &  20.08  & 2.2424          \\ \hline
-    ILS      &  25.74077   & 0.32985      &  18.78  & 12.0942         \\ \hline
-    Memético &  26.20867   & 0.3240552    &  20.14  & 6.8738          \\ \hline
-    SGA      &  30.4033    & 0.8534       &  23.36  & 16198      \\ \hline
-\end{tabular}
-}
-\caption{Resultados promedios para Pima}
-\label{tabla:11}
-\end{table}
-
-\begin{table}[h]
-\scalebox{0.6}{
-\begin{tabular}{ |l|l|l|l|l| }
-    \hline
-             &  Err Val    & Tamaño Reduc &  Err    & Tiempo (segundos)\\ \hline
-    Tabu     &  33.50879   & 0.683068     &  15.48  & 1.0738           \\ \hline
-    ILS      &  32.72987   & 0.586793     &  15.12  & 5.7216          \\ \hline
-    Memético &  33.91212   & 0.69262      &  15.66  & 2.9838          \\ \hline
-    SGA      &  34.41073   & 0.471327     &  15.9   & 0.6406          \\ \hline
-\end{tabular}
-}
-\caption{Resultados promedios para Saheart}
-\label{tabla:12}
-\end{table}
-
-
-\begin{table}[h]
-\scalebox{0.6}{
-\begin{tabular}{ |l|l|l|l|l| }
-    \hline
-             &  Err Val    & Tamaño Reduc &  Err    & Tiempo (segundos)\\ \hline
-    Tabu     &  39.0095    & 1.891115     &  8.1    & 1.067            \\ \hline
-    ILS      &  33.8666    & 1.698715     &  7.04   & 8.053            \\ \hline
-    Memético &  32.32379   & 2.275174     &  6.72   & 4.1412          \\ \hline
-    SGA      &  35.09998   & 6.571566     &  7.3    & 0.719           \\ \hline
-\end{tabular}
-}
-\caption{Resultados promedios para Sonar}
-\label{tabla:13}
-\end{table}
-
-\begin{table}[h]
-\scalebox{0.6}{
-\begin{tabular}{ |l|l|l|l|l| }
-    \hline
-             &  Err Val    & Tamaño Reduc &  Err    & Tiempo (segundos)\\ \hline
-    Tabu     &  34.52851   & 0.4338048    &  33.08  & 3.063            \\ \hline
-    ILS      &  33         & 1.16216      &  31.62  & 16.518           \\ \hline
-    Memético &  34.09035   & 0.9440143    &  32.66  & 10.2386          \\ \hline
-    SGA      &  34.75614   & 0.3804321    &  33.3   & 2.5356           \\ \hline
-\end{tabular}
-}
-\caption{Resultados promedios para Tic-Tac-Toe}
-\label{tabla:14}
-\end{table}
-
-\clearpage
-
-\begin{table}[h]
-\scalebox{0.6}{
-\begin{tabular}{ |l|l|l|l|l| }
-    \hline
-             &  Err Val    & Tamaño Reduc &  Err    & Tiempo (segundos)\\ \hline
-    Tabu     &  49.09916   & 3.123149     & 41.54   & 41.54            \\ \hline
-    ILS      &  46.66246   & 3.070576     & 39.48   & 56.56            \\ \hline
-    Memético &  47.49272   & 3.054687     & 40.18   & 18.8208          \\ \hline
-    SGA      &  45.90784   & 4.85396      & 38.84   & 3.509            \\ \hline
-\end{tabular}
-}
-\caption{Resultados promedios para Vehicle}
-\label{tabla:15}
-\end{table}
-
-\begin{table}[h]
-\scalebox{0.6}{
-\begin{tabular}{ |l|l|l|l|l| }
-    \hline
-             &  Err Val    & Tamaño Reduc &  Err    & Tiempo (segundos)\\ \hline
-    Tabu     &  8.681703   & 0.7069326    & 4.94    & 2.3308           \\ \hline
-    ILS      &  9.489349   & 0.601433     & 5.4     & 0.5102           \\ \hline
-    Memético &  8.365288   & 0.7850499    & 4.76    & 7.4894           \\ \hline
-    SGA      &  9.243108   & 1.241914     & 5.25    & 2.1942           \\ \hline
-\end{tabular}
-}
-\caption{Resultados promedios para WDBC}
-\label{tabla:15}
-\end{table}
-
-\begin{table}[h]
-\scalebox{0.6}{
-\begin{tabular}{ |l|l|l|l|l| }
-    \hline
-             &  Err Val    & Tamaño Reduc &  Err    & Tiempo (segundos)\\ \hline
-    Tabu     &  28.10458   &  2.32212     &  5      & 0.3314           \\ \hline
-    ILS      &  28.9085    &  2.322049    &  5.14   & 2.5746           \\ \hline
-    Memético &  28.69935   &  2.11015     &  5.1    & 0.9834           \\ \hline
-    SGA      &  30.24836   &  3.258773    &  5.38   & 0.1628           \\ \hline
-\end{tabular}
-}
-\caption{Resultados promedios para Wine}
-\label{tabla:15}
-\end{table}
-
-\begin{table}[h]
-\scalebox{0.6}{
-\begin{tabular}{ |l|l|l|l|l| }
-    \hline
-             &  Err Val    & Tamaño Reduc &  Err    & Tiempo (segundos)\\ \hline
-    Tabu     &  13.28302   & 3.937526     &  70.4   & 53.3222          \\ \hline
-    ILS      &  13.31699   & 1.305241     &  70.58  & 591.7742         \\ \hline
-    Memético &  14.02265   & 1.47631      &  74.32  & 172.797          \\ \hline
-    SGA      &  14.49056   & 2.111949     &  76.8   & 35.232           \\ \hline
-\end{tabular}
-}
-\caption{Resultados promedios para Wine}
-\label{tabla:15}
 \end{table}
 
 \begin{center}

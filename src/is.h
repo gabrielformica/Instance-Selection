@@ -32,7 +32,7 @@ namespace IS {
       public:
         Solution(int N) : size(N) { generateRandom(); };
         Solution(std::bitset<MAX> a, int N) : bits(a), size(N) { };
-        Solution(const Solution &a) : bits(a.getBits()), size(a.getSize()) { };
+        Solution(const Solution &a) : bits(a.getBits()), size(a.getSize()), fitness(a.getFitness()) { };
         int getSize() const { return size; };
         void setSize(int n) { size = n; };
         void setFitness(double f) { fitness = f; };

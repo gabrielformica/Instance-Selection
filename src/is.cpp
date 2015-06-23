@@ -18,6 +18,7 @@ void IS::Solution::copy(const Solution &a) {
     size = a.size;
     bits.reset();
     bits |= a.bits;
+    fitness = a.getFitness();
 }
 
 std::string IS::Instance::toString() const {

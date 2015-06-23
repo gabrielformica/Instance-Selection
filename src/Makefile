@@ -1,4 +1,4 @@
-GPPFLAGS= -std=c++11
+GPPFLAGS= -std=c++11 -g
 CLANG= clang++
 CC= clang++
 OBJ= main.cpp is.cpp metaheuristic.cpp tweaker.cpp utils.cpp populationbased.cpp

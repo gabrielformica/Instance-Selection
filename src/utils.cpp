@@ -143,6 +143,9 @@ Metaheuristic *choose_population(std::string population_str,
    if (population_str == "Hybrid") {
       if (poa_counter != 1) error_("Hybrid needs Population size as argument");
       return new Hybrid(population_optional_arg[0], local_search);
+   } else if (population_str == "SGA") {
+      if (poa_counter != 1) error_("SGA needs Population size as argument");
+      return new SGA(population_optional_arg[0], local_search);
    }
    error_("The Population based algorithm you are providing doesn't exist");
    return NULL;   // Shut up warning

@@ -3,16 +3,19 @@
 #include "utils.h"
 
 
-void PopulationBased::generatePopulation(Population &population, int size) const {
-    while (population.empty() || population.size() < popsize)
-        population.insert(IS::Solution(size));
+void PopulationBased::generatePopulation(Population &population, int size, const IS::Dataset &ds) const {
+    while (population.empty() || population.size() < popsize) {
+        IS::Solution sol = IS::Solution(size);
+        sol.setFitness(quality(ds, sol, 0.5));
+        population.insert(sol);
+    }
 }
 
 
 void Hybrid::optimize(const IS::Dataset &ds, IS::Solution &sol) const {
     std::cout << ">>>> Running Hybrid algorithm" << std::endl;
     Population population;
-    generatePopulation(population, sol.getSize());
+    generatePopulation(population, sol.getSize(), ds);
     IS::Solution best = IS::Solution(*(population.begin()));
     
     best.setFitness(quality(ds, best, 0.5));
@@ -46,7 +49,7 @@ void Hybrid::optimize(const IS::Dataset &ds, IS::Solution &sol) const {
             no_change = 0;
         }
         population = new_pop;
-        generatePopulation(population, sol.getSize());
+        generatePopulation(population, sol.getSize(), ds);
         assert(population.size() == popsize);
         
         bool stop = best.getFitness() > max_quality or iter == ite_limit;
@@ -88,7 +91,7 @@ IS::Solution PopulationBased::tourneySelection(const Population &p, int s) const
     Population::iterator sit = p.begin();
     advance(sit, (rand() % popsize));
     IS::Solution best = IS::Solution(*sit);
-
+    best.setFitness(sit->getFitness());
     for(int i = 0; i < s-1; ++i) {
         sit = p.begin();
         advance(sit, (rand() % popsize));
@@ -96,6 +99,8 @@ IS::Solution PopulationBased::tourneySelection(const Population &p, int s) const
             best.copy(*sit);
         }
     }
+    cout << BOLDRED << "Best fitness inside tourney" << best.getFitness() << RESET << endl;
+    cout << BOLDRED << "Done tourney" << RESET << endl;
     return best;
 }
 
@@ -117,4 +122,76 @@ Children PopulationBased::recombination(const IS::Solution &sa,
         cb[i] = b_bits[i];
     }
     return make_pair(IS::Solution(ca, sol_size), IS::Solution(cb, sol_size));
+}
+
+
+void SGA::optimize(const IS::Dataset &ds, IS::Solution &sol) const {
+    Population population;
+    generatePopulation(population, sol.getSize(), ds);
+    IS::Solution best = findBest(population);
+    double best_fitness = quality(ds, best, 0.5);
+    best.setFitness(best_fitness);
+    int iter = 0, no_change = 0;
+    double old_q = -1.0;
+    local_search->set_max_quality(std::min(best.getFitness() + 0.1, 0.95));
+    while(1) {
+        iter++;
+        IS::Solution p1 = tourneySelection(population, 3);
+        IS::Solution p2 = tourneySelection(population, 3);
+        IS::Solution p1_cand = IS::Solution(p1);
+        IS::Solution p2_cand = IS::Solution(p2);
+        Children recombination(p1_cand, p2_cand);
+        tweaker->tweak(p1_cand);
+        tweaker->tweak(p2_cand);
+        p1_cand.setFitness(quality(ds, p1_cand, 0.5));
+        p2_cand.setFitness(quality(ds, p2_cand, 0.5));
+        if(p1.getFitness() < p1_cand.getFitness() ) {
+            cout << BOLDGREEN << "GOOD CANDIDATE 1" << RESET << endl;
+            population.erase(p1);
+            population.insert(p1_cand);             
+        }
+        if(p2.getFitness() < p2_cand.getFitness() ) {
+            cout << BOLDGREEN << "GOOD CANDIDATE 2" << RESET << endl;
+            population.erase(p2);
+            population.insert(p2_cand);             
+        }
+        IS::Solution candidate = findBest(population);
+        if (candidate.getFitness() > best.getFitness()) {
+            cout << BOLDGREEN << "GOT BETTER" << RESET << endl;
+            old_q = best.getFitness();
+            best.copy(candidate);
+            best.setFitness(candidate.getFitness());
+        }
+        if (best.getFitness() - old_q < EPSILON) no_change++;
+        else {
+            cout << YELLOW << "CHANGE" << RESET << endl;
+            old_q = best.getFitness();
+            no_change = 0;
+        }
+        bool stop = best.getFitness() >= max_quality or iter == ite_limit;
+        stop = stop or no_change == no_change_best;
+        if (stop) break;
+        // Population breeded = breed(ds, population);
+        // population = breeded;
+    }
+    cout << GREEN << "iter " << iter << RESET <<endl;
+    cout << GREEN << "no_change " << no_change << RESET <<endl;
+    cout << GREEN << "no_change_best " << no_change_best << RESET <<endl;
+    cout << GREEN << "best.getFitness() " << best.getFitness() << RESET <<endl;
+    sol.copy(best);
+}
+
+IS::Solution PopulationBased::findBest(const Population &p) const {
+    Population::const_iterator sit = p.begin();
+    IS::Solution sol = IS::Solution(*sit);
+    double best = sit->getFitness();
+    sol.setFitness(best);
+    for (; sit != p.end(); sit++) {
+        if (sit->getFitness() > best) {
+            sol.copy(*sit);
+            best = sit->getFitness();
+            sol.setFitness(best);
+        }
+    }
+    return sol;
 }

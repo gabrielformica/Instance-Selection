@@ -11,7 +11,7 @@ class Metaheuristic {
   protected:
     Tweaker *tweaker;
     double max_quality = 0.95; 
-    int iterations = 1000;
+    int ite_limit = 1000;
     int no_change_best = 500;
   public:
     virtual void optimize(const IS::Dataset &T, IS::Solution &R) const = 0;
@@ -26,12 +26,15 @@ class Metaheuristic {
     double get_max_quality() const { return max_quality; };
     void setTweaker(Tweaker *tw) { tweaker = tw; };
     void set_max_quality(double x) { max_quality = x; }
-    void set_iterations(int x) { iterations = x; }
     void set_no_change_best(int x) { no_change_best = x; }
 };
 
 class HillClimbing : public Metaheuristic {
   public: 
+    HillClimbing(int i, int nc) { 
+        ite_limit = i; 
+        no_change_best = nc;
+    };
     void optimize(const IS::Dataset &T, IS::Solution &R) const;
     std::string output_params() const;
 };
@@ -49,7 +52,10 @@ class ILS : public Metaheuristic {
   private:
     int li, pp;
   public: 
-    ILS(int l, int t, int p) : li(l), pp(p) { iterations = t; };
+    ILS(int l, int t, int i, int nc) : li(l), pp(t) { 
+        ite_limit = i; 
+        no_change_best = nc;
+    };
     int  getLocalIter() const { return li; }
     int  getPerturbPerc() const { return pp; }
     void setLocalIter(int l) { li = l; }
@@ -62,10 +68,12 @@ class Tabu : public Metaheuristic {
   private:
     int length, number_of_tweaks;
   public:
-    Tabu(int l, int n, int i) : length(l), number_of_tweaks(n) { iterations = i; };
+    Tabu(int l, int n, int i, int nc) : length(l), number_of_tweaks(n) { 
+        ite_limit = i; 
+        no_change_best = nc;
+    };
     void optimize(const IS::Dataset &T, IS::Solution &R) const;
     std::string output_params() const;
 };
-
 
 #endif

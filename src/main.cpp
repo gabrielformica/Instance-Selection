@@ -119,7 +119,6 @@ int main(int argc, char *argv[]) {
         metaheuristic = choose_population(population_str, ls, 
                                           population_optional_arg, poa_counter);
         metaheuristic->setTweaker(tweaker);
-        metaheuristic->set_iterations(100);
     }
 
 

@@ -54,7 +54,7 @@ void Hybrid::optimize(const IS::Dataset &ds, IS::Solution &sol) const {
         generatePopulation(population, sol.getSize(), ds);
         assert(population.size() == popsize);
         
-        bool stop = best_fitness > max_quality or iter == iterations;
+        bool stop = best_fitness > max_quality or iter == ite_limit;
         stop = stop or iter_old == no_change_best;
         for (int i = 0; i < 10; i++) {
             std::cout << CYAN << "KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK";

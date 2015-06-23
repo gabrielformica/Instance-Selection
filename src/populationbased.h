@@ -15,12 +15,12 @@ class PopulationBased : public Metaheuristic {
     Metaheuristic *local_search;
   public:
     PopulationBased(int p, Metaheuristic *ls) : popsize(p), local_search(ls) { };
-    set<IS::Solution> breed(const set<IS::Solution> &p) const;
-    Children recombination(const IS::Solution &sa, 
+    set<IS::Solution> breed(const IS::Dataset &ds, const set<IS::Solution> &p) const;
+    pair<IS::Solution, IS::Solution> recombination(const IS::Solution &sa, 
                                                    const IS::Solution &sb) 
                                                    const;
     Population selection(const Population &sa, const Population &sb) const;
-    void generatePopulation(Population &population, int size, const IS::Dataset &ds) const;
+    void generatePopulation(Population &p, int size, const IS::Dataset &ds) const;
     IS::Solution tourneySelection(const set<IS::Solution> &p, int s) const;
     IS::Solution findBest(const Population &p) const;
 };

@@ -118,8 +118,9 @@ int main(int argc, char *argv[]) {
         Metaheuristic *ls = metaheuristic;
         metaheuristic = choose_population(population_str, ls, 
                                           population_optional_arg, poa_counter);
-
-        metaheuristic->setTweaker(new weightedRandomPlus(5,40));
+        metaheuristic->setTweaker(tweaker);
+        metaheuristic->set_no_change_best(30);
+        metaheuristic->set_ite_limit(1000);
     }
 
 

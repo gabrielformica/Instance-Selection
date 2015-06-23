@@ -27,6 +27,7 @@ class Metaheuristic {
     void setTweaker(Tweaker *tw) { tweaker = tw; };
     void set_max_quality(double x) { max_quality = x; }
     void set_no_change_best(int x) { no_change_best = x; }
+    void set_ite_limit(int x) {ite_limit = x; }
 };
 
 class HillClimbing : public Metaheuristic {

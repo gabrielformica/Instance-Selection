@@ -1,3 +1,13 @@
+/**
+  * @file
+  * @author Gabriel Formica <gabrielformica93@gmail.com>
+  * @author Melecio Ponte <pontezambrano@gmail.com>
+  *
+  * @section Description
+  *
+  * Utils classes
+  */
+
 #include <algorithm>
 #include <iostream>
 #include <fstream>
@@ -88,12 +98,29 @@ void print_help() {
     std::cout << "-o, --tweaker-optional-arg [VALUE]\tValue for tweaker"; 
     std::cout << std::endl << std::endl;
 
+    // Population
+    std::cout << "-P, --population-based [VALUE]\tSpecify population based algorithm"; 
+    std::cout << std::endl << std::endl;
+
+    std::cout << "-p [VALUE]\tValue for population based"; 
+    std::cout << std::endl << std::endl;
+
     // Example
-    std::cout << "Example" << std::endl;
-    std::cout << "   ./instance_selection -g \"Tabu\" -m 100 -m 30 ";
-    std::cout << "-x \"nRandomFlips\" -o 15" << std::endl << std::endl;
-    std::cout << "   Wich will use Tabu with a tabu list of 100 elements and";
-    std::cout << std::endl <<  "   number of tweaks equals to 30" << std::endl;
+    std::cout << "Running an simple example: " << std::endl;
+    std::cout << "   ./instance_selection -g \"Tabu\" -m 30 -m 10 -m 1000 -m 100";
+    std::cout << " -x \"weightedRandomPlus\" -o 10 -o 60 -f file_path";
+    std::cout << std::endl << std::endl;
+    std::cout << "Wich will use Tabu with a tabu list of 30 elements, ";
+    std::cout << std::endl <<  "10  number of tweaks equals to 30"; 
+    std::cout << std::endl <<  "1000 as a limit of global iterations and 100 ";
+    std::cout << std::endl <<  "as a limit of iterations without change"; 
+    std::cout << std::endl << std::endl;
+    std::cout << "Running a 10Fold validation:" << std::endl;
+    std::cout << "   ./instance_selection -g \"Tabu\" -m 30 -m 10 -m 1000 -m 100";
+    std::cout << " -x \"weightedRandomPlus\" -o 10 -o 60 -t file_DIR -n 5"; 
+    std::cout << std::endl << std::endl;
+    std::cout << "Same as above, but you have to specify the dir. -n 5 runs 5 times every validation";
+    std::cout << std::endl;
 
 }
 

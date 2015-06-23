@@ -1,8 +1,23 @@
+/**
+  * @file
+  * @author Gabriel Formica <gabrielformica93@gmail.com>
+  * @author Melecio Ponte <pontezambrano@gmail.com>
+  *
+  * @section Description
+  *
+  * Population-based algorithm classes
+  */
 #include "metaheuristic.h"
 #include "populationbased.h"
 #include "utils.h"
 
-
+/**
+  * Generate random population until popsize
+  * @param 'population'  : Population 
+  * @param 'ds'          : Dataset 
+  *
+  * This function fill population until population.size reach popsize
+  */
 void PopulationBased::generatePopulation(Population &population, int size, const IS::Dataset &ds) const {
     while (population.empty() || population.size() < popsize) {
         IS::Solution sol = IS::Solution(size);
@@ -11,7 +26,13 @@ void PopulationBased::generatePopulation(Population &population, int size, const
     }
 }
 
-
+/**
+  * Optimize of Hybrid
+  * @param 'T'      :  Dataset
+  * @param 'S'      :  Solution 
+  *
+  * This function save in S the best found solution 
+  */
 void Hybrid::optimize(const IS::Dataset &ds, IS::Solution &sol) const {
     std::cout << ">>>> Running Hybrid algorithm" << std::endl;
     Population population;
@@ -64,6 +85,13 @@ void Hybrid::optimize(const IS::Dataset &ds, IS::Solution &sol) const {
     sol.copy(best);
 }
 
+/**
+  * Breed Method
+  * @param 'ds'      :  Dataset
+  * @param 'p'       :  Population 
+  *
+  * Apply recombination and mutation, and then selects by elitist criteria
+  */
 Population PopulationBased::breed(const IS::Dataset &ds, const Population &p) const {
     Population breeded;
     for (int i = 0; i < popsize/2; ++i) {
@@ -87,6 +115,12 @@ Population PopulationBased::breed(const IS::Dataset &ds, const Population &p) co
     return breeded;
 }
 
+/**
+  * Tourney selection (as in literature)
+  * @param 'p'       :  Population 
+  * @param 's '      :  int
+  * @return A solution choose by tourney selection
+  */
 IS::Solution PopulationBased::tourneySelection(const Population &p, int s) const {
     Population::iterator sit = p.begin();
     advance(sit, (rand() % popsize));
@@ -104,6 +138,14 @@ IS::Solution PopulationBased::tourneySelection(const Population &p, int s) const
     return best;
 }
 
+/**
+  * Recombination method (as in literature)
+  * @param 'sa'   :  Solution 
+  * @param 'sb'   :  Solution 
+  * 
+  * Given to parents by tourney selection and apply one point cross-over
+  * @return A pair of Solution
+  */
 Children PopulationBased::recombination(const IS::Solution &sa, 
                                         const IS::Solution &sb) const {
     int sol_size = sa.getSize();
@@ -124,7 +166,13 @@ Children PopulationBased::recombination(const IS::Solution &sa,
     return make_pair(IS::Solution(ca, sol_size), IS::Solution(cb, sol_size));
 }
 
-
+/**
+  * Optimize of SGA 
+  * @param 'T'      :  Dataset
+  * @param 'S'      :  Solution 
+  *
+  * This function save in S the best found solution 
+  */
 void SGA::optimize(const IS::Dataset &ds, IS::Solution &sol) const {
     Population population;
     generatePopulation(population, sol.getSize(), ds);
@@ -181,6 +229,12 @@ void SGA::optimize(const IS::Dataset &ds, IS::Solution &sol) const {
     sol.copy(best);
 }
 
+/**
+  * Find best individual in a population (by fitness)
+  * @param 'p'      :  Population 
+  *
+  * This function save in S the best found solution 
+  */
 IS::Solution PopulationBased::findBest(const Population &p) const {
     Population::const_iterator sit = p.begin();
     IS::Solution sol = IS::Solution(*sit);

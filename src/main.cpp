@@ -26,12 +26,13 @@ int poa_counter = 0;
 
 int main(int argc, char *argv[]) {
 
+    // CLI options
     static struct option long_options[] = {
         {"help", no_argument, 0, 'h'},
         {"file", required_argument, 0, 'f'},
         {"disp", no_argument, 0, 'd'},
         {"metaheuristic", required_argument, 0, 'g'},
-        {"population-base", required_argument, 0, 'p'},
+        {"population-based", required_argument, 0, 'P'},
         {"meta-optional-arg", required_argument, 0, 'm'},
         {"tweaker-optional-arg", required_argument, 0, 'o'},
         {"tweaker", required_argument, 0, 'x'},
@@ -119,6 +120,7 @@ int main(int argc, char *argv[]) {
         metaheuristic = choose_population(population_str, ls, 
                                           population_optional_arg, poa_counter);
         metaheuristic->setTweaker(tweaker);
+        // Hard coded parameters since others since these seem to work fine
         metaheuristic->set_no_change_best(30);
         metaheuristic->set_ite_limit(1000);
     }

@@ -1,15 +1,36 @@
+/**
+  * @file
+  * @author Gabriel Formica <gabrielformica93@gmail.com>
+  * @author Melecio Ponte <pontezambrano@gmail.com>
+  *
+  * @section Description
+  *
+  * Metaheuristics' classes
+  */
+
 #include "metaheuristic.h"
 #include "is.h"
 
 using namespace std;
 
-/* Metaheuristics methods */
-
+/**
+  * Calculate euclidean distance. Simple call IS::Instance Method
+  * @param 'a'  :  Instance
+  * @param 'b'  :  Instance
+  * @return Euclidean distance between a and b
+  */
 double Metaheuristic::calc_distance(const IS::Instance &a, 
                                     const IS::Instance &b) const {
     return a.calcDistance(b);
 }
 
+/**
+  * Find instance nearest to an instance
+  * @param 'p'  :  Dataset
+  * @param 'a'  :  Instance
+  * @return Euclidean distance to the nearest instance in p to a 
+  *         (and different to a)
+  */
 double Metaheuristic::find_nearest(const IS::Dataset &p, const IS::Instance &a) const {
     double imin = 10000000;
     double category;
@@ -27,6 +48,13 @@ double Metaheuristic::find_nearest(const IS::Dataset &p, const IS::Instance &a) 
     return category;
 }
 
+/**
+  * One-NN method. Just calculate the nearest distances of elements
+  * in result to p. Save these distances in category
+  * @param 'training'  :  Dataset
+  * @param 'result'    :  Dataset 
+  * @param 'Category'  :  vector<double> (vector of distances)
+  */
 void Metaheuristic::oneNN(const IS::Dataset &training, 
                           const IS::Dataset &result, 
                           std::vector<double> &category) const {
@@ -35,6 +63,17 @@ void Metaheuristic::oneNN(const IS::Dataset &training,
         category[i] = find_nearest(training, result[i]);
 }
 
+/**
+  * Fitness function.
+  * @param 'T'      :  Dataset
+  * @param 'S'      :  Solution 
+  * @param 'alpha'  :  double
+  * 
+  * This function calculates:
+  * alpha * (instances_well_clasified) + (1 - alpha) * (percentage_of_reduction)
+  *
+  * @return Fitness of S. 
+  */
 double Metaheuristic::quality(const IS::Dataset &T, 
                               const IS::Solution &S,
                               double alpha) const {
@@ -76,8 +115,13 @@ double Metaheuristic::quality(const IS::Dataset &T,
 }
 
 
-/* Hill Climbing */
-
+/**
+  * Optimize of HillClimbing
+  * @param 'T'      :  Dataset
+  * @param 'S'      :  Solution 
+  *
+  * This function save in S the best found solution 
+  */
 void HillClimbing::optimize(const IS::Dataset &T, IS::Solution &S) const {
     std::cout << ">>>> Running Hill Climbing" << std::endl;
     std::cout << "quality = " << max_quality << std::endl;
@@ -116,55 +160,13 @@ std::string HillClimbing::output_params() const {
     return "HillC_";
 }
 
-/* Simulated Annealing  */
-
-void SimulatedAnnealing::optimize(const IS::Dataset &T, IS::Solution &S) const {
-    assert(T.size() == S.getSize());
-    std::cout << ">>>> Running Simulated Annealing" << std::endl;
-    std::cout << ">>>> quality = " << max_quality << std::endl;
-
-    IS::Solution best(S);  // Best solution
-
-    srand(time(NULL));
-
-    int t = temperature;  // Temperature 
-    while (1) {
-        IS::Solution R(S);
-        tweaker->tweak(R); 
-        // assert((S.getBits() ^ R.getBits()).count() == 1);
-
-        // Using 0.5 because paper
-        double qr = quality(T, R, 0.5), qs = quality(T, S, 0.5);
-        double qb = quality(T, best, 0.5);
-        // Random number between 0 and 1
-        double r = ((double) rand() / (double) (RAND_MAX));
-        double prob = -5.0;
-        if (t > 0) prob = exp((1.0 * (qr - qs)) / ((1.0) * t));
-
-        if (qr > qs || (prob - r > EPSILON)) {
-            S.setBits(R.getBits());
-            qs = qr;
-        }
-        t -= dec_factor;  // Decreasing temperature
-        // cout << "temperatura = " << t << endl;
-        
-        if (qs > qb) {
-            best.setBits(S.getBits());
-            qb = qs;
-        }
-
-        if (qb > max_quality || t <= EPSILON) break;
-    }
-}
-
-std::string SimulatedAnnealing::output_params() const {
-    std::string params = "SimulAnn_" + std::to_string(temperature) + "_";
-    params += std::to_string(dec_factor);
-    return params;
-}
-
-/* ILS */
-
+/**
+  * Optimize of ILS 
+  * @param 'T'      :  Dataset
+  * @param 'S'      :  Solution 
+  *
+  * This function save in S the best found solution 
+  */
 void ILS::optimize(const IS::Dataset &T, IS::Solution &S) const {
     std::cout << ">>>> Running ILS" << std::endl;
     std::cout << "quality = " << max_quality << std::endl;
@@ -228,8 +230,13 @@ std::string ILS::output_params() const {
 }
 
 
-/* Tabu */
-
+/**
+  * Optimize of ILS 
+  * @param 'T'      :  Dataset
+  * @param 'S'      :  Solution 
+  *
+  * This function save in S the best found solution 
+  */
 void Tabu::optimize(const IS::Dataset &T, IS::Solution &best) const {
     std::cout << ">>>> Running Tabu" << std::endl;
     std::cout << "quality = " << max_quality << std::endl;

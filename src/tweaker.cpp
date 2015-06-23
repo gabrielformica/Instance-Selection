@@ -1,6 +1,20 @@
+/**
+  * @file
+  * @author Gabriel Formica <gabrielformica93@gmail.com>
+  * @author Melecio Ponte <pontezambrano@gmail.com>
+  *
+  * @section Description
+  *
+  * Tweaker class
+  */
+
 #include <iostream>
 #include "tweaker.h"
 
+/**
+  * Just turn off one random bit (but a bit that is on)
+  * @param 'S'  :  Solution 
+  */
 void oneRandomUnset::tweak(IS::Solution &S) {
     std::bitset<MAX> bits = S.getBits();
     int size = S.getSize();
@@ -12,6 +26,10 @@ void oneRandomUnset::tweak(IS::Solution &S) {
     S.setBits(bits);
 }
 
+/**
+  * Apply upto Random flips on random bits of solution
+  * @param 'S'  :  Solution 
+  */
 void upToNRandomFlips::tweak(IS::Solution &S) {
     std::bitset<MAX> bits = S.getBits();
     int size = S.getSize();
@@ -25,6 +43,10 @@ void upToNRandomFlips::tweak(IS::Solution &S) {
     S.setBits(bits);
 }
 
+/**
+  * Apply n Random flips on random bits of solution
+  * @param 'S'  :  Solution 
+  */
 void nRandomFlips::tweak(IS::Solution &S) {
     std::bitset<MAX> bits = S.getBits();
     int size = S.getSize();
@@ -36,6 +58,11 @@ void nRandomFlips::tweak(IS::Solution &S) {
     S.setBits(bits);
 }
 
+/**
+  * Apply flip over an amount of bits (percetange of size of dataset)
+  * and choosen randomly
+  * @param 'S'  :  Solution 
+  */
 void percRandomFlips::tweak(IS::Solution &S) {
     std::bitset<MAX> bits = S.getBits();
     int size = S.getSize();
@@ -48,6 +75,11 @@ void percRandomFlips::tweak(IS::Solution &S) {
     S.setBits(bits);
 }
 
+/**
+  * Choose an amount of bits (percentage of size of dataset) 
+  * of bits and turn them off or on with a probability
+  * @param 'S'  :  Solution 
+  */
 void weightedRandom::tweak(IS::Solution &S) {
     std::bitset<MAX> bits = S.getBits();
     int size = S.getSize();
@@ -62,6 +94,13 @@ void weightedRandom::tweak(IS::Solution &S) {
     S.setBits(bits);
 }
 
+/**
+  * Choose an amount of bits (percentage of size of dataset) 
+  * of bits and turn them off or on with a probability, but, if 
+  * a bit has to be turned off, then it has to be ramdon bit on.
+  * If a bit has to be turned on, then it has to be a random bit off.
+  * @param 'S'  :  Solution 
+  */
 void weightedRandomPlus::tweak(IS::Solution &S) {
     std::bitset<MAX> bits = S.getBits();
     int size = S.getSize();

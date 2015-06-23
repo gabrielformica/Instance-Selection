@@ -63,13 +63,13 @@ double Metaheuristic::quality(const IS::Dataset &T,
     double fitness = alpha * clas_rate + (1 - alpha) * perc_redc;
 
     // // XXX: Print
-      cout << "Hubo un total de " << count << " aciertos" << endl;
-      cout << "Result es de tamanio: " << result.size() << endl;
-      cout << "La relación es: " << clas_rate << endl;
-      cout << "El tamaño de T es: " << T.size() << endl;
-      cout << "El tamaño de training es: " << training.size() << endl;
-      cout << "El porcentaje de reducción es: " << perc_redc << endl;
-      cout << "El fitness es : " << fitness << endl << endl;
+      //cout << "Hubo un total de " << count << " aciertos" << endl;
+      //cout << "Result es de tamanio: " << result.size() << endl;
+      //cout << "La relación es: " << clas_rate << endl;
+      //cout << "El tamaño de T es: " << T.size() << endl;
+      //cout << "El tamaño de training es: " << training.size() << endl;
+      //cout << "El porcentaje de reducción es: " << perc_redc << endl;
+      //cout << "El fitness es : " << fitness << endl << endl;
 
     assert(fitness <= 1.0);
     return fitness;
@@ -173,7 +173,6 @@ void ILS::optimize(const IS::Dataset &T, IS::Solution &S) const {
     std::cout << ">>>>>>>>>>>>>>>>>>>>" << std::endl;
 
     IS::Solution best(S);
-    IS::Solution home_base(S);
 
     double q_max, q_BEST = -1.0;
     int global_iter = 0;

@@ -15,7 +15,7 @@ class PopulationBased : public Metaheuristic {
     Metaheuristic *local_search;
   public:
     PopulationBased(int p, Metaheuristic *ls) : popsize(p), local_search(ls) { };
-    set<IS::Solution> breed(const set<IS::Solution> &p) const;
+    set<IS::Solution> breed(const IS::Dataset &ds, const set<IS::Solution> &p) const;
     pair<IS::Solution, IS::Solution> recombination(const IS::Solution &sa, 
                                                    const IS::Solution &sb) 
                                                    const;

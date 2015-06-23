@@ -14,66 +14,71 @@ void Hybrid::optimize(const IS::Dataset &ds, IS::Solution &sol) const {
     Population population;
     generatePopulation(population, sol.getSize());
     IS::Solution best = IS::Solution(*(population.begin()));
-    double best_fitness = quality(ds, best, 0.5);
-    best.setFitness(best_fitness);
-    int iter = 0, iter_old = 0;
-    double old_best = -1.0;
+    
+    best.setFitness(quality(ds, best, 0.5));
 
-    while(1) {
+    int iter = 0, no_change = 0;
+    while(1) {  // Main loop
         iter++;
         Population::const_iterator sit;
-        local_search->set_max_quality(std::min(best.getFitness() + 0.1, 0.95));
-        Population new_pop;
+        Population new_pop;  // New population 
+        bool best_changed = false;
         for (sit = population.begin(); sit != population.end(); sit++) {
+            local_search->set_max_quality(std::min(best.getFitness() + 0.1, 0.95));
             IS::Solution p = IS::Solution(*sit);
             local_search->optimize(ds, p);
-            double p_fitness = quality(ds, p, 0.5);
-            p.setFitness(p_fitness);
+            p.setFitness(quality(ds, p, 0.5)); 
             new_pop.insert(p);
-            if (p_fitness > best_fitness) {
+            if (p.getFitness() > best.getFitness()) {
                 best.copy(p);
-                best_fitness = p_fitness;
+                best.setFitness(p.getFitness());
+                best_changed = true;
             }
         }
-        if (best_fitness - old_best < EPSILON) {
+        if (! best_changed) {
             for (int i = 0; i < 10; i++) {
                 std::cout << BOLDGREEN << "HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH";
                 std::cout  << RESET << std::endl;
             }
-            iter_old++;
-        }
-        else {
-            std::cout << "BEST = " << best_fitness << " , old_best = " << old_best << endl;
-            old_best = best_fitness;
-            iter_old = 0;
+            no_change++;
+        } else {
+            no_change = 0;
         }
         population = new_pop;
         generatePopulation(population, sol.getSize());
         assert(population.size() == popsize);
         
-        bool stop = best_fitness > max_quality or iter == ite_limit;
-        stop = stop or iter_old == no_change_best;
-        for (int i = 0; i < 10; i++) {
+        bool stop = best.getFitness() > max_quality or iter == ite_limit;
+        stop = stop or no_change == no_change_best;
+        for (int i = 0; i < 30; i++) {
             std::cout << CYAN << "KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK";
             std::cout  << RESET << std::endl;
         }
         if (stop) break;
-        Population breeded = breed(population);
+        Population breeded = breed(ds, population);
     }
     sol.copy(best);
 }
 
-Population PopulationBased::breed(const Population &p) const {
+Population PopulationBased::breed(const IS::Dataset &ds, const Population &p) const {
     Population breeded;
     for (int i = 0; i < popsize/2; ++i) {
-        IS::Solution c1 = tourneySelection(p, 3);
-        IS::Solution c2 = tourneySelection(p, 3);
-        while (c1 == c2) c2 = tourneySelection(p, 3);
-        Children recombination(c1, c2);
+        IS::Solution p1 = tourneySelection(p, 3);
+        IS::Solution p2 = tourneySelection(p, 3);
+        while (p1 == p2) p2 = tourneySelection(p, 3);
+        Children children = recombination(p1, p2);
+        IS::Solution c1(children.first), c2(children.second);
         tweaker->tweak(c1);
         tweaker->tweak(c2);
+        //double q_children = quality(ds, c1, 0.5) + quality(ds, c2, 0.5);
+        //double q_parents = quality(ds, p1, 0.5) + quality(ds, p2, 0.5);
+        //if (q_children > q_parents) {  // Elitist
         breeded.insert(c1);
         breeded.insert(c2);
+        //} else {
+        //    breeded.insert(p1);
+        //    breeded.insert(p2);
+        //}
     }
     return breeded;
 }
@@ -94,7 +99,7 @@ IS::Solution PopulationBased::tourneySelection(const Population &p, int s) const
 }
 
 Children PopulationBased::recombination(const IS::Solution &sa, 
-                                   const IS::Solution &sb) const {
+                                        const IS::Solution &sb) const {
     int sol_size = sa.getSize();
     int point = rand() % sol_size;
     bitset<MAX> a_bits = sa.getBits();

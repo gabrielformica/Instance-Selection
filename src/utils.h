@@ -49,6 +49,13 @@ Tweaker *choose_tweaker(std::string tweaker_str,
                         int (&tweaker_optional_arg)[10],
                         int toa_counter);
 
+Metaheuristic *choose_population(std::string metaheuristic_str, 
+                                   Metaheuristic *local_search,
+                                   int (&metaheuristic_optional_arg)[10],
+                                   int moa_counter);
+
+
+
 results run_tenfold(const vps &datasets, 
                  const Metaheuristic *metaheuristic, 
                  int runs);

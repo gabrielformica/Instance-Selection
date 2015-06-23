@@ -16,7 +16,6 @@ class Metaheuristic {
   public:
     virtual void optimize(const IS::Dataset &T, IS::Solution &R) const = 0;
     virtual std::string output_params() const = 0;
-    void setTweaker(Tweaker *tw) { tweaker = tw; };
     Tweaker* getTweaker() const { return tweaker; };
     double quality(const IS::Dataset &T, const IS::Solution &S, double alpha) const;
     double find_nearest(const IS::Dataset &p, const IS::Instance &a) const ;
@@ -25,7 +24,10 @@ class Metaheuristic {
                std::vector<double> &category) const;
     double calc_distance(const IS::Instance &a, const IS::Instance &b) const; 
     double get_max_quality() const { return max_quality; };
+    void setTweaker(Tweaker *tw) { tweaker = tw; };
     void set_max_quality(double x) { max_quality = x; }
+    void set_iterations(int x) { iterations = x; }
+    void set_no_change_best(int x) { no_change_best = x; }
 };
 
 class HillClimbing : public Metaheuristic {
@@ -45,14 +47,12 @@ class SimulatedAnnealing : public Metaheuristic {
 
 class ILS : public Metaheuristic {
   private:
-    int li, ti, pp;
+    int li, pp;
   public: 
-    ILS(int l, int t, int p) : li(l), ti(t), pp(p) { };
+    ILS(int l, int t, int p) : li(l), pp(p) { iterations = t; };
     int  getLocalIter() const { return li; }
-    int  getTotalIter() const { return ti; }
     int  getPerturbPerc() const { return pp; }
     void setLocalIter(int l) { li = l; }
-    void setTotalIter(int t) { ti = t; }
     void setPerturbPerc(int p) { pp = p; }
     void optimize(const IS::Dataset &T, IS::Solution &R) const;
     std::string output_params() const;
@@ -60,9 +60,9 @@ class ILS : public Metaheuristic {
 
 class Tabu : public Metaheuristic {
   private:
-    int length, number_of_tweaks, iter_limit;
+    int length, number_of_tweaks;
   public:
-    Tabu(int l, int n, int i) : length(l), number_of_tweaks(n), iter_limit(i) { };
+    Tabu(int l, int n, int i) : length(l), number_of_tweaks(n) { iterations = i; };
     void optimize(const IS::Dataset &T, IS::Solution &R) const;
     std::string output_params() const;
 };

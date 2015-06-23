@@ -8,6 +8,7 @@ void PopulationBased::generatePopulation(Population &population, int size, const
         IS::Solution sol = IS::Solution(size);
         sol.setFitness(quality(ds, sol, 0.5));
         population.insert(sol);
+        cout << BOLDBLUE << sol.getFitness() << RESET << endl;
     }
 }
 
@@ -120,6 +121,13 @@ Children PopulationBased::recombination(const IS::Solution &sa,
 void SGA::optimize(const IS::Dataset &ds, IS::Solution &sol) const {
     Population population;
     generatePopulation(population, sol.getSize(), ds);
+
+    Population::const_iterator sit = population.begin();
+    for(; sit != population.end(); ++sit) {
+        cout << BOLDRED << sit->getFitness() << RESET << endl;
+    }
+
+
     IS::Solution best = findBest(population);
     double best_fitness = quality(ds, best, 0.5);
     best.setFitness(quality(ds, best, 0.5));
@@ -158,7 +166,7 @@ void SGA::optimize(const IS::Dataset &ds, IS::Solution &sol) const {
             old_q = best.getFitness();
             iter_old = 0;
         }
-        bool stop = best.getFitness() >= max_quality or iter == iterations;
+        bool stop = best.getFitness() >= max_quality or iter == ite_limit;
         stop = stop or iter_old == no_change_best;
         if (stop) break;
         Population breeded = breed(population);

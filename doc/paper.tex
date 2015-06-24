@@ -50,6 +50,14 @@
 
 \begin{document}
 \maketitle
+
+\begin{abstract}
+  El problema de \textit{Selección de Instancias}  busca
+  escoger un subconjunto de instancias de menor cardinalidad del conjunto original
+  que mantenga la clasificación de las muestras a ser usadas como un conjunto
+  de entrenamiento. En este articulo se considera la resolución de este problema mediante varios algoritmos metaheurísticos de trayectoria y poblacionales. Particularmente se consideran las técnicas Tabu, ILS, Memético y SGA. Se comparan estas implementaciones con un conjunto extenso de datos y se extraen conclusiones acerca de su desempeño en tiempo y calidad de solución.
+\end{abstract}
+
 \section{Introducción}
   En este trabajo se considera el problema de Selección de Instancias, como
   estrategia de reducción de datos para aplicación de procesos de KDD. Dado un conjunto de
@@ -59,8 +67,8 @@
   que mantenga o mejore la clasificación de las muestras a ser usadas como un conjunto
   de entrenamiento. 
   
-  En el presente trabajo se implementan 3 Metaheurísticas de trayectorias 
-  (Hill CLimb, ILS, Tabú) y 2 Metaheurísticas poblacionales (Algoritmo Memético y 
+  En el presente trabajo se implementan 2 Metaheurísticas de trayectorias 
+  (ILS, Tabú) y 2 Metaheurísticas poblacionales (Algoritmo Memético y 
   SGA (Stationary Genetic Algorithm por sus siglas en inglés), 
   mostrando para cada una de ellas los resultados 
   y tiempos de corrida al aplicarlas sobre diferentes conjuntos de datos.
@@ -73,15 +81,6 @@
   una de ellas. Seguido a esto, se describen cada uno de los conjuntos de datos usados
   en los experimentos. Finalmente, se presentan los resultados experimentales y se 
   concluye en base a dicho resultados.
-
-\begin{abstract}
-  El problema de \textit{Selección de Instancias}  busca
-  escoger un subconjunto de instancias de menor cardinalidad del conjunto original
-  que mantenga o mejore la clasificación de las muestras a ser usadas como un conjunto
-  de entrenamiento. En este articulo se considera la resolución de este problema
-  mediante varios algoritmos metaheurísticos, finalizando con los resultados 
-  experimentales y comparaciones entre ellos.
-\end{abstract}
 
 \section{Definición del Problema}
 
@@ -440,7 +439,7 @@ Los experimentos se corrieron sobre computadores de procesador Intel(R) Core(TM)
 \clearpage
 
 \subsection{Resultados}
-    
+
 \begin{table}[h]
 \scalebox{0.6}{
 \begin{tabular}{ |l|l|l|l|l|l| }
@@ -448,58 +447,54 @@ Los experimentos se corrieron sobre computadores de procesador Intel(R) Core(TM)
         \multicolumn{6}{ |c| }{Casos de prueba pequeños} \\
     \hline
     Caso & Heuristica & Err val & Tam Reduc & Error & Tiempo \\ \hline
-    \multirow{4}{*}{Abalone}   & Tabu     & 78.8211     & 0.09902 & 329    & 62.30 \\
-                               & ILS      & 77.60396    & 0.11925 & 323.2  & 336.89 \\
-                               & Memetico & 78.35113    & 0.1378  & 327.04 & 160.96 \\
-                               & SGA      & 80.1339     & 0.52334 & 334.48 & 44.45\\ \hline
-    \multirow{4}{*}{Bupa} & Tabu     & 35.13766   & 0.97264      &  12.12  & 0.5884 \\
-                             & ILS      & 31.28007   & 0.889045     &  10.8   & 4.1052 \\
-                             & Memetico & 33.99377   & 0.92767      &  11.72  & 1.7144 \\
-                             & SGA      & 39.48908   & 1.320954     &  13.62  & 0.3142\\ \hline
-    \multirow{4}{*}{Ecoli}   & Tabu     & 30.85025   & 2.55893      &  10.38  & 0.6244 \\
-                             & ILS      & 26.52584   & 4.028173     &  8.92   & 7.0984 \\
-                             & Memetico & 29.12677   & 3.643914     &  9.8    & 1.9566 \\
-                             & SGA      & 28.8253    & 5.3836       &  9.7    & 0.3122\\ \hline
-    \multirow{4}{*}{Glass}   & Tabu     & 40.26272   & 4.080946     &  8.66   & 0.3336 \\
-                             & ILS      & 37.98743   & 4.327704     &  8.22   & 3.7046 \\
+    \multirow{4}{*}{Bupa} & Tabu     & 35.13766         & 0.97264      &  12.12          & 0.5884 \\
+                             & ILS      & \bf{31.28007} & \bf{0.889045}     &  \bf{10.8} & 4.1052 \\
+                             & Memetico & 33.99377      & 0.92767      &  11.72          & 1.7144 \\
+                             & SGA      & 39.48908      & 1.320954     &  13.62          & \bf{0.3142}\\ \hline
+    \multirow{4}{*}{Ecoli}   & Tabu     & 30.85025      & \bf{2.55893}      &  10.38  & 0.6244 \\
+                             & ILS      & \bf{26.52584} & 4.028173     &  \bf{8.92}   & 7.0984 \\
+                             & Memetico & 29.12677      & 3.643914     &  9.8    & 1.9566 \\
+                             & SGA      & 28.8253       & 5.3836       &  9.7    & \bf{0.3122}\\ \hline
+    \multirow{4}{*}{Glass}   & Tabu     & 40.26272   & \bf{4.080946}     &  8.66   & 0.3336 \\
+                             & ILS      & \bf{37.98743}   & 4.327704     &  \bf{8.22}   & 3.7046 \\
                              & Memetico & 38.22237   & 4.659532     &  8.24   & 1.2344 \\
-                             & SGA      & 38.49303   & 8.02254      &  8.3    & 0.18\\ \hline
-    \multirow{4}{*}{Haberman}   & Tabu     & 25.86667   & 0.994915     &  7.9    & 0.429 \\
-                                & ILS      & 25.80216   & 0.893281     &  7.88   & 2.9763 \\
-                                & Memetico & 26.38925   & 0.944243     &  8.06   & 1.0734 \\
-                                & SGA      & 26.41724   & 0.58108      &  8.08   & 0.1846\\ \hline
+                             & SGA      & 38.49303   & 8.02254      &  8.3    & \bf{0.18}\\ \hline
+    \multirow{4}{*}{Haberman}   & Tabu     & 25.86667   & 0.994915        &  7.9    & 0.429 \\
+                                & ILS      & \bf{25.80216}   & 0.893281   &  \bf{7.88}   & 2.9763 \\
+                                & Memetico & 26.38925   & 0.944243        &  8.06   & 1.0734 \\
+                                & SGA      & 26.41724   & \bf{0.58108}    &  8.08   & \bf{0.1846}\\ \hline
     \multirow{4}{*}{Ionosphere}   & Tabu     & 16.07302   & 2.272815     &  5.64   & 1.5468 \\
-                                  & ILS      & 13.40159   & 2.279123     &  4.7    & 15.304 \\
-                                  & Memetico & 15.16667   & 2.044946     &  5.32   & 5.7892 \\
-                                  & SGA      & 17.27461   & 4.868776     &  6.06   & 1.0562\\ \hline
-    \multirow{4}{*}{Iris}   & Tabu     & 5.733331   & 3.970368     &  0.86   & 0.0348 \\
-                            & ILS      & 5.73333    & 3.659257     &  0.86   & 0.0152 \\
-                            & Memetico & 6.39999    & 3.99999      &  0.96   & 0.1462 \\
-                            & SGA      & 5.86666    & 4.992591     &  0.88   & 0.452\\ \hline
+                                  & ILS      & \bf{13.40159}   & 2.279123     &  \bf{4.7}    & 15.304 \\
+                                  & Memetico & 15.16667   & \bf{2.044946}     &  5.32   & 5.7892 \\
+                                  & SGA      & 17.27461   & 4.868776     &  6.06   & \bf{1.0562}\\ \hline
+    \multirow{4}{*}{Iris}   & Tabu     & \bf{5.733331}   & 3.970368     &  \bf{0.86}   & 0.0348 \\
+                            & ILS      & \bf{5.73333}    & \bf{3.659257}     &  \bf{0.86}   & \bf{0.0152} \\
+                            & Memetico & 6.39999         & 3.99999      &  0.96   & 0.1462 \\
+                            & SGA      & 5.86666         & 4.992591     &  0.88   & 0.452\\ \hline
     \multirow{4}{*}{Monk-2}   & Tabu     & 19.3827    & 1.419281     &  8.32   & 0.8218 \\
-                              & ILS      & 11.77317   & 1.389261     &  5.1    & 7.9858 \\
+                              & ILS      & \bf{11.77317}   & \bf{1.389261}     &  \bf{5.1}    & 7.9858 \\
                               & Memetico & 15.78001   & 1.394267     &  6.82   & 2.5364 \\
-                              & SGA      & 18.3673    & 4.473317     &  7.96   & 0.4278\\ \hline
+                              & SGA      & 18.3673    & 4.473317     &  7.96   & \bf{0.4278}\\ \hline
     \multirow{4}{*}{Newthyroid}   & Tabu     & 11.64502   & 2.53245      &  2.5    & 0.2808 \\
-                                  & ILS      & 9.748918   & 2.191604     &  2.1    & 2.1954 \\
+                                  & ILS      & \bf{9.748918}   & \bf{2.191604}     &  \bf{2.1}    & 2.1954 \\
                                   & Memetico & 10.49351   & 2.811653     &  2.6    & 0.7974 \\
-                                  & SGA      & 11.70563   & 5.405375     &  2.52   & 0.1154\\ \hline
+                                  & SGA      & 11.70563   & 5.405375     &  2.52   & \bf{0.1154}\\ \hline
     \multirow{4}{*}{Saheart}  & Tabu     & 33.50879   & 0.683068     &  15.48  & 1.0738 \\
-                              & ILS      & 32.72987   & 0.586793     &  15.12  & 5.7216 \\
+                              & ILS      & \bf{32.72987}   & 0.586793     &  \bf{15.12}  & 5.7216 \\
                               & Memetico & 33.91212   & 0.69262      &  15.66  & 2.9838 \\
-                              & SGA      & 34.41073   & 0.471327     &  15.9   & 0.6406\\ \hline
+                              & SGA      & 34.41073   & \bf{0.471327}     &  15.9   & \bf{0.6406}\\ \hline
     \multirow{4}{*}{Sonar}  & Tabu     & 39.0095    & 1.891115     &  8.1    & 1.067 \\
-                            & ILS      & 33.8666    & 1.698715     &  7.04   & 8.053 \\
-                            & Memetico & 32.32379   & 2.275174     &  6.72   & 4.1412 \\
-                            & SGA      & 35.09998   & 6.571566     &  7.3    & 0.719\\ \hline
-    \multirow{4}{*}{Wine} & Tabu     & 28.10458   &  2.32212     &  5.0      & 0.3314 \\
+                            & ILS      & 33.8666    & \bf{1.698715}     &  7.04   & 8.053 \\
+                            & Memetico & \bf{32.32379}   & 2.275174     &  \bf{6.72}   & 4.1412 \\
+                            & SGA      & 35.09998   & 6.571566     &  7.3    & \bf{0.719}\\ \hline
+    \multirow{4}{*}{Wine} & Tabu     & \bf{28.10458}   &  2.32212     &  \bf{5.0}      & 0.3314 \\
                           & ILS      & 28.9085    &  2.322049    &  5.14   & 2.5746 \\
-                          & Memetico & 28.69935   &  2.11015     &  5.1    & 0.9834 \\
-                          & SGA      & 30.24836   &  3.258773    &  5.38   & 0.1628\\ \hline
+                          & Memetico & 28.69935   &  \bf{2.11015}     &  5.1    & 0.9834 \\
+                          & SGA      & 30.24836   &  3.258773    &  5.38   & \bf{0.1628}\\ \hline
     \multirow{4}{*}{Saheart}  & Tabu     & 33.50879   & 0.683068     &  15.48  & 1.0738 \\
-                              & ILS      & 32.72987   & 0.586793     &  15.12  & 5.7216 \\
+                              & ILS      & \bf{32.72987}   & 0.586793     &  \bf{15.12}  & 5.7216 \\
                               & Memetico & 33.91212   & 0.69262      &  15.66  & 2.9838 \\
-                              & SGA      & 34.41073   & 0.471327     &  15.9   & 0.6406\\ \hline
+                              & SGA      & 34.41073   & \bf{0.471327}     &  15.9   & \bf{0.6406}\\ \hline
 \end{tabular}
 }
 \end{table}
@@ -513,29 +508,29 @@ Los experimentos se corrieron sobre computadores de procesador Intel(R) Core(TM)
         \multicolumn{6}{ |c| }{Casos de prueba medianos} \\
     \hline
     Caso & Heuristica & Err val & Tam Reduc & Error & Tiempo \\ \hline
-    \multirow{4}{*}{Australian}   & Tabu     & 33.3913    & 0.42512  & 23.04 & 2.6786 \\
-                                  & ILS      & 31.5072    & 0.412238 & 21.74 & 15.253 \\
-                                  & Memetico & 33.42028   & 0.412238 & 23.06 & 8.322 \\
-                                  & SGA      & 37.2463    & 1.07246  & 25.7  & 2.018\\ \hline
+    \multirow{4}{*}{Australian}   & Tabu     & 33.3913     & 0.42512  & 23.04 & 2.6786 \\
+                                  & ILS      & \bf{31.5072} & \bf{0.412238} & \bf{21.74} & 15.253 \\
+                                  & Memetico & 33.42028   & \bf{0.412238} & 23.06 & 8.322 \\
+                                  & SGA      & 37.2463    & 1.07246  & 25.7  & \bf{2.018}\\ \hline
     \multirow{4}{*}{Balance} & Tabu     & 16.2951    &  0.5155      &  10.18  & 1.3566 \\
-                             & ILS      & 12.8966    &  0.444467    &  8.06   & 10.0512 \\
+                             & ILS      & \bf{12.8966}    &  \bf{0.444467}    &  \bf{8.06}   & 10.0512 \\
                              & Memetico & 14.2838    &  0.462071    &  8.92   & 4.0198 \\
-                             & SGA      & 20.70254   &  2.179019    &  12.94  & 0.7512\\ \hline
-    \multirow{4}{*}{Pima}   & Tabu     & 26.13381   & 0.355893     &  20.08  & 2.2424 \\
-                            & ILS      & 25.74077   & 0.32985      &  18.78  & 12.0942 \\
-                            & Memetico & 26.20867   & 0.3240552    &  20.14  & 6.8738 \\
+                             & SGA      & 20.70254   &  2.179019    &  12.94  & \bf{0.7512}\\ \hline
+    \multirow{4}{*}{Pima}   & Tabu     & 26.13381   & 0.355893     &  20.08  & \bf{2.2424} \\
+                            & ILS      & \bf{25.74077}   & 0.32985      &  \bf{18.78}  & 12.0942 \\
+                            & Memetico & 26.20867   & \bf{0.3240552}    &  20.14  & 6.8738 \\
                             & SGA      & 30.4033    & 0.8534       &  23.36  & 16198.0\\ \hline
     \multirow{4}{*}{Tic-Tac-Toe}   & Tabu     & 34.52851   & 0.4338048    &  33.08  & 3.063 \\
-                                   & ILS      & 33.0         & 1.16216      &  31.62  & 16.518 \\
+                                   & ILS      & \bf{33.0}         & 1.16216      &  \bf{31.62}  & 16.518 \\
                                    & Memetico & 34.09035   & 0.9440143    &  32.66  & 10.2386 \\
-                                   & SGA      & 34.75614   & 0.3804321    &  33.3   & 2.5356\\ \hline
+                                   & SGA      & 34.75614   & \bf{0.3804321}    &  33.3   & \bf{2.5356}\\ \hline
     \multirow{4}{*}{Vehicle}  & Tabu     & 49.09916   & 3.123149     & 41.54   & 41.54 \\
-                              & ILS      & 46.66246   & 3.070576     & 39.48   & 56.56 \\
-                              & Memetico & 47.49272   & 3.054687     & 40.18   & 18.8208 \\
-                              & SGA      & 45.90784   & 4.85396      & 38.84   & 3.509\\ \hline
+                              & ILS      & \bf{46.66246}   & 3.070576     & \bf{39.48}   & 56.56 \\
+                              & Memetico & 47.49272   & \bf{3.054687}     & 40.18   & 18.8208 \\
+                              & SGA      & 45.90784   & 4.85396      & 38.84   & \bf{3.509}\\ \hline
     \multirow{4}{*}{WDBC} & Tabu     & 8.681703   & 0.7069326    & 4.94    & 2.3308 \\
-                          & ILS      & 9.489349   & 0.601433     & 5.4     & 0.5102 \\
-                          & Memetico & 8.365288   & 0.7850499    & 4.76    & 7.4894 \\
+                          & ILS      & 9.489349   & \bf{0.601433}     & 5.4     & \bf{0.5102} \\
+                          & Memetico & \bf{8.365288}   & 0.7850499    & \bf{4.76}    & 7.4894 \\
                           & SGA      & 9.243108   & 1.241914     & 5.25    & 2.1942\\ \hline
 \end{tabular}
 }
@@ -548,10 +543,10 @@ Los experimentos se corrieron sobre computadores de procesador Intel(R) Core(TM)
         \multicolumn{6}{ |c| }{Casos de prueba grandes} \\
     \hline
     Caso & Heuristica & Err val & Tam Reduc & Error & Tiempo \\ \hline
-    \multirow{4}{*}{Banana} & Tabu     & 13.28302   & 3.937526     &  70.4   & 53.3222 \\
-                            & ILS      & 13.31699   & 1.305241     &  70.58  & 591.7742 \\
+    \multirow{4}{*}{Banana} & Tabu     & \bf{13.28302}   & 3.937526     &  \bf{70.4}   & 53.3222 \\
+                            & ILS      & 13.31699   & \bf{1.305241}     &  70.58  & 591.7742 \\
                             & Memetico & 14.02265   & 1.47631      &  74.32  & 172.797 \\
-                            & SGA      & 14.49056   & 2.111949     &  76.8   & 35.232\\ \hline
+                            & SGA      & 14.49056   & 2.111949     &  76.8   & \bf{35.232}\\ \hline
 \end{tabular}
 }
 \end{table}
@@ -563,6 +558,14 @@ Los experimentos se corrieron sobre computadores de procesador Intel(R) Core(TM)
 \begin{center}
   \includegraphics[scale=0.4]{sizes.jpeg}~\\[1cm]
 \end{center}
+
+\section{Conclusiones y recomendaciones}
+
+Las metaheurísticas lograron resolver en gran medida el problema propuesto. Considerando los porcentajes promedio de reducción y de errores de validación se observan resultados prometedores para los casos evaluados. El mayor espacio a mejora se encuentra en los errores de validación, para lo cual se debe considerar evaluar entonaciones adicionales sobre los operadores usados por las metaheurísticas.
+
+Se hace evidente además que las metaheurísticas funcionan de una manera por casos, por lo cual los parámetros para un conjunto de datos no necesariamente son buenos para otro. Por lo cual se requiere un estudio más avanzado de cada uno de los conjuntos de datos que se quieran tratar.
+
+En general, si se está buscando rapidez, las metaheurísticas de Tabu y SGA tienen un tiempo menor de corrida, sin embargo, para este trabajo se necesita mayor cuidado en la entonación de ésta última ya que fue común que sus resultados no fueran tan buenos como los de otros. Análogamente, la técnica con mejor desempeño en detrimento del tiempo fue el algoritmo memético.
 
 % include your own bib file like this:
 %\bibliographystyle{acl}

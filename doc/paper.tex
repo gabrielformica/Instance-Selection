@@ -340,8 +340,6 @@ se presenta el pseudo-código del operador. \\
   Recordando que \emph{apagarBitPrendido} escoge un aleatoreamente un bit prendido,
   y  que \emph{prenderBitApagado} escoge un aleatoreamente un bit apagado.
 
-\clearpage
-
 \section{Evaluación Experimental}
 
 La tarea principal de la evaluación experimental en este trabajo es evaluar el desempeño de distintas metaheurísticas sobre varios conjuntos de datos. Dicho desempeño se mide mediante tres indicadores: 
@@ -358,9 +356,7 @@ La tarea principal de la evaluación experimental en este trabajo es evaluar el 
 \subsection{Conjuntos de datos}
 Los conjuntos de datos se escogieron intentando alcanzar un balance entre tener conjuntos similares entre sí en función de número de instancias y número de atributos, y conjuntos de datos que fueran diversos entre sí, tratando de abarcar el máximo espacio posible del universo de conjuntos de datos.
 
-Los datos son obtenidos de KEEL 
-Data-Mining Software Tool [hay que poner el link en referencias].
-En la siguientes tablas se muestran los conjuntos de datos considerados pequeños, medianos y grandes respectivamente.
+Los datos son obtenidos de \emph{KEEL Data-Mining Software Tool}. En la siguientes tablas se muestran los conjuntos de datos considerados pequeños, medianos y grandes respectivamente.
 
 \begin{table}[h]
 \begin{tabular}{ |l|l|l|l|l| }
@@ -436,9 +432,22 @@ Cada metaheurística se entonó hasta encontrar los parámetros que mejoraban el
 \subsection{Ejecuciones}
 Los experimentos se corrieron sobre computadores de procesador Intel(R) Core(TM) i7-3770 CPU @ 3.40GHz, con 8 GB de RAM sobre un sistema Debian Linux.
 
-\clearpage
-
 \subsection{Resultados}
+
+\begin{table}[h]
+\scalebox{0.6}{
+\begin{tabular}{ |l|l|l|l|l|l| }
+    \hline
+        \multicolumn{6}{ |c| }{Casos de prueba grandes} \\
+    \hline
+    Caso & Heuristica & Err val & Tam Reduc & Error & Tiempo \\ \hline
+    \multirow{4}{*}{Banana} & Tabu     & \bf{13.28302}   & 3.937526     &  \bf{70.4}   & 53.3222 \\
+                            & ILS      & 13.31699   & \bf{1.305241}     &  70.58  & 591.7742 \\
+                            & Memetico & 14.02265   & 1.47631      &  74.32  & 172.797 \\
+                            & SGA      & 14.49056   & 2.111949     &  76.8   & \bf{35.232}\\ \hline
+\end{tabular}
+}
+\end{table}
 
 \begin{table}[h]
 \scalebox{0.6}{
@@ -500,6 +509,7 @@ Los experimentos se corrieron sobre computadores de procesador Intel(R) Core(TM)
 \end{table}
 
 \newpage
+\vfill
 
 \begin{table}[h]
 \scalebox{0.6}{
@@ -536,29 +546,49 @@ Los experimentos se corrieron sobre computadores de procesador Intel(R) Core(TM)
 }
 \end{table}
 
-\begin{table}[h]
-\scalebox{0.6}{
-\begin{tabular}{ |l|l|l|l|l|l| }
-    \hline
-        \multicolumn{6}{ |c| }{Casos de prueba grandes} \\
-    \hline
-    Caso & Heuristica & Err val & Tam Reduc & Error & Tiempo \\ \hline
-    \multirow{4}{*}{Banana} & Tabu     & \bf{13.28302}   & 3.937526     &  \bf{70.4}   & 53.3222 \\
-                            & ILS      & 13.31699   & \bf{1.305241}     &  70.58  & 591.7742 \\
-                            & Memetico & 14.02265   & 1.47631      &  74.32  & 172.797 \\
-                            & SGA      & 14.49056   & 2.111949     &  76.8   & \bf{35.232}\\ \hline
-\end{tabular}
-}
-\end{table}
+\clearpage
+\newpage
 
+\begin{figure}[h!]
 \begin{center}
-  \includegraphics[scale=0.4]{val_errors.jpeg}~\\[1cm]
+  \includegraphics[scale=0.4]{banana_error_val.jpeg}~\\[1cm]
 \end{center}
+\end{figure}
 
+\begin{figure}[h!]
 \begin{center}
-  \includegraphics[scale=0.4]{sizes.jpeg}~\\[1cm]
+  \includegraphics[scale=0.4]{banana_tam_reduc.jpeg}~\\[1cm]
 \end{center}
+\end{figure}
 
+\begin{figure}[h!]
+\begin{center}
+  \includegraphics[scale=0.4]{sonar_err_val.jpeg}~\\[1cm]
+\end{center}
+\end{figure}
+
+\begin{figure}[h!]
+\begin{center}
+  \includegraphics[scale=0.4]{sonar_tam_red.jpeg}~\\[1cm]
+\end{center}
+\end{figure}
+
+\begin{figure}[h!]
+\begin{center}
+  \includegraphics[scale=0.4]{wdbc_err_val.jpeg}~\\[1cm]
+\end{center}
+\end{figure}
+
+\clearpage
+
+\begin{figure}[h!]
+\begin{center}
+  \includegraphics[scale=0.4]{wdbc_tam_red.jpeg}~\\[1cm]
+\end{center}
+\end{figure}
+
+
+% \newpage
 \section{Conclusiones y recomendaciones}
 
 Las metaheurísticas lograron resolver en gran medida el problema propuesto. Considerando los porcentajes promedio de reducción y de errores de validación se observan resultados prometedores para los casos evaluados. El mayor espacio a mejora se encuentra en los errores de validación, para lo cual se debe considerar evaluar entonaciones adicionales sobre los operadores usados por las metaheurísticas.
@@ -587,6 +617,10 @@ Godfried Toussaing.
 \newblock {\em Proximity Graphs for Nearest Neighbor Decision Problem}.
 \newblock School of computer science. McGill University
 
+\bibitem[\protect\citename{Essentials of Metaheuristics}2013]{Sean:01}
+Luke, Sean
+\newblock 2013
+\newblock {\em Essentials Of Metaheuristics}. 
 \end{thebibliography}
 
 \end{document}

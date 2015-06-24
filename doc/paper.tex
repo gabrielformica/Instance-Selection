@@ -140,6 +140,85 @@ El objetivo de un algoritmo es maximizar esta función, entonces si $evaluar(A) 
 
     Para los algoritmos basados en poblaciones, se utilizó como operador de mutación el cruce en un punto (\emph{one-point crossover}), mientras que para la selección se usó la técnica de torneo (\emph{tourney selection}) con un torneo de tamaño 3.
 
+    \subsection{Tabú}
+    Tabú mantiene una \emph{lista tabú} en la cual mantiene un historial de soluciones candidatas recientemente consideras 
+    y rechaza retornar dichos candidatos hasta que estén lo suficientemente en el pasado. De esta manera,
+
+
+    {\fontsize{9}{12}\selectfont
+    \begin{algorithmic}
+        \Function{Tabú}{$T: Problema, S: Solution, l: Entero, N: Entero$}
+            \State $S$ \Comment{Solución candidata}
+            \State $N$ \Comment{Numero de tweaks a aplicar}
+            \State $l$ \Comment{Largo máximo de la lista tabu}
+            \State $Mejor \gets S$ 
+            \State $Tabu \gets {}$  \Comment{Lista tabu inicialmente vacía}
+            \State $Tabu \gets S \cup Tabu$ 
+            \While{$\lnot condicionDeParada$}
+                \If{\Call{length}{$Tabu$} $>$ $l$}
+                    \State \Call{removeOldestElement}{$Tabu$}
+                \EndIf
+                \State $R \gets \Call{tweak}{S}$
+                \For{$N - 1 \ veces$}
+                \State $S' \gets \Call{copy}{S}$
+                \State $W \gets \Call{tweak}{S'}$
+                \If{W no peternece a Tabu Y ($\Call{quality}{W} > \Call{quality}{R}$
+                    O R pertenece a Tabu)}
+                    \State $R \gets W$
+                \EndIf
+            \EndFor
+            \If{R no peternece a Tabu Y ($\Call{quality}{R} > \Call{quality}{S}$}
+                \State $S \gets R$
+                \State $Tabu \gets R \cup Tabu$ 
+            \EndIf
+            \If{$\Call{quality}{S} > \Call{quality}{Mejor}$}
+                \State $Mejor \gets S$
+            \EndIf
+            \EndWhile
+            \State return $Mejor$
+        \EndFunction
+    \end{algorithmic}
+    }
+
+    ~\ 
+
+    Como condición de parada se establece que el mínimo de calidad de una solución sea $0.95$ y una cantidad determinada de iteraciones en las cuales la solución no cambie.
+
+    \subsection{ILS}
+    ILS es basicamente una versión mejorada de Hill-Climbing con reinicios aleatorios. A continuación, se presenta al lector el pseudo-código:
+
+
+    {\fontsize{9}{12}\selectfont
+    \begin{algorithmic}
+        \Function{ILS}{$T: Problema, S: Solution,  t: Entero$}
+            \State $t$ \Comment{Tiempo para reinicio}
+            \State $S$ \Comment{Solución inicial}
+            \State $Mejor \gets S$
+            \While{$\lnot condicionDeParada$}
+                \State $time \gets numero aleatorio en base a t$
+
+                \While{$\lnot condicionDeParadaInterna$}
+                    \State $S' \gets \Call{copy}{S}$
+                    \State $R \gets \Call{tweak}{S'}$
+                    \If{$\Call{quality}{R} > \Call{quality}{S}$}
+                        \State $S \gets R$
+                    \EndIf
+                \EndWhile
+            \If{$\Call{quality}{S} > \Call{quality}{Mejor}$}
+                \State $Mejor \gets S$
+            \EndIf
+            \State $S \gets \Call{perturb}{S}$
+            \EndWhile
+            \State return $Mejor$
+        \EndFunction
+    \end{algorithmic}
+    }
+
+    ~\ 
+
+    Como condición de parada se establece que el mínimo de calidad de una solución sea $0.95$ y una cantidad determinada de iteraciones en las cuales la solución no cambie.
+
+
     \subsection{Algoritmo poblacional híbrido (memético)}
     Para la busqueda poblacional híbrida se considera una combinación de la noción de población y mutación con la búsqueda local clásica.
 
@@ -165,6 +244,8 @@ El objetivo de un algoritmo es maximizar esta función, entonces si $evaluar(A) 
     ~\ 
 
     Como condición de parada se establece que el mínimo de calidad de una solución sea $0.95$ y una cantidad determinada de iteraciones en las cuales la solución no cambie. Adicionalmente, siempre se favorece la descendencia al reproducir la población.
+
+
 
     \subsection{SGA}
     Para el SGA se considera utiliza un criterio de selección elitista, es decir, los hijos sólo reemplazan a los padres si son mejores. \\
